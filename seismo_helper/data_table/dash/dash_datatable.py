@@ -4,7 +4,6 @@ import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 from dash.dependencies import Output, Input, State
 from django.db.models import Count
-import random
 import pandas as pd
 from backend.models import Event
 # from backend.models import
@@ -23,11 +22,18 @@ app.layout = html.Div(
 
 def update_events_table(n):
     vv = Event.objects.all()
-    print(vv)
-    v = Zaglushka(15)
-    df = pd.DataFrame(v).T.sort_values(0).T
+    S = [[],[],[],[],[], [], []]
+    for i in vv:
+        S[0].append(i.id)
+        S[1].append(i.location.name)
+        S[2].append(i.time)
+        S[3].append(i.x)
+        S[4].append(i.y)
+        S[5].append(i.z)
+        S[6].append(i.magnitude)
+    df = pd.DataFrame(S).T.sort_values(0).T
     data = go.Figure(
-        data=[go.Table(header=dict(values=['№', 'Локация', 'Время', 'Координаты', 'Магнитуда']), cells={"values": df.values})]
+        data=[go.Table(header=dict(values=['№', 'Локация', 'Время', 'x','y', 'z', 'Магнитуда']), cells={"values": df.values})]
     )
     data.update_layout(
     updatemenus=[
@@ -38,7 +44,7 @@ def update_events_table(n):
                     "label": b["l"],
                     "args": [{"cells": {"values": df.T.sort_values(b["c"]).T.values}},[0],],
                 }
-                for b in [{"l": "№", "c": 0}, {"l": "Локация", "c": 1}, {"l": "Время", "c": 2}, {"l": "Магнитуда", "c": 4}]
+                for b in [{"l": "№", "c": 0}, {"l": "Локация", "c": 1}, {"l": "Время", "c": 2}, {"l": "Магнитуда", "c": 6}]
             ],
             "direction": "down",
             "y": 1,
@@ -46,6 +52,3 @@ def update_events_table(n):
     ]
 )
     return go.Figure(data=data)
-
-def Zaglushka(n):
-    return [[random.randint(0,100) for i in range(n)] for q in range(5)]
