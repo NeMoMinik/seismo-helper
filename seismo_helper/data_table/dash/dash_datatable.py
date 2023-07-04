@@ -19,17 +19,61 @@ for i in vv:
     S[5].append(i['z'])
     S[6].append(i['magnitude'])
 df = pd.DataFrame(S).T.sort_values(0)
-df.columns = ['№', 'Локация', 'Время', 'x','y', 'z', 'Магнитуда']
+table_columns  = [
+    {
+        'id': '0',
+        'name': '№',
+        'sortable': True,
+    },
+    {
+        'id': '1',
+        'name': 'Локация',
+        'sortable': True,
+    },
+    {
+        'id': '2',
+        'name': 'Время',
+        'sortable': True,
+    },
+    {
+        'id': '3',
+        'name': 'X',
+        'sortable': False,
+    },
+    {
+        'id': '4',
+        'name': 'Y',
+        'sortable': False,
+    },
+    {
+        'id': '5',
+        'name': 'Z',
+        'sortable': False,
+    },
+    {
+        'id': '6',
+        'name': 'Магнитуда',
+        'sortable': True,
+    }
+]
 
+non_sortable_column_ids = [col['id'] for col in table_columns if col.pop('sortable') is False]
+
+table_css = [
+    {
+        'selector': f'th[data-dash-column="{col}"] span.column-header--sort',
+        'rule': 'display: none',
+    }
+    for col in non_sortable_column_ids
+]
 app.layout = html.Div([
     dash_table.DataTable(
         id='datatable-interactivity',
-        columns=[
-            {"name": i, "id": i, "deletable": False, "selectable": True} for i in df.columns
-        ],
+            columns=table_columns,
+        css=table_css,
         data=df.to_dict('records'),
         sort_action="native",
-        sort_mode="multi",
+        sort_mode="single",
     ),
     html.Div(id='datatable-interactivity-container')
 ])
