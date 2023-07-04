@@ -21,16 +21,16 @@ app.layout = html.Div(
 )
 
 def update_events_table(n):
-    vv = Event.objects.all()
+    vv = Event.objects.all().values('id', 'location__name', 'time', 'x', 'y', 'z', 'magnitude')
     S = [[],[],[],[],[], [], []]
     for i in vv:
-        S[0].append(i.id)
-        S[1].append(i.location.name)
-        S[2].append(i.time)
-        S[3].append(i.x)
-        S[4].append(i.y)
-        S[5].append(i.z)
-        S[6].append(i.magnitude)
+        S[0].append(i['id'])
+        S[1].append(i['location__name'])
+        S[2].append(i['time'])
+        S[3].append(i['x'])
+        S[4].append(i['y'])
+        S[5].append(i['z'])
+        S[6].append(i['magnitude'])
     df = pd.DataFrame(S).T.sort_values(0).T
     data = go.Figure(
         data=[go.Table(header=dict(values=['№', 'Локация', 'Время', 'x','y', 'z', 'Магнитуда']), cells={"values": df.values})]
