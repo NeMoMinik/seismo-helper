@@ -71,22 +71,19 @@ site_lat = []
 site_lon = []
 for i in S:
     site_lat.append(i[0]/10000)
-    site_lon.append(i[1]/10000)
-stations_S = pd.DataFrame(S)
-
+    site_lon.append(i[1]/100000)
 
 fig = go.Figure()
 
 fig.add_traces((go.Scattermapbox(
-        lat=site_lat,
-        lon=site_lon,
+        lat=site_lon,
+        lon=site_lat,
         mode='markers',
         marker=go.scattermapbox.Marker(
-            size=10,
-            color='rgb(0, 255, 15)',
+            size=15,
+            color='rgb(0, 255, 0)',
             opacity=1
         ),
-        hoverinfo='none'
     )))
 
 fig.add_traces(list(px.scatter_mapbox(mdf, lat = 'Y', lon = 'X', size = Size,
@@ -154,17 +151,17 @@ def update_output(value):
                         color = 'Магнитуда', color_continuous_scale = 'plasma').select_traces()))
     
     fig.add_traces((go.Scattermapbox(
-        lat=site_lat,
-        lon=site_lon,
+        lat=site_lon,
+        lon=site_lat,
         mode='markers',
         marker=go.scattermapbox.Marker(
-            size=10,
-            color='rgb(0, 255, 15)',
+            size=15,
+            color='rgb(0, 255, 0)',
             opacity=1
         ),
         hoverinfo='none'
     )))
-    
+
     fig.update_layout(mapbox_style="open-street-map",
                   mapbox_zoom=3)
 
