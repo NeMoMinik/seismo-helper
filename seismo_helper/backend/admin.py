@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Corporation, Location, Event, Station, Trace
+from .models import Corporation, Location, Event, Station, Trace, Channel
 
 
 @admin.register(Corporation)
@@ -25,3 +25,8 @@ class StationAdmin(admin.ModelAdmin):
 @admin.register(Trace)
 class TraceAdmin(admin.ModelAdmin):
     list_display = ('id', 'path', 'start', 'end')
+
+
+@admin.register(Channel)
+class ChannelAdmin(admin.ModelAdmin):
+    list_display = ('id', 'path')
