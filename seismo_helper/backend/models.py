@@ -41,23 +41,32 @@ class Station(models.Model):
         Location,
         on_delete=models.CASCADE
     )
+
     def __str__(self):
         return self.name
 
 
 class Trace(models.Model):
-    path = models.CharField(max_length=256)  # путь будет начинаться с базовой директории локаций
-    start = models.PositiveIntegerField()
-    end = models.PositiveIntegerField()
-
+    path = models.CharField(max_length=256)
+    start = models.DateTimeField()
+    end = models.DateTimeField()
     event = models.ForeignKey(
         Event,
         on_delete=models.CASCADE,
-        related_name='event'
+        related_name='traces'
     )
 
     station = models.ForeignKey(
         Station,
         on_delete=models.PROTECT,
-        related_name='station'
+        related_name='traces'
+    )
+
+
+class Channel(models.Model):
+    path = models.CharField(max_length=256)
+    trace = models.ForeignKey(
+        Trace,
+        on_delete=models.CASCADE,
+        related_name="channels"
     )
