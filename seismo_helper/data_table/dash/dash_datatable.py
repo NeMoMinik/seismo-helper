@@ -14,11 +14,12 @@ app.layout = html.Div(
     dcc.Graph(id='events_table'),
     dbc.Button(id='update_table', children='Обновить таблицу', n_clicks=0)]
 )
+
+
 @app.callback(
     Output('events_table', 'figure'),
-    Input('update_table', 'n_clicks'),
+    Input('id_event', 'value'),
 )
-
 def update_events_table(n):
     data = go.Figure(data=[go.Table(header=dict(values=['№', 'Локация', 'Время', 'Координаты', 'Магнитуда']),
                     cells=dict(values=Zaglushka(15)
