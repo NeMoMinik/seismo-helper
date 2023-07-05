@@ -84,25 +84,3 @@ app.layout = html.Div([
     ),
     html.Div(id='datatable-interactivity-container')
 ])
-
-non_sortable_column_ids = [col['id'] for col in table_columns if col.pop('sortable') is False]
-
-table_css = [
-    {
-        'selector': f'th[data-dash-column="{col}"] span.column-header--sort',
-        'rule': 'display: none',
-    }
-    for col in non_sortable_column_ids
-]
-app.layout = html.Div([
-    dash_table.DataTable(
-        id='datatable-interactivity',
-            columns=table_columns,
-        css=table_css,
-        data=df.to_dict('records'),
-        sort_action="native",
-        sort_mode="single",
-        style_cell={'textAlign': 'center'},
-    ),
-    html.Div(id='datatable-interactivity-container')
-])
