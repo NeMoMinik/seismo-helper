@@ -7,6 +7,7 @@ from django.db.models import Count
 import pandas as pd
 from backend.models import Event
 import plotly.express as px
+import scipy.io as sio
 
 app = DjangoDash('DashDatatable')
 
@@ -58,13 +59,48 @@ table_columns  = [
         'sortable': True,
     }
 ]
+
+
 mdf = df.copy()
 Size = [df[6][i] for i in range(len(df[6]))]
 mdf.columns = ['№','Локация','Время','X','Y','Z','Магнитуда']
-fig = px.scatter_mapbox(mdf, lon = 'X', lat = 'Y', size = Size,
-                        color = 'Магнитуда', color_continuous_scale = 'plasma',
-                          zoom = 3, mapbox_style = 'open-street-map')
-fig.update_layout(height=600)
+
+readed_mat = sio.loadmat("stations_coordinates_UTM")
+S = readed_mat['station_coordinates_UTM']
+site_lat = []
+site_lon = []
+for i in S:
+    site_lat.append(i[0]/10000)
+    site_lon.append(i[1]/10000)
+stations_S = pd.DataFrame(S)
+
+
+fig = go.Figure()
+
+fig.add_traces((go.Scattermapbox(
+        lat=site_lat,
+        lon=site_lon,
+        mode='markers',
+        marker=go.scattermapbox.Marker(
+            size=10,
+            color='rgb(0, 255, 15)',
+            opacity=1
+        ),
+        hoverinfo='none'
+    )))
+
+fig.add_traces(list(px.scatter_mapbox(mdf, lat = 'Y', lon = 'X', size = Size,
+                        color = 'Магнитуда', color_continuous_scale = 'plasma').select_traces()))
+
+
+
+fig.update_layout(mapbox_style="open-street-map",
+                  mapbox_zoom=3)
+
+fig.update_layout(height=500, margin={"r":0,"t":0,"l":0,"b":0})
+
+#DATATABLE
+
 
 non_sortable_column_ids = [col['id'] for col in table_columns if col.pop('sortable') is False]
 
@@ -91,6 +127,8 @@ app.layout = html.Div([
 ])
 
 
+#UPDATE
+
 @app.callback(
     Output('mapD', 'figure'),
     Input('loc-dropdown', 'value'),
@@ -109,7 +147,26 @@ def update_output(value):
     mdf = pd.DataFrame(W).T.sort_values(0)
     Size = [W[6][i] for i in range(len(W[6]))]
     mdf.columns = ['№','Локация','Время','X','Y','Z','Магнитуда']
-    fig = px.scatter_mapbox(mdf, lon = 'X', lat = 'Y', size = Size,
-                        color = 'Магнитуда', color_continuous_scale = 'plasma',
-                          zoom = 3, mapbox_style = 'open-street-map')
+
+
+    fig = go.Figure()
+    fig.add_traces(list(px.scatter_mapbox(mdf, lat = 'Y', lon = 'X', size = Size,
+                        color = 'Магнитуда', color_continuous_scale = 'plasma').select_traces()))
+    
+    fig.add_traces((go.Scattermapbox(
+        lat=site_lat,
+        lon=site_lon,
+        mode='markers',
+        marker=go.scattermapbox.Marker(
+            size=10,
+            color='rgb(0, 255, 15)',
+            opacity=1
+        ),
+        hoverinfo='none'
+    )))
+    
+    fig.update_layout(mapbox_style="open-street-map",
+                  mapbox_zoom=3)
+
+    fig.update_layout(height=500, margin={"r":0,"t":0,"l":0,"b":0})
     return fig
