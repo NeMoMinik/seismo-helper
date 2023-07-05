@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from data_table.dash import dash_datatable
+from data_table.dash import dash_datatable, dash_chart
 
 urlpatterns = [
     path('admin/', admin.site.urls),
