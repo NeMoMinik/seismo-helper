@@ -74,6 +74,7 @@ app.layout = html.Div([
         data=df.to_dict('records'),
         sort_action="native",
         sort_mode="single",
+        style_cell={'textAlign': 'center'},
     ),
     html.Div(id='datatable-interactivity-container')
 ])
