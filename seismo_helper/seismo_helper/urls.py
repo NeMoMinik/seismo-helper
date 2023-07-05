@@ -20,5 +20,5 @@ from data_table.dash import dash_datatable
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('django_plotly_dash/', include('django_plotly_dash.urls')),
-    path('backend/', include('backend.urls')),
+    path('', include('backend.urls')),
 ]
