@@ -10,23 +10,27 @@ import plotly.express as px
 import scipy.io as sio
 
 app = DjangoDash('DashDatatable')
-
+BASE_LINK = 'http://127.0.0.1:8000/Events/'
 vv = Event.objects.all().values('id', 'location__name', 'time', 'x', 'y', 'z', 'magnitude')
+z = 1
 S = [[],[],[],[],[],[],[]]
 for i in vv:
-    S[0].append(i['id'])
+    S[0].append('[' + str(i['id']) + ']' + '(' + BASE_LINK + str(z) + ')')
     S[1].append(i['location__name'])
     S[2].append(i['time'])
     S[3].append(i['x'])
     S[4].append(i['y'])
     S[5].append(i['z'])
     S[6].append(i['magnitude'])
+    z += 1
 df = pd.DataFrame(S).T.sort_values(0)
 table_columns  = [
     {
         'id': '0',
         'name': '№',
         'sortable': True,
+        'presentation': 'markdown',
+        'textAlign': 'center'
     },
     {
         'id': '1',
@@ -104,6 +108,7 @@ table_css = [
     {
         'selector': f'th[data-dash-column="{col}"] span.column-header--sort',
         'rule': 'display: none',
+        'textAlign': 'center'
     }
     for col in non_sortable_column_ids
 ]
@@ -112,7 +117,7 @@ app.layout = html.Div([
     dcc.Graph(figure=fig, id='mapD'),
     dash_table.DataTable(
         id='datatable-interactivity',
-            columns=table_columns,
+        columns=table_columns,
         css=table_css,
         data=df.to_dict('records'),
         sort_action="native",
