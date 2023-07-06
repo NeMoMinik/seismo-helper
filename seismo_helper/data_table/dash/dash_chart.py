@@ -24,16 +24,16 @@ app.layout = html.Div([
 )
 def update_line_chart(value):
     data = Trace.objects.filter(event__id=value).all()
-    fig = make_subplots(rows=len(data), cols=1)
+    fig = make_subplots(rows=len(data), cols=1, shared_xaxes=True, shared_yaxes=True)
     for n, i in enumerate(data):
-          # go.Figure()
-        print(i)
         for j in i.channels.all():
             print(n, j.path)
             d = np.load(i.path + j.path)
             fig.add_trace(go.Scatter(x=[i for i in range(len(d))], y=d,
                                      mode='lines',
-                                     name=j.path), col=1, row=n + 1)
+                                     name=j.path.split('.')[0]), col=1, row=n + 1)
+            fig.update_yaxes(title_text=i.station.name, col=1, row=n + 1)
+            fig.update_xaxes(title_text="time", col=1, row=n + 1, )
         # fig.add_trace(go.Scatter(d[6], mode="lines", name='N'))
         # fig.update_layout(yaxis_title=i.station.name, xaxis_title='time', title="magnitude trace")
         # fig.
