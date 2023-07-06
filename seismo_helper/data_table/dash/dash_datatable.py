@@ -5,7 +5,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Output, Input, State 
 from django.db.models import Count
 import pandas as pd
-from backend.models import Event
+from backend.models import Event, Station
 import plotly.express as px
 import scipy.io as sio
 
@@ -65,13 +65,12 @@ mdf = df.copy()
 Size = [df[6][i] for i in range(len(df[6]))]
 mdf.columns = ['№','Локация','Время','X','Y','Z','Магнитуда']
 
-readed_mat = sio.loadmat("stations_coordinates_UTM")
-S = readed_mat['station_coordinates_UTM']
+station_coords = Station.objects.all().values('x', 'y')
 site_lat = []
 site_lon = []
-for i in S:
-    site_lat.append(i[0]/10000)
-    site_lon.append(i[1]/100000)
+for i in station_coords:
+    site_lat.append(i['x'])
+    site_lon.append(i['y'])
 
 fig = go.Figure()
 
