@@ -118,7 +118,7 @@ app.layout = html.Div([
     dash_table.DataTable(
         id='datatable-interactivity',
         columns=table_columns,
-        css=table_css,
+        css=[{"selector": "p", "rule": "text-Align: center"}],
         data=df.to_dict('records'),
         sort_action="native",
         sort_mode="single",
