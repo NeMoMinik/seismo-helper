@@ -11,13 +11,13 @@ import scipy.io as sio
 
 app = DjangoDash('DashDatatable')
 BASE_LINK = 'http://127.0.0.1:8000/Events/'
-vv = Event.objects.all().values('id', 'location__name', 'time', 'x', 'y', 'z', 'magnitude')
+vv = Event.objects.all().values('id', 'location__name', 'x', 'y', 'z', 'magnitude')
 z = 1
 S = [[],[],[],[],[],[],[]]
 for i in vv:
     S[0].append('[' + str(i['id']) + ']' + '(' + BASE_LINK + str(z) + ')')
     S[1].append(i['location__name'])
-    S[2].append(i['time'])
+    # S[2].append(i['time'])
     S[3].append(i['x'])
     S[4].append(i['y'])
     S[5].append(i['z'])
@@ -153,7 +153,7 @@ def update_output(value):
     fig = go.Figure()
     fig.add_traces(list(px.scatter_mapbox(mdf, lat = 'Y', lon = 'X', size = Size,
                         color = 'Магнитуда', color_continuous_scale = 'plasma').select_traces()))
-    
+
     fig.add_traces((go.Scattermapbox(
         lat=site_lon,
         lon=site_lat,
