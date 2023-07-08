@@ -1,3 +1,4 @@
+import dash
 from dash import html, dcc, no_update, Dash, dash_table, callback
 from django_plotly_dash import DjangoDash
 import plotly.graph_objects as go
@@ -7,9 +8,9 @@ from django.db.models import Count
 import pandas as pd
 from backend.models import Event, Station
 import plotly.express as px
-import scipy.io as sio
 
 app = DjangoDash('DashDatatable')
+
 BASE_LINK = 'http://127.0.0.1:8000/Events/'
 vv = Event.objects.all().values('id', 'location__name', 'time', 'x', 'y', 'z', 'magnitude')
 z = 1
