@@ -7,12 +7,18 @@ import pandas
 import plotly.graph_objects as go
 import numpy as np
 from plotly.subplots import make_subplots
+from data_table.dash.Pageblank import navbar, footer
+import dash_bootstrap_components as dbc
 
-app = DjangoDash('Chart')
+app = DjangoDash('Chart',external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 app.layout = html.Div([
+    navbar,
+    html.H1('Сейсмотрасса'),
     dcc.Graph(id="graph"),
-    dcc.Input(id='id_event', type='hidden', value='')]
+    dcc.Input(id='id_event', type='hidden', value=''),
+    footer
+    ]
 )
 
 

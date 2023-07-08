@@ -1,4 +1,3 @@
-import dash
 from dash import html, dcc, no_update, Dash, dash_table, callback
 from django_plotly_dash import DjangoDash
 import plotly.graph_objects as go
@@ -8,8 +7,10 @@ from django.db.models import Count
 import pandas as pd
 from backend.models import Event, Station
 import plotly.express as px
+import dash_mantine_components as dmc
+from data_table.dash.Pageblank import footer, navbar
 
-app = DjangoDash('DashDatatable')
+app = DjangoDash('DashDatatable',external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 BASE_LINK = 'http://127.0.0.1:8000/Events/'
 vv = Event.objects.all().values('id', 'location__name', 'time', 'x', 'y', 'z', 'magnitude')
@@ -114,6 +115,7 @@ table_css = [
     for col in non_sortable_column_ids
 ]
 app.layout = html.Div([
+    navbar,
     dcc.Dropdown(['Все']+ list(set([x for x in mdf['Локация']])), 'Все', id='loc-dropdown'),
     dcc.Graph(figure=fig, id='mapD'),
     dash_table.DataTable(
@@ -125,7 +127,7 @@ app.layout = html.Div([
         sort_mode="single",
         style_cell={'textAlign': 'center'},
     ),
-    html.Div(id='datatable-interactivity-container')
+    footer,
 ])
 
 
