@@ -13,7 +13,7 @@ class StationSerializer(serializers.ModelSerializer):
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
-        fields = ('name', 'corporation')
+        fields = ('name', 'corporation', 'id')
 
 
 class EventSerializer(serializers.ModelSerializer):
