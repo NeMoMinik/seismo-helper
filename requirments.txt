@@ -11,11 +11,13 @@ dash==2.9.3
 dash-bootstrap-components==1.4.1
 dash-core-components==2.0.0
 dash-html-components==2.0.0
+dash-mantine-components==0.12.1
 dash-table==5.0.0
 decorator==5.1.1
 Django==3.2.3
 django-extensions==3.2.3
 django-plotly-dash==2.2.1
+djangorestframework==3.14.0
 dpd-components==0.1.0
 Flask==2.3.2
 fonttools==4.40.0
