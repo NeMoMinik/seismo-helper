@@ -32,15 +32,17 @@ def get_about(request):
 
 
 def login(request):
+    print(request.GET)
     if request.method == "POST":
         r = rq.post("http://127.0.0.1:8088/auth/token/login/", data=request.POST).json()
+        print(r)
         if "auth_token" in r:
             response = render(request, 'datatable/Datatable.html')
             response.set_cookie('Authorization', f'Token {r["auth_token"]}')
         else:
-            response = render(request, 'datatable/Login.html')  # выкинуть ошибку
+            response = render(request, 'datatable/LoginPage.html')  # выкинуть ошибку
     else:
-        response = render(request, 'datatable/Login.html')
+        response = render(request, 'datatable/LoginPage.html')
     return response
 
 
