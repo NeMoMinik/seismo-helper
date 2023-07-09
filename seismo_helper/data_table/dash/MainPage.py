@@ -1,10 +1,9 @@
-from dash import html, dcc, no_update, Dash, dash_table, callback
+from dash import html, dcc, dash_table
 from django_plotly_dash import DjangoDash
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 from dash.dependencies import Output, Input, State
 import pandas as pd
-from backend.models import Event, Station
 import plotly.express as px
 from data_table.dash.Pageblank import footer, navbar
 import base64
@@ -127,11 +126,11 @@ def update_output(value):
         site_lat.append(i['x'])
         site_lon.append(i['y'])
 
-    W = [[], [], [], [], [], [], [], []]
+    W = [[], [], [], [], [], [], [], [], []]
     for i in vv:
         print(i)
         if i['location'] == value or value == 'Все':
-            W[0].append(f"[({i['id']})]({BASE_LINK}{i['id']})")
+            W[0].append(f"[{i['id']}]({BASE_LINK}{i['id']})")
             W[1].append(i['location'])
             W[2].append(i['start'])
             W[3].append(i['end'])
@@ -139,11 +138,12 @@ def update_output(value):
             W[5].append(i['y'])
             W[6].append(i['z'])
             W[7].append(i['magnitude'])
+            W[8].append(i['id'])
     mdf = pd.DataFrame(W).T.sort_values(0)
     df = pd.DataFrame(W[:8]).T.sort_values(0)
     Size = [W[7][i] for i in range(len(W[7]))]
     print(mdf)
-    mdf.columns = ['№', 'Локация', 'Начало', 'Конец', 'X', 'Y', 'Z', 'Магнитуда']
+    mdf.columns = ['№', 'Локация', 'Начало', 'Конец', 'X', 'Y', 'Z', 'Магнитуда', 'id']
     print(mdf)
     fig = go.Figure()
 
@@ -209,6 +209,5 @@ def update_output(value):
         footer
     ])
     return fig
-
 
 # update_output('Все')

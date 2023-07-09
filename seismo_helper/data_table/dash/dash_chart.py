@@ -6,7 +6,6 @@ import numpy as np
 from plotly.subplots import make_subplots
 import requests as rq
 
-
 app = DjangoDash('Chart')
 
 app.layout = html.Div([

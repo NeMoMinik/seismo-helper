@@ -9,7 +9,6 @@ router.register(r'events', views.GetEvent, basename='events')
 router.register(r'traces', views.GetTrace, basename='traces')
 router.register(r'corporation', views.GetCorporation, basename='corporations')
 
-
 urlpatterns = [
     path('', include(router.urls)),
 ]

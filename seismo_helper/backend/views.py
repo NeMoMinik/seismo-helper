@@ -1,8 +1,7 @@
 from django.shortcuts import render
-import plotly.express as px
 from .models import Trace, Event
-import obspy
 from data_table.dash.MainPage import update_output
+
 
 def get_table(request):
     update_output('Все')

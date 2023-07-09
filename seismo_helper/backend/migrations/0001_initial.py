@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -47,8 +46,10 @@ class Migration(migrations.Migration):
                 ('path', models.CharField(max_length=256)),
                 ('start', models.PositiveIntegerField()),
                 ('end', models.PositiveIntegerField()),
-                ('event', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='event', to='backend.event')),
-                ('station', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='station', to='backend.station')),
+                ('event', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='event',
+                                            to='backend.event')),
+                ('station', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='station',
+                                              to='backend.station')),
             ],
         ),
         migrations.CreateModel(
@@ -56,7 +57,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100)),
-                ('corporation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='backend.corporation')),
+                ('corporation',
+                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='backend.corporation')),
             ],
         ),
         migrations.AddField(

@@ -34,4 +34,4 @@ class TraceSerializer(serializers.ModelSerializer):
 class CorporationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Corporation
-        fields = ('name', )
+        fields = ('name',)

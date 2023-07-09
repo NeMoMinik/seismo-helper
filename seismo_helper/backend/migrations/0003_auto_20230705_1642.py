@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('backend', '0002_station_location'),
     ]
@@ -19,7 +18,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='trace',
             name='event',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='traces', to='backend.event'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='traces',
+                                    to='backend.event'),
         ),
         migrations.AlterField(
             model_name='trace',
@@ -29,14 +29,16 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='trace',
             name='station',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='traces', to='backend.station'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='traces',
+                                    to='backend.station'),
         ),
         migrations.CreateModel(
             name='Channel',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('path', models.CharField(max_length=256)),
-                ('trace', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='channels', to='backend.trace')),
+                ('trace', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='channels',
+                                            to='backend.trace')),
             ],
         ),
     ]
