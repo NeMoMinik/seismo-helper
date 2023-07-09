@@ -114,7 +114,6 @@ def update_contents(clickData):
     Input('loc-dropdown', 'value'),
 )
 def update_output(value):
-    print("DDDD")
     global vv, mdf
     vv = Event.objects.all().values('id', 'location__name', 'time', 'x', 'y', 'z', 'magnitude')
 
@@ -184,7 +183,7 @@ def update_output(value):
         },
         multiple=False
     ),style={'width': '49%', 'display': 'inline-block'}),
-    html.Div(dcc.Dropdown(['Все']+ list(set([x for x in mdf['Локация']])), 'Все', id='loc-dropdown'),style={'width': '45%', 'display': 'inline-block', 'float':'right', 'textAlign': 'center', 'margin': '10px','height': '40px'}),
+    html.Div(dcc.Dropdown(['Все']+ list(set([x for x in mdf['Локация']])), 'Все', id='loc-dropdown'),style={'width': '45%', 'display': 'inline-block', 'float':'right', 'textAlign': 'center', 'margin': '12px','height': '40px'}),
     dcc.Graph(figure=fig, id='mapD'),
     dash_table.DataTable(
         id='datatable-interactivity',
