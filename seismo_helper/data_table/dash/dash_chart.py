@@ -27,6 +27,7 @@ DATABASE_API =  f'http://{ALLOWED_HOSTS[0]}:8000/api/'
     Input('id_event', 'value')
 )
 def update_line_chart(value):
+    print(value)
     data = list(filter(lambda x: x['event'] == value, rq.get(DATABASE_API + 'traces/').json()['results']))
     fig = make_subplots(rows=len(data), cols=1, shared_xaxes=True, shared_yaxes=True)
     for n, i in enumerate(data):
