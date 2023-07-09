@@ -15,10 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from data_table.dash import dash_datatable, dash_chart
+from data_table.dash import MainPage, dash_chart, Tutorpage, AboutPage
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('django_plotly_dash/', include('django_plotly_dash.urls')),
     path('', include('backend.urls')),
+    path('api/', include('seismo_api.urls'))
 ]
