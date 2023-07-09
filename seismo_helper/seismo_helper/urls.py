@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('django_plotly_dash/', include('django_plotly_dash.urls')),
     path('', include('backend.urls')),
+    path('api/', include('seismo_api.urls'))
 ]

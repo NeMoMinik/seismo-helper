@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Corporation(models.Model):
     name = models.CharField(max_length=32)
 
@@ -23,8 +24,9 @@ class Event(models.Model):
     y = models.FloatField()
     z = models.FloatField()
     magnitude = models.FloatField()
-    time = models.DateTimeField()
-
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+    name = models.CharField(max_length=32)
     location = models.ForeignKey(
         Location,
         on_delete=models.CASCADE
@@ -33,9 +35,9 @@ class Event(models.Model):
 
 class Station(models.Model):
     name = models.CharField(max_length=32)
-    x = models.FloatField()
-    y = models.FloatField()
-    z = models.FloatField()
+    x = models.FloatField(null=True)
+    y = models.FloatField(null=True)
+    z = models.FloatField(null=True)
 
     location = models.ForeignKey(
         Location,
@@ -48,8 +50,6 @@ class Station(models.Model):
 
 class Trace(models.Model):
     path = models.CharField(max_length=256)
-    start = models.DateTimeField()
-    end = models.DateTimeField()
     event = models.ForeignKey(
         Event,
         on_delete=models.CASCADE,
@@ -62,11 +62,17 @@ class Trace(models.Model):
         related_name='traces'
     )
 
+    def __str__(self):
+        return self.path
+
 
 class Channel(models.Model):
-    path = models.CharField(max_length=256)
+    path = models.CharField(max_length=128)
     trace = models.ForeignKey(
         Trace,
         on_delete=models.CASCADE,
         related_name="channels"
     )
+
+    def __str__(self):
+        return self.path
