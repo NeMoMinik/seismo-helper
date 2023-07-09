@@ -1,8 +1,9 @@
 import dash_mantine_components as dmc
 import dash_bootstrap_components as dbc
 from dash import html, dcc, no_update, Dash, dash_table, callback
+from seismo_helper.settings import ALLOWED_HOSTS
 
-BASE_LINK = 'http://127.0.0.1:8000/'
+BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/'
 
 #dbc.DropdownMenu(children=[dbc.DropdownMenuItem("More pages", header=True),dbc.DropdownMenuItem("Page 2", href="#"),dbc.DropdownMenuItem("Page 3", href="#"),],nav=True,in_navbar=True,label="More",),
 navbar = dbc.NavbarSimple(

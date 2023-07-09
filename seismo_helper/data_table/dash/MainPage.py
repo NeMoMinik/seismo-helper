@@ -10,6 +10,7 @@ import base64
 import os
 import webbrowser
 import requests as rq
+from seismo_helper.settings import ALLOWED_HOSTS
 
 
 global vv
@@ -18,8 +19,8 @@ external_stylesheets_downl = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 UPLOAD_DIRECTORY = os.getcwd() + "\\media\\"
 
 app = DjangoDash('DashDatatable', external_stylesheets=[dbc.themes.BOOTSTRAP, external_stylesheets_downl])
-DATABASE_API = 'http://127.0.0.1:8000/api/'
-BASE_LINK = 'http://127.0.0.1:8000/Events/'
+DATABASE_API = f'http://{ALLOWED_HOSTS[0]}:8000/api/'
+BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/Events/'
 
 table_columns = [
     {
