@@ -129,7 +129,6 @@ def update_output(value):
 
     W = [[], [], [], [], [], [], [], [], []]
     for i in vv:
-        print(i)
         if i['location'] == value or value == 'Все':
             W[0].append(f"[{i['id']}]({BASE_LINK}{i['id']})")
             W[1].append(i['location'])

@@ -30,7 +30,6 @@ def update_line_chart(value):
     fig = make_subplots(rows=len(data), cols=1, shared_xaxes=True, shared_yaxes=True)
     for n, i in enumerate(data):
         for j in i['channels']:
-            print(n, j)
             d = np.load(i['path'] + j)
             fig.add_trace(go.Scatter(x=[i for i in range(0, len(d) * 5, 5)], y=d,
                                      mode='lines',
