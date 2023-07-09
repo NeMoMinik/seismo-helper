@@ -35,7 +35,7 @@ app.layout = html.Div([
 def upd_dd(value):
     vv = rq.get(DATABASE_API + 'locations/').json()['results']
     A = [{'label': x['name'], 'value':x['id']} for x in vv]
-    return [dcc.Dropdown(options=A, id='dd')]
+    return [dcc.Dropdown(options=A, value=value, id='dd')]
 
 @app.callback(
     Output('container-button-basic', 'children'),
@@ -55,5 +55,4 @@ def update_output(n_clicks, x, y, z, name, loc_id):
             "z":z,
             "location": loc_id,
         }
-        print(data)
         rq.post(DATABASE_API + 'stations/', data=data)

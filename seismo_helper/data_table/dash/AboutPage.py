@@ -11,5 +11,6 @@ app = DjangoDash('AboutPage',external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.layout = html.Div([
     navbar,
     html.H1('Сервис Seismo-helper'),
+    html.P('Seismo-helper - сервис для автоматизированного мониторинга сейсмической активности'),
     footer
 ])
