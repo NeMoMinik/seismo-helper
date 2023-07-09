@@ -13,7 +13,6 @@ import requests as rq
 DATABASE_API = f'http://{ALLOWED_HOSTS[0]}:8000/api/'
 BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/Events/'
 app = DjangoDash('AddStations',external_stylesheets=[dbc.themes.BOOTSTRAP])
-fupd = 0
 table_columns = [
     {
         'id': '0',
@@ -71,24 +70,22 @@ def upd_dd(value):
         S[4].append(i['z'])
     A = [{'label': x['name'], 'value':x['id']} for x in vv]
     df = pd.DataFrame(S).T.sort_values(0)
-    if fupd == 0:
-        fupd += 1
-        return [dcc.Dropdown(options=A, value=value, id='dd'),
-                dcc.Input(id='name', placeholder='Название', type='text'),
-                dcc.Input(id='X', placeholder='Широта', type='float'),
-                dcc.Input(id='Y', placeholder='Долгота', type='float'),
-                dcc.Input(id='Z', placeholder='Высота над уровнем моря', type='float'),
-                html.Button('Добавить', id='submit-val', n_clicks=0),
-                dash_table.DataTable(
-                    id='datatable',
-                    columns=table_columns,
-                    data=df.to_dict('records'),style_cell={'textAlign': 'center'})]
-    else:
-        return no_update
+    return [dcc.Dropdown(options=A, value=value, id='dd'),
+            dcc.Input(id='name', placeholder='Название', type='text'),
+            dcc.Input(id='X', placeholder='Широта', type='float'),
+            dcc.Input(id='Y', placeholder='Долгота', type='float'),
+            dcc.Input(id='Z', placeholder='Высота над уровнем моря', type='float'),
+            html.Button('Добавить', id='submit-val', n_clicks=0),
+            html.Div(id='tableDiv', children=[dash_table.DataTable(
+                id='datatable',
+                columns=table_columns,
+                sort_action="native",
+                sort_mode="single",
+                data=df.to_dict('records'),style_cell={'textAlign': 'center'})] ) ]
 
 
 @app.callback(
-    Output('container-button-basic', 'children'),
+    Output('tableDiv', 'children'),
     Input('submit-val', 'n_clicks'),
     State('X', 'value'),
     State('Y', 'value'),
@@ -106,3 +103,20 @@ def update_output(n_clicks, x, y, z, name, loc_id):
             "location": loc_id,
         }
         rq.post(DATABASE_API + 'stations/', data=data)
+
+        dt = rq.get(DATABASE_API + 'stations/').json()['results']
+        S = [[],[],[],[], []]
+        for i in dt:
+            S[0].append(i['id'])
+            S[1].append(i['name'])
+            S[2].append(i['x'])
+            S[3].append(i['y'])
+            S[4].append(i['z'])
+        df = pd.DataFrame(S).T.sort_values(0)
+        return [dash_table.DataTable(
+                id='datatable',
+                columns=table_columns,
+                sort_action="native",
+                sort_mode="single",
+                data=df.to_dict('records'),style_cell={'textAlign': 'center'})]
+    return no_update
