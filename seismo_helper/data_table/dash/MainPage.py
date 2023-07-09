@@ -11,6 +11,7 @@ import os
 import webbrowser
 import requests as rq
 
+
 global vv
 global mdf
 external_stylesheets_downl = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -74,6 +75,7 @@ table_css = [
     for col in non_sortable_column_ids
 ]
 
+
 fig = go.Figure()
 
 app.layout = html.Div([
@@ -107,7 +109,6 @@ def update_contents(clickData):
                 webbrowser.open_new_tab(BASE_LINK + str(mdf['id'][i]))
     return html.Div()
 
-
 # UPDATE
 
 @app.callback(
@@ -115,11 +116,11 @@ def update_contents(clickData):
     Input('loc-dropdown', 'value'),
 )
 def update_output(value):
-    print("DDDD")
     global vv, mdf
     vv = rq.get(DATABASE_API + 'events/').json()['results']
 
     station_coords = rq.get(DATABASE_API + 'stations/').json()['results']
+    
     site_lat = []
     site_lon = []
     for i in station_coords:
@@ -142,9 +143,7 @@ def update_output(value):
     mdf = pd.DataFrame(W).T.sort_values(0)
     df = pd.DataFrame(W[:8]).T.sort_values(0)
     Size = [W[7][i] for i in range(len(W[7]))]
-    print(mdf)
     mdf.columns = ['№', 'Локация', 'Начало', 'Конец', 'X', 'Y', 'Z', 'Магнитуда', 'id']
-    print(mdf)
     fig = go.Figure()
 
     fig.add_traces(list(px.scatter_mapbox(mdf, lat='Y', lon='X', size=Size,
@@ -165,7 +164,6 @@ def update_output(value):
 
     fig.update_layout(mapbox_style="open-street-map",
                       mapbox_zoom=3)
-
     fig.update_layout(height=500, margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
     app.layout = html.Div([
@@ -191,7 +189,7 @@ def update_output(value):
         ), style={'width': '49%', 'display': 'inline-block'}),
         html.Div(dcc.Dropdown(['Все'] + list(set([x for x in mdf['Локация']])), 'Все', id='loc-dropdown'),
                  style={'width': '45%', 'display': 'inline-block', 'float': 'right', 'textAlign': 'center',
-                        'margin': '10px', 'height': '40px'}),
+                        'margin': '12px', 'height': '40px'}),
         dcc.Graph(figure=fig, id='mapD'),
         dash_table.DataTable(
             id='datatable-interactivity',
@@ -209,5 +207,3 @@ def update_output(value):
         footer
     ])
     return fig
-
-# update_output('Все')
