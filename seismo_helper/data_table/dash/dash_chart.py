@@ -7,6 +7,7 @@ from plotly.subplots import make_subplots
 import requests as rq
 from data_table.dash.Pageblank import navbar, footer
 import dash_bootstrap_components as dbc
+from seismo_helper.settings import ALLOWED_HOSTS
 
 app = DjangoDash('Chart',external_stylesheets=[dbc.themes.BOOTSTRAP])
 
@@ -18,7 +19,7 @@ app.layout = html.Div([
     footer
     ]
 )
-DATABASE_API = 'http://127.0.0.1:8000/api/'
+DATABASE_API =  f'http://{ALLOWED_HOSTS[0]}:8000/api/'
 
 
 @app.callback(
@@ -26,11 +27,11 @@ DATABASE_API = 'http://127.0.0.1:8000/api/'
     Input('id_event', 'value')
 )
 def update_line_chart(value):
+    print(value)
     data = list(filter(lambda x: x['event'] == value, rq.get(DATABASE_API + 'traces/').json()['results']))
     fig = make_subplots(rows=len(data), cols=1, shared_xaxes=True, shared_yaxes=True)
     for n, i in enumerate(data):
         for j in i['channels']:
-            print(n, j)
             d = np.load(i['path'] + j)
             fig.add_trace(go.Scatter(x=[i for i in range(0, len(d) * 5, 5)], y=d,
                                      mode='lines',

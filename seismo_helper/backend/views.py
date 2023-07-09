@@ -23,7 +23,6 @@ def get_chart(request, id_event):
 
 def get_tutor(request):
     template = 'datatable/TutorPage.html'
-    print(request.COOKIES)
     return render(request, template)
 
 
@@ -43,3 +42,20 @@ def login(request):
     else:
         response = render(request, 'datatable/Login.html')
     return response
+
+
+def get_profile(request):
+    template = 'datatable/ProfilePage.html'
+    return render(request, template)
+
+def get_login(request):
+    template = 'datatable/LoginPage.html'
+    return render(request, template)
+
+def get_stations(request):
+    template = 'datatable/AddStations.html'
+    return render(request, template)
+
+def get_start(request):
+    template = 'datatable/StartPage.html'
+    return render(request, template)

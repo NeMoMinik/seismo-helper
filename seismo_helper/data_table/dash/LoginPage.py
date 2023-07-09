@@ -5,11 +5,10 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 from data_table.dash.Pageblank import footer, navbar
 import os
-
-app = DjangoDash('AboutPage',external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = DjangoDash('LoginPage',external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 app.layout = html.Div([
     navbar,
-    html.H1('Сервис Seismo-helper'),
+    html.H1('Войдите или зарегистрируйтесь'),
     footer
 ])

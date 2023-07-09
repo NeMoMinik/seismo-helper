@@ -1,4 +1,4 @@
-from dash import html, dcc, dash_table
+from dash import html, dcc, dash_table, no_update
 from django_plotly_dash import DjangoDash
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
@@ -8,8 +8,11 @@ import plotly.express as px
 from data_table.dash.Pageblank import footer, navbar
 import base64
 import os
-import webbrowser
 import requests as rq
+from seismo_helper.settings import ALLOWED_HOSTS
+from django.shortcuts import render
+from django.http import HttpResponse
+from data_table.dash.dash_chart import app as app1
 
 
 global vv
@@ -18,8 +21,8 @@ external_stylesheets_downl = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 UPLOAD_DIRECTORY = os.getcwd() + "\\media\\"
 
 app = DjangoDash('DashDatatable', external_stylesheets=[dbc.themes.BOOTSTRAP, external_stylesheets_downl])
-DATABASE_API = 'http://127.0.0.1:8000/api/'
-BASE_LINK = 'http://127.0.0.1:8000/Events/'
+DATABASE_API = f'http://{ALLOWED_HOSTS[0]}:8000/api/'
+BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/Events/'
 
 table_columns = [
     {
@@ -78,11 +81,15 @@ table_css = [
 
 fig = go.Figure()
 
-app.layout = html.Div([
-    navbar,
-    dcc.Dropdown(['Все'], 'Все', id='loc-dropdown'),
-    footer
-])
+app.layout = html.Div(
+    [navbar, html.Div(id="page-content", children=[dcc.Dropdown(['Все'], 'Все', id='loc-dropdown')]), footer]
+)
+app.validation_layout = html.Div(
+    [
+        app1.layout,
+        app.layout,
+    ]
+)
 
 
 @app.callback(Output('store', 'data'),
@@ -97,23 +104,25 @@ def update_output(contents, list_of_names, list_of_dates):
         fh.write(base64.decodebytes(data))
 
 
-@app.callback(Output('contents', 'children'),
+@app.callback(Output("hidden_div_for_redirect_callback", "children"),
               Input('mapD', 'clickData'))
 def update_contents(clickData):
-    global vv, mdf
+    global mdf
+    link = "/"
     if clickData:
         x = clickData['points'][0]['lon']
         y = clickData['points'][0]['lat']
-        for i in range(len(vv[0])):
+        for i in range(len(mdf['X'])):
             if mdf['X'][i] == x and mdf['Y'][i] == y:
-                webbrowser.open_new_tab(BASE_LINK + str(mdf['id'][i]))
-    return html.Div()
+                link = ('Events/'+str(mdf['id'][i]))
+                return dcc.Location(pathname=link, id="someid_doesnt_matter")
 
-# UPDATE
+# UPDATE    
 
 @app.callback(
-    Output('mapD', 'figure'),
+    Output('page-content', 'children'),
     Input('loc-dropdown', 'value'),
+
 )
 def update_output(value):
     global vv, mdf
@@ -129,7 +138,6 @@ def update_output(value):
 
     W = [[], [], [], [], [], [], [], [], []]
     for i in vv:
-        print(i)
         if i['location'] == value or value == 'Все':
             W[0].append(f"[{i['id']}]({BASE_LINK}{i['id']})")
             W[1].append(i['location'])
@@ -166,8 +174,10 @@ def update_output(value):
                       mapbox_zoom=3)
     fig.update_layout(height=500, margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
-    app.layout = html.Div([
-        navbar,
+    divs_children = [
+        html.Div(dbc.NavItem(dbc.NavLink("Добавить станции", href=f'http://{ALLOWED_HOSTS[0]}:8000/Stations/', target='_blank', style={'color':'Black','width': '100%',
+                'height': '40px','lineHeight': '40px','borderWidth': '1px','borderStyle': 'dashed','borderRadius': '5px','textAlign': 'center','vertical-align': 'middle','margin': '10px'})),
+                 style={'width': '15%', 'display': 'inline-block', 'float': 'left', 'textAlign': 'center','margin-right':'15px'}),
         html.Div(dcc.Upload(
             id='upload-data',
             children=html.Div([
@@ -186,9 +196,9 @@ def update_output(value):
                 'vertical-align': 'middle'
             },
             multiple=False
-        ), style={'width': '49%', 'display': 'inline-block'}),
+        ), style={'width': '40%', 'display': 'inline-block'}),
         html.Div(dcc.Dropdown(['Все'] + list(set([x for x in mdf['Локация']])), 'Все', id='loc-dropdown'),
-                 style={'width': '45%', 'display': 'inline-block', 'float': 'right', 'textAlign': 'center',
+                 style={'width': '40%', 'display': 'inline-block', 'float': 'right', 'textAlign': 'center',
                         'margin': '12px', 'height': '40px'}),
         dcc.Graph(figure=fig, id='mapD'),
         dash_table.DataTable(
@@ -204,6 +214,7 @@ def update_output(value):
         ),
         dcc.Store(id='store'),
         html.Div(id='contents'),
-        footer
-    ])
-    return fig
+        html.Div(id="hidden_div_for_redirect_callback")
+    ]
+    
+    return divs_children
