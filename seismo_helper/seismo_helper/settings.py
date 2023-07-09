@@ -38,10 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'seismo_api',
     'django_plotly_dash.apps.DjangoPlotlyDashConfig',
     'backend',
     'data_table',
-    'rest_framework',
 ]
 
 MIDDLEWARE = [

@@ -1,5 +1,3 @@
 cd venv\Scripts
 activate
-cd ..
-cd ..
-cd seismo_helper
+cd C:\Users\User\Desktop\seismo-helper\seismo_helper
