@@ -11,9 +11,6 @@ import os
 import requests as rq
 from seismo_helper.settings import ALLOWED_HOSTS
 from django.shortcuts import render
-from django.http import HttpResponse
-from data_table.dash.dash_chart import app as app1
-
 
 global vv
 global mdf
@@ -82,13 +79,7 @@ table_css = [
 fig = go.Figure()
 
 app.layout = html.Div(
-    [navbar, html.Div(id="page-content", children=[dcc.Dropdown(['Все'], 'Все', id='loc-dropdown')]), footer]
-)
-app.validation_layout = html.Div(
-    [
-        app1.layout,
-        app.layout,
-    ]
+    [navbar, html.Div(id="page-content", children=[dcc.Dropdown(['Все'], 'Все', id='loc-dropdown'), dcc.Graph(figure=fig, id='mapD'),]),html.Div(id="redirDiv"), footer]
 )
 
 
@@ -96,7 +87,7 @@ app.validation_layout = html.Div(
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
               State('upload-data', 'last_modified'))
-def update_output(contents, list_of_names, list_of_dates):
+def update_outputfile(contents, list_of_names, list_of_dates):
     if contents is None:
         return None
     with open(UPLOAD_DIRECTORY + list_of_names, "wb") as fh:
@@ -104,7 +95,7 @@ def update_output(contents, list_of_names, list_of_dates):
         fh.write(base64.decodebytes(data))
 
 
-@app.callback(Output("hidden_div_for_redirect_callback", "children"),
+@app.callback(Output("redirDiv", "children"),
               Input('mapD', 'clickData'))
 def update_contents(clickData):
     global mdf
@@ -115,14 +106,13 @@ def update_contents(clickData):
         for i in range(len(mdf['X'])):
             if mdf['X'][i] == x and mdf['Y'][i] == y:
                 link = ('Events/'+str(mdf['id'][i]))
-                return dcc.Location(pathname=link, id="someid_doesnt_matter")
+                return dcc.Location(pathname=link, id="sid")
 
 # UPDATE    
 
 @app.callback(
     Output('page-content', 'children'),
-    Input('loc-dropdown', 'value'),
-
+    Input('loc-dropdown', 'value')
 )
 def update_output(value):
     global vv, mdf
@@ -155,8 +145,7 @@ def update_output(value):
     fig = go.Figure()
 
     fig.add_traces(list(px.scatter_mapbox(mdf, lat='Y', lon='X', size=Size,
-                                          color='Магнитуда',
-                                          color_continuous_scale=px.colors.cyclical.IceFire).select_traces()))
+                                          color='Магнитуда', color_continuous_scale=px.colors.cyclical.IceFire).select_traces()))
 
     fig.add_traces((go.Scattermapbox(
         lat=site_lon,
@@ -214,7 +203,6 @@ def update_output(value):
         ),
         dcc.Store(id='store'),
         html.Div(id='contents'),
-        html.Div(id="hidden_div_for_redirect_callback")
     ]
     
     return divs_children
