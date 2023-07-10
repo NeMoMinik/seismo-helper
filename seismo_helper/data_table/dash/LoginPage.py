@@ -7,7 +7,7 @@ from data_table.dash.Pageblank import footer, navbar
 from dash.dependencies import Output, Input, State
 import requests as rq
 from backend.views import logged
-app = DjangoDash('LoginPage',external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = DjangoDash('LoginPage',external_stylesheets=[dbc.themes.LUMEN])
 
 app.layout = html.Div([
     navbar,

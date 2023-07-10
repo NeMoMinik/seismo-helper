@@ -221,10 +221,7 @@ def update_output(value):
 
 
         html.Div(dcc.Graph(figure=fig, id='mapD')), 
-        html.Div(dcc.Graph(id="MagTimeGraph", figure=pxMagTimeGraph),
-            style={'width': '50%', 'display': 'inline-block', 'float': 'left'}),
-        html.Div(dcc.Graph(id="MagCountGrapf", figure=pxMagCountGrapf),
-            style={'width': '50%', 'display': 'inline-block', 'float': 'right'}),
+        dbc.Row([dbc.Col(dcc.Graph(id="MagTimeGraph", figure=pxMagTimeGraph)),dbc.Col(dcc.Graph(id="MagCountGrapf", figure=pxMagCountGrapf))]),
 
         dash_table.DataTable(
             id='datatable-interactivity',

@@ -9,7 +9,7 @@ from data_table.dash.Pageblank import navbar, footer
 import dash_bootstrap_components as dbc
 from seismo_helper.settings import ALLOWED_HOSTS
 
-app = DjangoDash('Chart',external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = DjangoDash('Chart',external_stylesheets=[dbc.themes.LUMEN])
 
 app.layout = html.Div([
     navbar,

@@ -9,7 +9,7 @@ from seismo_helper.settings import ALLOWED_HOSTS
 import dash_mantine_components as dmc
 
 
-app = DjangoDash('StartPage',external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = DjangoDash('StartPage',external_stylesheets=[dbc.themes.LUMEN])
 
 BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/'
 

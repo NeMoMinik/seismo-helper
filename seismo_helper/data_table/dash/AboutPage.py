@@ -6,7 +6,7 @@ import plotly.express as px
 from data_table.dash.Pageblank import footer, navbar
 import os
 
-app = DjangoDash('AboutPage',external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = DjangoDash('AboutPage',external_stylesheets=[dbc.themes.LUMEN])
 
 app.layout = html.Div([
     navbar,
