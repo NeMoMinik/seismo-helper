@@ -1,11 +1,22 @@
 from django.shortcuts import render
-from .models import Trace, Event
 from data_table.dash.MainPage import update_output
-from django.template import RequestContext
-from django.http import HttpResponse, HttpRequest
+from rest_framework.authtoken.models import Token
+from django.contrib.auth.models import User
 import requests as rq
 from django.views.decorators.csrf import csrf_exempt
 rq.session()
+
+
+def get_token(request):
+    print(request.user)
+    token = Token.objects.get(user=request.user).key
+    context = {
+        'dash_context': {
+            'session': {"data": token}
+        }
+    }
+    return context
+
 
 def get_table(request):
     update_output('Все')
@@ -16,9 +27,7 @@ def get_table(request):
 def get_chart(request, id_event):
     template = 'datatable/Chart.html'
     context = {'dash_context': {'id_event': {'value': id_event}}}
-    print(request.COOKIES)
     response = render(request, template, context=context)
-    response.set_cookie('last_connection', "123321")
     return response
 
 
@@ -29,6 +38,7 @@ def get_tutor(request):
 
 def get_about(request):
     template = 'datatable/AboutPage.html'
+    print(request.user)
     return render(request, template)
 
 
@@ -66,3 +76,8 @@ def get_stations(request):
 def get_start(request):
     template = 'datatable/StartPage.html'
     return render(request, template)
+
+
+def get_auth(request):
+    template = 'datatable/SignUpPage.html'
+    return render(request, template, context=get_token(request))

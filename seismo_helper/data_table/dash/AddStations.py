@@ -5,6 +5,7 @@ import dash_bootstrap_components as dbc
 from data_table.dash.Pageblank import footer, navbar
 from dash.dependencies import Output, Input, State
 import requests as rq
+import pandas as pd
 
 DATABASE_API = f'http://{ALLOWED_HOSTS[0]}:8000/api/'
 BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/Events/'
@@ -57,7 +58,7 @@ def upd_dd(value):
     global fupd
     vv = rq.get(DATABASE_API + 'locations/').json()['results']
     dt = rq.get(DATABASE_API + 'stations/').json()['results']
-    S = [[],[],[],[], []]
+    S = [[], [], [], [], []]
     for i in dt:
         S[0].append(i['id'])
         S[1].append(i['name'])
@@ -77,7 +78,7 @@ def upd_dd(value):
                 columns=table_columns,
                 sort_action="native",
                 sort_mode="single",
-                data=df.to_dict('records'),style_cell={'textAlign': 'center'})] ) ]
+                data=df.to_dict('records'), style_cell={'textAlign': 'center'})])]
 
 
 @app.callback(
@@ -90,18 +91,30 @@ def upd_dd(value):
     State('dd', 'value')
 )
 def update_output(n_clicks, x, y, z, name, loc_id):
-    if x != None and loc_id != 'Локация':
+    stuff = {"z": "Высота",
+             "x": "Широта",
+             "y": "Долгота",
+             "A valid number is required.": "введите ЧИСЛЕННОЕ значение.",
+             "name": "Название",
+             "This field may not be blank.": "Поле не может быть пустым."}
+    if (x or y or z) is not None and loc_id != 'Локация':
         data = {
             "name": name,
-            "x":x,
-            "y":y,
-            "z":z,
+            "x": x,
+            "y": y,
+            "z": z,
             "location": loc_id,
         }
-        rq.post(DATABASE_API + 'stations/', data=data)
-
+        r = rq.post(DATABASE_API + 'stations/', data=data)
+        text = "Успешно"
+        txtstyle = {'color':'Green'}
+        if r.status_code == 400:
+            text = ''
+            for i in r.json():
+                text += f"{stuff[i]}: {stuff[r.json()[i][0]]}\n"
+                txtstyle = {'color': 'Red'}
+        S = [[], [], [], [], []]
         dt = rq.get(DATABASE_API + 'stations/').json()['results']
-        S = [[],[],[],[], []]
         for i in dt:
             S[0].append(i['id'])
             S[1].append(i['name'])
@@ -109,10 +122,13 @@ def update_output(n_clicks, x, y, z, name, loc_id):
             S[3].append(i['y'])
             S[4].append(i['z'])
         df = pd.DataFrame(S).T.sort_values(0)
+        print('aaaaaaaaaaaaa')
         return [dash_table.DataTable(
                 id='datatable',
                 columns=table_columns,
                 sort_action="native",
                 sort_mode="single",
-                data=df.to_dict('records'),style_cell={'textAlign': 'center'})]
+                data=df.to_dict('records'),
+                style_cell={'textAlign': 'center'}),
+                text]
     return no_update
