@@ -102,15 +102,10 @@ def update_outputfile(contents, list_of_names, list_of_dates):
 @app.callback(Output("redirDiv", "children"),
               Input('mapD', 'clickData'))
 def update_contents(clickData):
-    global mdf
-    link = "/"
     if clickData:
-        x = clickData['points'][0]['lon']
-        y = clickData['points'][0]['lat']
-        for i in range(len(mdf['X'])):
-            if mdf['X'][i] == x and mdf['Y'][i] == y:
-                link = ('Events/'+str(mdf['id'][i]))
-                return dcc.Location(pathname=link, id="sid")
+        event_id = clickData['points'][0]['customdata'][0]
+        link = f'Events/{event_id}'
+        return dcc.Location(pathname=link, id="sid")
 
 # UPDATE    
 
@@ -151,7 +146,7 @@ def update_output(value):
     mdf.columns = ['№', 'Локация', 'Начало', 'Конец', 'X', 'Y', 'Z', 'Магнитуда', 'id']
     fig = go.Figure()
 
-    fig.add_traces(list(px.scatter_mapbox(mdf, lat='Y', lon='X', size=Size,
+    fig.add_traces(list(px.scatter_mapbox(mdf, lat='Y', lon='X', size=Size, hover_data="id",
                                           color='Магнитуда', color_continuous_scale=px.colors.cyclical.IceFire).select_traces()))
 
     fig.add_traces((go.Scattermapbox(

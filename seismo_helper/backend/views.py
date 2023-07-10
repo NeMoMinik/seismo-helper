@@ -5,7 +5,6 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpRequest
 import requests as rq
 from django.views.decorators.csrf import csrf_exempt
-import flask
 rq.session()
 
 def get_table(request):
