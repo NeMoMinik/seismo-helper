@@ -11,8 +11,9 @@ import os
 import requests as rq
 from seismo_helper.settings import ALLOWED_HOSTS
 from django.shortcuts import render
-from django.http import HttpResponse
-from data_table.dash.dash_chart import app as app1
+from plotly.subplots import make_subplots
+import numpy as np
+from sklearn.linear_model import LinearRegression
 
 
 global vv
@@ -20,7 +21,7 @@ global mdf
 external_stylesheets_downl = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 UPLOAD_DIRECTORY = os.getcwd() + "\\media\\"
 
-app = DjangoDash('DashDatatable', external_stylesheets=[dbc.themes.BOOTSTRAP, external_stylesheets_downl])
+app = DjangoDash('DashDatatable', external_stylesheets=[dbc.themes.LUMEN, external_stylesheets_downl])
 DATABASE_API = f'http://{ALLOWED_HOSTS[0]}:8000/api/'
 BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/Events/'
 
@@ -82,13 +83,7 @@ table_css = [
 fig = go.Figure()
 
 app.layout = html.Div(
-    [navbar, html.Div(id="page-content", children=[dcc.Dropdown(['Все'], 'Все', id='loc-dropdown')]), footer]
-)
-app.validation_layout = html.Div(
-    [
-        app1.layout,
-        app.layout,
-    ]
+    [navbar, html.Div(id="page-content", children=[dcc.Dropdown(['Все'], 'Все', id='loc-dropdown'), dcc.Graph(figure=fig, id='mapD'),]),html.Div(id="redirDiv"), footer]
 )
 
 
@@ -96,7 +91,7 @@ app.validation_layout = html.Div(
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
               State('upload-data', 'last_modified'))
-def update_output(contents, list_of_names, list_of_dates):
+def update_outputfile(contents, list_of_names, list_of_dates):
     if contents is None:
         return None
     with open(UPLOAD_DIRECTORY + list_of_names, "wb") as fh:
@@ -104,7 +99,7 @@ def update_output(contents, list_of_names, list_of_dates):
         fh.write(base64.decodebytes(data))
 
 
-@app.callback(Output("hidden_div_for_redirect_callback", "children"),
+@app.callback(Output("redirDiv", "children"),
               Input('mapD', 'clickData'))
 def update_contents(clickData):
     global mdf
@@ -115,14 +110,13 @@ def update_contents(clickData):
         for i in range(len(mdf['X'])):
             if mdf['X'][i] == x and mdf['Y'][i] == y:
                 link = ('Events/'+str(mdf['id'][i]))
-                return dcc.Location(pathname=link, id="someid_doesnt_matter")
+                return dcc.Location(pathname=link, id="sid")
 
 # UPDATE    
 
 @app.callback(
     Output('page-content', 'children'),
-    Input('loc-dropdown', 'value'),
-
+    Input('loc-dropdown', 'value')
 )
 def update_output(value):
     global vv, mdf
@@ -136,6 +130,7 @@ def update_output(value):
         site_lat.append(i['x'])
         site_lon.append(i['y'])
 
+    MTGrapg = []
     W = [[], [], [], [], [], [], [], [], []]
     for i in vv:
         if i['location'] == value or value == 'Все':
@@ -148,6 +143,8 @@ def update_output(value):
             W[6].append(i['z'])
             W[7].append(i['magnitude'])
             W[8].append(i['id'])
+            MTGrapg.append({'Time':i['start'], 'Magnitude':i['magnitude']})
+
     mdf = pd.DataFrame(W).T.sort_values(0)
     df = pd.DataFrame(W[:8]).T.sort_values(0)
     Size = [W[7][i] for i in range(len(W[7]))]
@@ -155,8 +152,7 @@ def update_output(value):
     fig = go.Figure()
 
     fig.add_traces(list(px.scatter_mapbox(mdf, lat='Y', lon='X', size=Size,
-                                          color='Магнитуда',
-                                          color_continuous_scale=px.colors.cyclical.IceFire).select_traces()))
+                                          color='Магнитуда', color_continuous_scale=px.colors.cyclical.IceFire).select_traces()))
 
     fig.add_traces((go.Scattermapbox(
         lat=site_lon,
@@ -174,6 +170,33 @@ def update_output(value):
                       mapbox_zoom=3)
     fig.update_layout(height=500, margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
+
+    pxMagTimeGraph = px.line(MTGrapg, x="Time", y="Magnitude", title="Магнитуда от времени")
+    pxMagTimeGraph.update_traces(mode="markers", hovertemplate=None)
+
+    MagCount = [0 for _ in range(100)]
+    MagCountdf = []
+    for i in range(len(W[0])):
+        MagCount[int(W[7][i]*100 // 10)] += 1
+    MagCountX = []
+    MagCountY = []
+    for i in range(100):
+        if(MagCount[i]!= 0):
+            MagCountdf.append({'Magnitude': i/10, 'Count':MagCount[i]})
+            MagCountX.append(i/10)
+            MagCountY.append(MagCount[i])
+    MCdf = pd.DataFrame(MagCount)
+    MagCountX = np.array(MagCountX)
+    MagCountX = MagCountX.reshape(-1, 1)
+
+    model = LinearRegression()
+    model.fit(MagCountX, MagCountY)
+    x_range = np.linspace(MagCountX.min(), MagCountX.max(), 100)
+    y_range = model.predict(x_range.reshape(-1, 1))
+
+    pxMagCountGrapf = px.scatter(MagCountdf, x="Magnitude", y="Count", title="Количество от магнитуды")
+    pxMagCountGrapf.add_traces(go.Scatter(x=x_range, y=y_range, name='Тренд'))
+    
     divs_children = [
         html.Div(dbc.NavItem(dbc.NavLink("Добавить станции", href=f'http://{ALLOWED_HOSTS[0]}:8000/Stations/', target='_blank', style={'color':'Black','width': '100%',
                 'height': '40px','lineHeight': '40px','borderWidth': '1px','borderStyle': 'dashed','borderRadius': '5px','textAlign': 'center','vertical-align': 'middle','margin': '10px'})),
@@ -197,10 +220,17 @@ def update_output(value):
             },
             multiple=False
         ), style={'width': '40%', 'display': 'inline-block'}),
-        html.Div(dcc.Dropdown(['Все'] + list(set([x for x in mdf['Локация']])), 'Все', id='loc-dropdown'),
+        html.Div(dcc.Dropdown(['Все'] + list(set([x for x in mdf['Локация']])), value, id='loc-dropdown'),
                  style={'width': '40%', 'display': 'inline-block', 'float': 'right', 'textAlign': 'center',
                         'margin': '12px', 'height': '40px'}),
-        dcc.Graph(figure=fig, id='mapD'),
+
+
+        html.Div(dcc.Graph(figure=fig, id='mapD')), 
+        html.Div(dcc.Graph(id="MagTimeGraph", figure=pxMagTimeGraph),
+            style={'width': '50%', 'display': 'inline-block', 'float': 'left'}),
+        html.Div(dcc.Graph(id="MagCountGrapf", figure=pxMagCountGrapf),
+            style={'width': '50%', 'display': 'inline-block', 'float': 'right'}),
+
         dash_table.DataTable(
             id='datatable-interactivity',
             columns=table_columns,
@@ -214,7 +244,6 @@ def update_output(value):
         ),
         dcc.Store(id='store'),
         html.Div(id='contents'),
-        html.Div(id="hidden_div_for_redirect_callback")
     ]
     
     return divs_children
