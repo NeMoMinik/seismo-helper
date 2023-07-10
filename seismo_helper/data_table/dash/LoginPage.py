@@ -1,3 +1,4 @@
+import dash
 from dash import html, dcc, no_update, Dash, dash_table, callback
 from django_plotly_dash import DjangoDash
 import plotly.graph_objects as go
@@ -5,7 +6,7 @@ import dash_bootstrap_components as dbc
 from data_table.dash.Pageblank import footer, navbar
 from dash.dependencies import Output, Input, State
 import requests as rq
-import os
+from backend.views import logged
 app = DjangoDash('LoginPage',external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 app.layout = html.Div([
@@ -29,10 +30,10 @@ app.layout = html.Div([
     prevent_initial_call=True,
 )
 def log_in(n_clicks, username, password):
-    print(n_clicks)
     r = rq.post("http://127.0.0.1:8000/auth/token/login/", data={"username": username, "password": password}).json()
     print(r)
     if "auth_token" in r:
+        dash.callback_context.response().set_cookie("Authorization", "Token " + r['auth_token'])
         return dcc.Location(pathname="Events/", id="someid_doesnt_matter")
     else:
         return no_update
