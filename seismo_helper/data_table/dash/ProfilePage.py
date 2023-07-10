@@ -5,7 +5,7 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 from data_table.dash.Pageblank import footer, navbar
 import os
-app = DjangoDash('ProfilePage',external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = DjangoDash('ProfilePage',external_stylesheets=[dbc.themes.LUMEN])
 
 app.layout = html.Div([
     navbar,
