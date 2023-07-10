@@ -34,11 +34,11 @@ app.layout = html.Div([
     html.P(f"Seismo-helper - сервис для автоматизированного мониторинга сейсмической активности, инструкция по использованию находится в туториале."),
     html.H2('Разработчики', style={'text-align': 'center'}),
     dbc.Row([
-        dbc.Col([html.Div(imgA1), html.H3("Мастов Арсений"), html.P("Back-end, Front-end разработка")], style={'text-align': 'center'}),
-        dbc.Col([html.Div(imgA2), html.H3("Старченко Александр"), html.P("Нейронная сеть, предобработка данных")], style={'text-align': 'center'}),
-        dbc.Col([html.Div(imgA3), html.H3("Ольга Демидович"), html.P("Предобработка данных")], style={'text-align': 'center'}),
-        dbc.Col([html.Div(imgA4), html.H3("Борисенко Владислав"), html.P("Front-end разработка, дизайн")], style={'text-align': 'center'}),
-        dbc.Col([html.Div(imgA5), html.H3("Шинелёв Маким"), html.P("Нейронная сеть")], style={'text-align': 'center'}),
+        dbc.Col([html.Div(imgA1), html.H3("Мастов Арсений"), html.P("Fullstack Developer")], style={'text-align': 'center'}),
+        dbc.Col([html.Div(imgA2), html.H3("Старченко Александр"), html.P("ML, DS Engineer")], style={'text-align': 'center'}),
+        dbc.Col([html.Div(imgA3), html.H3("Ольга Демидович"), html.P("DS Engineer")], style={'text-align': 'center'}),
+        dbc.Col([html.Div(imgA4), html.H3("Борисенко Владислав"), html.P("Backend Developer + UI & UX Designer")], style={'text-align': 'center'}),
+        dbc.Col([html.Div(imgA5), html.H3("Шинелёв Маким"), html.P("ML Engineer")], style={'text-align': 'center'}),
     ]),
     html.H2('Руководители', style={'text-align': 'center'}),
     dbc.Row([
