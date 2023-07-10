@@ -81,7 +81,9 @@ fig = go.Figure()
 app.layout = html.Div(
     [navbar, html.Div(id="page-content",
                       children=[dcc.Dropdown(['Все'], 'Все', id='loc-dropdown'), dcc.Graph(figure=fig, id='mapD'), ]),
-     html.Div(id="redirDiv"), footer]
+    html.Div(id="redirDiv"),
+    html.Div(id="redirDiv2"),
+    footer]
 )
 
 
@@ -105,6 +107,13 @@ def update_contents(clickData):
         link = f'Events/{event_id}'
         return dcc.Location(pathname=link, id="sid")
 
+@app.callback(Output("redirDiv2", "children"),
+              Input('MagTimeGraph', 'clickData'))
+def redir_from_graph(clickData):
+    if clickData:
+        event_id = clickData['points'][0]['customdata'][0]
+        link = f'Events/{event_id}'
+        return dcc.Location(pathname=link, id="sid")    
 
 # UPDATE
 
@@ -137,7 +146,7 @@ def update_output(value):
             W[6].append(i['z'])
             W[7].append(i['magnitude'])
             W[8].append(i['id'])
-            MTGrapg.append({'Time': i['start'], 'Magnitude': i['magnitude']})
+            MTGrapg.append({'Time': i['start'], 'Magnitude': i['magnitude'], 'id':i['id']})
 
     mdf = pd.DataFrame(W).T.sort_values(0)
     df = pd.DataFrame(W[:8]).T.sort_values(0)
@@ -164,7 +173,7 @@ def update_output(value):
     fig.update_layout(mapbox_style="open-street-map",
                       mapbox_zoom=3)
     fig.update_layout(height=500, margin={"r": 0, "t": 0, "l": 0, "b": 0})
-    pxMagTimeGraph = px.line(MTGrapg, x="Time", y="Magnitude", title="Магнитуда от времени")
+    pxMagTimeGraph = px.line(MTGrapg, x="Time", y="Magnitude", hover_data="id", title="Магнитуда от времени")
     pxMagTimeGraph.update_traces(mode="markers", hovertemplate=None)
 
     MagCount = [0 for _ in range(100)]

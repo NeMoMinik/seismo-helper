@@ -38,7 +38,7 @@ footer = dmc.Footer(
     height=100,
     fixed=True,
     children=[dbc.Row([
-        dbc.Col(html.Div(bvlogo, style={'width':'305px', 'height':'100px', 'margin-left':'auto','margin-right':'auto'})),
+        dbc.Col(html.Div(html.A(bvlogo, href='https://konkurs.sochisirius.ru/', target='_blank'), style={'width':'305px', 'height':'100px', 'margin-left':'auto','margin-right':'auto'})),
         dbc.Col(html.Div([
             dmc.Text("Seismo-helper"),
             html.Div(html.A("Информация ", href=BASE_LINK+'About/', target="_blank", style={'color': '#000000'})),
