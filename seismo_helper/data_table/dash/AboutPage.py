@@ -3,7 +3,7 @@ from django_plotly_dash import DjangoDash
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 import plotly.express as px
-from data_table.dash.Pageblank import footer, navbar
+from data_table.dash.Pageblank import footer, navbar, stylesheets
 import os
 from seismo_helper.settings import ALLOWED_HOSTS
 import base64
@@ -18,7 +18,7 @@ def openImg(path):
 
 BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/'
 
-app = DjangoDash('AboutPage',external_stylesheets=[dbc.themes.LUMEN])
+app = DjangoDash('AboutPage',external_stylesheets=stylesheets)
 
 imgA1 = openImg('\\media\\Photos_for_Front\\A1.png')
 imgA2 = openImg('\\media\\Photos_for_Front\\A2.png')

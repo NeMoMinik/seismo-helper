@@ -3,11 +3,11 @@ from dash import html, dcc, no_update, Dash, dash_table, callback
 from django_plotly_dash import DjangoDash
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
-from data_table.dash.Pageblank import footer, navbar
+from data_table.dash.Pageblank import footer, navbar, stylesheets
 from dash.dependencies import Output, Input, State
 import requests as rq
 from backend.views import logged
-app = DjangoDash('LoginPage',external_stylesheets=[dbc.themes.LUMEN])
+app = DjangoDash('LoginPage',external_stylesheets=stylesheets)
 
 app.layout = html.Div([
     navbar,

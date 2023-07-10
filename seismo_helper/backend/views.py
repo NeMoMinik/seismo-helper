@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from data_table.dash.MainPage import update_output
+from data_table.dash.ProfilePage import load_profile
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 import requests as rq
@@ -59,7 +60,7 @@ def logged(request):
 
 def get_profile(request):
     template = 'datatable/ProfilePage.html'
-    return render(request, template)
+    return render(request, template, context=get_token(request))
 
 
 def get_login(request):

@@ -5,7 +5,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Output, Input, State
 import pandas as pd
 import plotly.express as px
-from data_table.dash.Pageblank import footer, navbar
+from data_table.dash.Pageblank import footer, navbar, stylesheets
 import base64
 import os
 import requests as rq
@@ -14,13 +14,11 @@ from django.shortcuts import render
 from plotly.subplots import make_subplots
 import numpy as np
 from sklearn.linear_model import LinearRegression
-
 global vv
 global mdf
-external_stylesheets_downl = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 UPLOAD_DIRECTORY = os.getcwd() + "\\media\\"
 
-app = DjangoDash('DashDatatable', external_stylesheets=[dbc.themes.LUMEN, external_stylesheets_downl])
+app = DjangoDash('DashDatatable', external_stylesheets=stylesheets)
 DATABASE_API = f'http://{ALLOWED_HOSTS[0]}:8000/api/'
 BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/Events/'
 

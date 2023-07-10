@@ -3,10 +3,10 @@ from django_plotly_dash import DjangoDash
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 import plotly.express as px
-from data_table.dash.Pageblank import footer, navbar
+from data_table.dash.Pageblank import footer, navbar, stylesheets
 import os
 import base64
-app = DjangoDash('TutorPage',external_stylesheets=[dbc.themes.LUMEN])
+app = DjangoDash('TutorPage',external_stylesheets=stylesheets)
 
 def openImg(path):
     with open(os.getcwd()+ path, "rb") as image_file:

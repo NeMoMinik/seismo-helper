@@ -1,12 +1,12 @@
 from dash import html, dcc, no_update, Dash, dash_table, callback
 from django_plotly_dash import DjangoDash
 import dash_bootstrap_components as dbc
-from data_table.dash.Pageblank import footer, navbar
+from data_table.dash.Pageblank import footer, navbar, stylesheets
 from dash.dependencies import Output, Input, State
 import requests as rq
 import os
 
-app = DjangoDash("SignUpPage", external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = DjangoDash("SignUpPage", external_stylesheets=stylesheets)
 
 app.layout = html.Div([
     navbar,
