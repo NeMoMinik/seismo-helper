@@ -20,7 +20,7 @@ def get_token(request):
 
 
 def get_table(request):
-    update_output('Все')
+    update_output('Все локации', 'Станция')
     template = 'datatable/Datatable.html'
     return render(request, template)
 

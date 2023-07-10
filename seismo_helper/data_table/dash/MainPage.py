@@ -16,7 +16,7 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 global vv
 global mdf
-UPLOAD_DIRECTORY = os.getcwd() + "\\media\\"
+UPLOAD_DIRECTORY = os.getcwd() + "\\media\\MiniSeed\\"
 
 app = DjangoDash('DashDatatable', external_stylesheets=stylesheets)
 DATABASE_API = f'http://{ALLOWED_HOSTS[0]}:8000/api/'
@@ -80,7 +80,9 @@ fig = go.Figure()
 
 app.layout = html.Div(
     [navbar, html.Div(id="page-content",
-                      children=[dcc.Dropdown(['Все'], 'Все', id='loc-dropdown'), dcc.Graph(figure=fig, id='mapD'), ]),
+                      children=[dcc.Dropdown(['Все локации'], 'Все локации', id='loc-dropdown'),
+                                dcc.Dropdown(['Станция'], 'Станция', id='Stations-dropdown'),
+                                  dcc.Graph(figure=fig, id='mapD'), ]),
     html.Div(id="redirDiv"),
     html.Div(id="redirDiv2"),
     footer]
@@ -90,13 +92,16 @@ app.layout = html.Div(
 @app.callback(Output('store', 'data'),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
-              State('upload-data', 'last_modified'))
-def update_outputfile(contents, list_of_names, list_of_dates):
-    if contents is None:
+              State('upload-data', 'last_modified'),
+              State('Stations-dropdown', 'value'))
+def update_outputfile(contents, list_of_names, list_of_dates, station):
+    if contents is None or station == 'Станция':
         return None
-    with open(UPLOAD_DIRECTORY + list_of_names, "wb") as fh:
+    if not os.path.exists(UPLOAD_DIRECTORY + "\\" + station + "\\"): os.makedirs(UPLOAD_DIRECTORY + "\\" + station + "\\") 
+    with open(UPLOAD_DIRECTORY + "\\" + station + "\\" + list_of_names, "wb") as fh:
         data = contents.encode("utf8").split(b";base64,")[1]
         fh.write(base64.decodebytes(data))
+        #ЗДЕСЬ ОБРАБОТКУ ВКИНУТЬ
 
 
 @app.callback(Output("redirDiv", "children"),
@@ -119,24 +124,25 @@ def redir_from_graph(clickData):
 
 @app.callback(
     Output('page-content', 'children'),
-    Input('loc-dropdown', 'value')
+    Input('loc-dropdown', 'value'),
+    State('Stations-dropdown', 'value')
 )
-def update_output(value):
+def update_output(value, v2):
     global vv, mdf
     vv = rq.get(DATABASE_API + 'events/').json()['results']
-
     station_coords = rq.get(DATABASE_API + 'stations/').json()['results']
 
     site_lat = []
     site_lon = []
+    Stat_n = []
     for i in station_coords:
         site_lat.append(i['x'])
         site_lon.append(i['y'])
-
+        Stat_n.append(i['name'])
     MTGrapg = []
     W = [[], [], [], [], [], [], [], [], []]
     for i in vv:
-        if i['location'] == value or value == 'Все':
+        if i['location'] == value or value == 'Все локации':
             W[0].append(f"[{i['id']}]({BASE_LINK}{i['id']})")
             W[1].append(i['location'])
             W[2].append(i['start'])
@@ -200,15 +206,19 @@ def update_output(value):
     pxMagCountGrapf.add_traces(go.Scatter(x=x_range, y=y_range, name='Тренд'))
 
     divs_children = [
-        html.Div(dbc.NavItem(
+        dbc.Row([
+            dbc.Col(html.Div(dcc.Dropdown(['Все локации'] + list(set([x for x in mdf['Локация']])), value, id='loc-dropdown'),
+                 style={'textAlign': 'center',
+                        'margin': '12px', 'height': '40px'})),
+            dbc.Col(html.Div(dbc.NavItem(
             dbc.NavLink("Добавить станции", href=f'http://{ALLOWED_HOSTS[0]}:8000/Stations/', target='_blank',
                         style={'color': 'Black', 'width': '100%',
                                'height': '40px', 'lineHeight': '40px', 'borderWidth': '1px', 'borderStyle': 'dashed',
                                'borderRadius': '5px', 'textAlign': 'center', 'vertical-align': 'middle',
                                'margin': '10px'})),
-                 style={'width': '15%', 'display': 'inline-block', 'float': 'left', 'textAlign': 'center',
-                        'margin-right': '15px'}),
-        html.Div(dcc.Upload(
+                 style={'textAlign': 'center',
+                        'margin-right': '15px'})),
+            dbc.Col(html.Div(dcc.Upload(
             id='upload-data',
             children=html.Div([
                 'Drag and Drop or ',
@@ -226,10 +236,12 @@ def update_output(value):
                 'vertical-align': 'middle'
             },
             multiple=False
-        ), style={'width': '40%', 'display': 'inline-block'}),
-        html.Div(dcc.Dropdown(['Все'] + list(set([x for x in mdf['Локация']])), value, id='loc-dropdown'),
-                 style={'width': '40%', 'display': 'inline-block', 'float': 'right', 'textAlign': 'center',
-                        'margin': '12px', 'height': '40px'}),
+        ))),
+        dbc.Col(html.Div(dcc.Dropdown(['Станция'] + Stat_n, v2, id='Stations-dropdown'),
+                 style={'textAlign': 'center',
+                        'margin': '12px', 'height': '40px'}))        
+        ]),
+        
 
         html.Div(dcc.Graph(figure=fig, id='mapD')),
         dbc.Row([
