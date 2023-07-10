@@ -215,13 +215,16 @@ def update_output(value):
             },
             multiple=False
         ), style={'width': '40%', 'display': 'inline-block'}),
+
         html.Div(dcc.Dropdown(['Все'] + list(set([x for x in mdf['Локация']])), value, id='loc-dropdown'),
                  style={'width': '40%', 'display': 'inline-block', 'float': 'right', 'textAlign': 'center',
                         'margin': '12px', 'height': '40px'}),
 
-
         html.Div(dcc.Graph(figure=fig, id='mapD')), 
-        dbc.Row([dbc.Col(dcc.Graph(id="MagTimeGraph", figure=pxMagTimeGraph)),dbc.Col(dcc.Graph(id="MagCountGrapf", figure=pxMagCountGrapf))]),
+        dbc.Row([
+            dbc.Col(dcc.Graph(id="MagTimeGraph", figure=pxMagTimeGraph)),
+            dbc.Col(dcc.Graph(id="MagCountGrapf", figure=pxMagCountGrapf))
+        ]),
 
         dash_table.DataTable(
             id='datatable-interactivity',
