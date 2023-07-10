@@ -27,5 +27,5 @@ footer = dmc.Footer(
               dmc.Text("Контакты:"),
               html.Div(html.A("Телеграмм", href='https://t.me/Emil817', target="_blank", style={'color': '#000000'}))
               ],
-    style={"backgroundColor": "#0D6EFD"},
+    style={"backgroundColor": "#137ea7"},
 )
