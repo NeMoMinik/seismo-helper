@@ -10,10 +10,10 @@ import base64
 import os
 import requests as rq
 from seismo_helper.settings import ALLOWED_HOSTS
-from django.shortcuts import render
-from plotly.subplots import make_subplots
 import numpy as np
 from sklearn.linear_model import LinearRegression
+from data_table.Upload_Miniseed import upload_miniseed
+
 global vv
 global mdf
 UPLOAD_DIRECTORY = os.getcwd() + "\\media\\MiniSeed\\"
@@ -93,15 +93,15 @@ app.layout = html.Div(
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
               State('upload-data', 'last_modified'),
-              State('Stations-dropdown', 'value'))
-def update_outputfile(contents, list_of_names, list_of_dates, station):
-    if contents is None or station == 'Станция':
+              State('loc-dropdown', 'value'))
+def update_outputfile(contents, list_of_names, list_of_dates, location):
+    if contents is None or location == 'Все локации':
         return None
-    if not os.path.exists(UPLOAD_DIRECTORY + "\\" + station + "\\"): os.makedirs(UPLOAD_DIRECTORY + "\\" + station + "\\") 
-    with open(UPLOAD_DIRECTORY + "\\" + station + "\\" + list_of_names, "wb") as fh:
+    if not os.path.exists(UPLOAD_DIRECTORY + "\\" + location + "\\"): os.makedirs(UPLOAD_DIRECTORY + "\\" + location + "\\") 
+    with open(UPLOAD_DIRECTORY + "\\" + location + "\\" + list_of_names, "wb") as fh:
         data = contents.encode("utf8").split(b";base64,")[1]
         fh.write(base64.decodebytes(data))
-        #ЗДЕСЬ ОБРАБОТКУ ВКИНУТЬ
+        upload_miniseed(UPLOAD_DIRECTORY + "\\" + location + "\\" + list_of_names)
 
 
 @app.callback(Output("redirDiv", "children"),
