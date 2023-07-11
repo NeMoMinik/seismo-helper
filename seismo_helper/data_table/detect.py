@@ -5,7 +5,7 @@ from datetime import timedelta
 import numpy as np
 import obspy
 
-from preprocessing import Preprocessing
+from data_table.preprocessing import Preprocessing
 
 
 class Detect:
@@ -24,8 +24,9 @@ threshold : float
     Пороговое значение sta/lta, число больше которого считается активностью
     """
 
-    def __init__(self, paths: list, n_sta: int = 500, n_lta: int = 10000, threshold: float = 5, eps: int = 1000):
+    def __init__(self, paths: list, location: str, n_sta: int = 500, n_lta: int = 10000, threshold: float = 5, eps: int = 1000):
         self.paths = paths
+        self.location = location
         self.n_sta = n_sta
         self.n_lta = n_lta
         self.threshold = threshold
@@ -170,7 +171,7 @@ threshold : float
                         detect_trace[self.station_name[ind_st]].append([self.channel[ind_tr], trace[start:end]])
             detect_traces.append(
                 Event(
-                    ind_event,
+                    ind_event, self.location,
                     self.start_end_time[ind_event][0],
                     self.start_end_time[ind_event][1],
                     detect_trace,
@@ -192,10 +193,11 @@ traces : dict
     Словарь dict[{индекс станции: обрезанная трасса по всем каналам}
     """
 
-    def __init__(self, name: int, start_time: obspy.core.utcdatetime.UTCDateTime,
+    def __init__(self, name: int, location: str, start_time: obspy.core.utcdatetime.UTCDateTime,
                  end_time: obspy.core.utcdatetime.UTCDateTime, traces: dict,
                  sta: int, lta: int):
         self.name = name
+        self.location = location
         self.start_time = start_time
         self.end_time = end_time
         self.traces = traces
@@ -209,7 +211,7 @@ traces : dict
         start_time = self.start_time.strftime("%Y-%m-%d %H-%M-%S")
         end_time = self.end_time.strftime("%Y-%m-%d %H-%M-%S")
         js = {'name_event': self.name, 'start_time': start_time, 'end_time': end_time}
-        path = fr"results/new_{self.sta}_{self.lta}"
+        path = fr"media/events/{self.location}"
 
         if not os.path.exists(path):
             os.makedirs(path)
