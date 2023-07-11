@@ -40,5 +40,8 @@ def register(clicks, username, password, data):  # email
         "password": password
     }
             )
+    r = rq.post("http://127.0.0.1:8000/auth/token/login/", data={
+        "username": username,
+        "password": password})
     print(r.content)
     return dcc.Location(pathname="About/", id="someid_doesnt_matter")

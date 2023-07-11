@@ -6,7 +6,7 @@ import dash_bootstrap_components as dbc
 from data_table.dash.Pageblank import footer, navbar
 from dash.dependencies import Output, Input, State
 import requests as rq
-from backend.views import logged
+import json
 app = DjangoDash('LoginPage',external_stylesheets=[dbc.themes.LUMEN])
 
 app.layout = html.Div([
@@ -17,6 +17,7 @@ app.layout = html.Div([
         dcc.Input(id='password', placeholder='Пароль', type='password'),
         html.Button('Добавить', id='submit_val', n_clicks=0),
     ]),
+    dcc.Store(id="session", data=''),
     footer,
     html.Div(id="hidden_div_for_callback")
 ])
@@ -27,13 +28,14 @@ app.layout = html.Div([
     Input("submit_val", "n_clicks"),
     State("username", "value"),
     State("password", "value"),
+    State("session", "data"),
     prevent_initial_call=True,
 )
-def log_in(n_clicks, username, password):
+def log_in(n_clicks, username, password, data):
+    print()
     r = rq.post("http://127.0.0.1:8000/auth/token/login/", data={"username": username, "password": password}).json()
-    print(r)
     if "auth_token" in r:
-        dash.callback_context.response().set_cookie("Authorization", "Token " + r['auth_token'])
-        return dcc.Location(pathname="Events/", id="someid_doesnt_matter")
+        r = rq.get("http://127.0.0.1:8000/auth/users/me/", headers={"Authorization": f"Token {r['auth_token']}"}).json()
+        return dcc.Location(pathname=f"Logging/{r['id']}", id="someid_doesnt_matter")
     else:
         return no_update
