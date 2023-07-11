@@ -24,8 +24,9 @@ threshold : float
     Пороговое значение sta/lta, число больше которого считается активностью
     """
 
-    def __init__(self, paths: list, n_sta: int = 500, n_lta: int = 10000, threshold: float = 5, eps: int = 1000):
+    def __init__(self, paths: list, location: str, n_sta: int = 500, n_lta: int = 10000, threshold: float = 5, eps: int = 1000):
         self.paths = paths
+        self.location = location
         self.n_sta = n_sta
         self.n_lta = n_lta
         self.threshold = threshold
@@ -177,7 +178,7 @@ threshold : float
                     self.start_end_time[ind_event][0],
                     self.start_end_time[ind_event][1],
                     detect_trace,
-                    self.n_sta, self.n_lta))
+                    self.n_sta, self.n_lta, self.location))
         return detect_traces  # list[Event.object]
 
 
@@ -197,13 +198,14 @@ traces : dict
 
     def __init__(self, name: int, start_time: obspy.core.utcdatetime.UTCDateTime,
                  end_time: obspy.core.utcdatetime.UTCDateTime, traces: dict,
-                 sta: int, lta: int):
+                 sta: int, lta: int, location: str):
         self.name = name
         self.start_time = start_time
         self.end_time = end_time
         self.traces = traces
         self.sta = sta
         self.lta = lta
+        self.location = location
 
     def __str__(self):
         return f'Name:{self.name}, start: {self.start_time}, end: {self.end_time}'
@@ -212,13 +214,14 @@ traces : dict
         start_time = self.start_time.strftime("%Y-%m-%d %H-%M-%S")
         end_time = self.end_time.strftime("%Y-%m-%d %H-%M-%S")
         js = {'name_event': self.name, 'start_time': start_time, 'end_time': end_time}
-        path = fr"results/new_{self.sta}_{self.lta}"
+        path = fr"media/events/{self.location}/new_{self.sta}_{self.lta}"
 
         if not os.path.exists(path):
             os.makedirs(path)
         for trace in self.traces.items():
             if not os.path.exists(f'{path}/{start_time}'):
                 os.makedirs(f'{path}/{start_time}')
-            np.save(f'{path}/{start_time}/{trace[0]}', trace[1])
+            for ind, tr in enumerate(trace[1]):
+                np.save(f'{path}/{start_time}/{trace[0]}_{ind}', tr)
         with open(path + f'/{start_time}/info.json', 'w') as outfile:
             json.dump(js, outfile)

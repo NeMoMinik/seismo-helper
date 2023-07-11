@@ -104,7 +104,7 @@ def update_outputfile(contents, list_of_names, list_of_dates, location):
                 data = contents[i].encode("utf8").split(b";base64,")[1]
                 fh.write(base64.decodebytes(data))
                 Paths.append(UPLOAD_DIRECTORY + str(location) + "\\" + list_of_names[i])
-    upload_miniseed(Paths)
+    upload_miniseed(Paths, location)
 
 @app.callback(Output("redirDiv", "children"),
               Input('mapD', 'clickData'))
