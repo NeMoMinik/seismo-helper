@@ -183,7 +183,8 @@ def update_output(value):
     MagCount = [0 for _ in range(100)]
     MagCountdf = []
     for i in range(len(W[0])):
-        MagCount[int(W[7][i] * 100 // 10)] += 1
+        if W[7][i]:
+            MagCount[int(W[7][i] * 100 // 10)] += 1
     MagCountX = []
     MagCountY = []
     for i in range(100):

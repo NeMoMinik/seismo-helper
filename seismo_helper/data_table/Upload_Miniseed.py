@@ -2,6 +2,10 @@ import obspy
 import numpy as np
 from datetime import datetime
 from data_table.detect import Detect
+import requests as rq
+from seismo_helper.settings import ALLOWED_HOSTS
+DATABASE_API = f'http://{ALLOWED_HOSTS[0]}:8000/api/'
+
 
 def upload_miniseed(paths, location):
     Files = []
@@ -19,14 +23,16 @@ def upload_miniseed(paths, location):
             if j[0] == i:
                 A.append(j[1])
         sorted_files.append(A)
-    print(sorted_files)
     for list_names in sorted_files:
         print('list_names', list_names)
         detect_obj = Detect(list_names, str(location))
         events_list = detect_obj.detection()
-        print(events_list)
         if events_list:
             for event in events_list:
                 event.save()
-                print(event)
-        
+                r = rq.post(DATABASE_API+'events/', data={
+                    'name': 'event',
+                    'start': event.start_time,
+                    'end': event.end_time,
+                    'location': location
+                })
