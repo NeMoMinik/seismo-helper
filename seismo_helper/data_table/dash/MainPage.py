@@ -165,6 +165,7 @@ def update_output(value):
     fig.add_traces((go.Scattermapbox(
         lat=site_lon,
         lon=site_lat,
+        name = 'Станции',
         mode='markers',
         marker=go.scattermapbox.Marker(
             size=15,
