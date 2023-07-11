@@ -2,11 +2,10 @@ from django.shortcuts import render, redirect
 from data_table.dash.MainPage import update_output
 from data_table.dash.ProfilePage import load_profile
 from rest_framework.authtoken.models import Token
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 import requests as rq
 from django.contrib.auth import login
 from django.views.decorators.csrf import csrf_exempt
-
 
 def get_token(request):
     token = {"dash_context": {"session": {'data': ""}}}
@@ -66,6 +65,6 @@ def get_auth(request):
 
 
 def logging(request, user_id):
-    u = User.objects.get(id=user_id)
+    u = get_user_model().objects.get(id=user_id)
     login(request, u)
     return redirect("http://127.0.0.1:8000/About/")
