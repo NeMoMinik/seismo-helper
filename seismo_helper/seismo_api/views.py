@@ -17,7 +17,6 @@ class GetEvent(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
 
-
 class GetTrace(viewsets.ModelViewSet):
     queryset = Trace.objects.all()
     serializer_class = TraceSerializer
