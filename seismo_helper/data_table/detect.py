@@ -5,7 +5,7 @@ from datetime import timedelta
 import numpy as np
 import obspy
 
-from data_table.preprocessing import Preprocessing
+from preprocessing import Preprocessing
 
 
 class Detect:
@@ -24,9 +24,8 @@ threshold : float
     Пороговое значение sta/lta, число больше которого считается активностью
     """
 
-    def __init__(self, paths: list, location: str, n_sta: int = 500, n_lta: int = 10000, threshold: float = 5, eps: int = 1000):
+    def __init__(self, paths: list, n_sta: int = 500, n_lta: int = 10000, threshold: float = 5, eps: int = 1000):
         self.paths = paths
-        self.location = location
         self.n_sta = n_sta
         self.n_lta = n_lta
         self.threshold = threshold
@@ -38,23 +37,16 @@ threshold : float
 
     def detection(self) -> list:
         sta_lta = []
-        seismic_stations = self.reading_miniseeds(self.paths)
-        print('seismic_stations',seismic_stations)
+        seismic_stations= self.reading_miniseeds(self.paths)
         filtered_stations = self.using_preprocessing(seismic_stations)
-        print('filtered_stations', filtered_stations)
         for filtered_traces in filtered_stations:
             if len(filtered_traces) != 3:
                 continue
             sta_lta.append(self.calculation_sta_lta(filtered_traces))
-        print('sta_lta',sta_lta)
         detect_sta_lta = self.detection_on_sta_lta(sta_lta)
-        print('detect_sta_lta',detect_sta_lta)
         event = self.event_aggregation(detect_sta_lta)
-        print('event',event)
         event_st = self.event_on_seismic_traces(event)
-        print('event_st', event_st)
         event_sample = self.event_on_samples(event_st)
-        print('event_sample', event_sample)
         event_time = self.event_on_time(event_st, seismic_stations)
         detect_event = self.detection_on_seismic_traces(event_sample, filtered_stations)
         return detect_event
@@ -182,7 +174,7 @@ threshold : float
                     self.start_end_time[ind_event][0],
                     self.start_end_time[ind_event][1],
                     detect_trace,
-                    self.n_sta, self.n_lta, self.location))
+                    self.n_sta, self.n_lta))
         return detect_traces  # list[Event.object]
 
 
@@ -202,14 +194,13 @@ traces : dict
 
     def __init__(self, name: int, start_time: obspy.core.utcdatetime.UTCDateTime,
                  end_time: obspy.core.utcdatetime.UTCDateTime, traces: dict,
-                 sta: int, lta: int, location: str):
+                 sta: int, lta: int):
         self.name = name
         self.start_time = start_time
         self.end_time = end_time
         self.traces = traces
         self.sta = sta
         self.lta = lta
-        self.location = location
 
     def __str__(self):
         return f'Name:{self.name}, start: {self.start_time}, end: {self.end_time}'
@@ -218,14 +209,14 @@ traces : dict
         start_time = self.start_time.strftime("%Y-%m-%d %H-%M-%S")
         end_time = self.end_time.strftime("%Y-%m-%d %H-%M-%S")
         js = {'name_event': self.name, 'start_time': start_time, 'end_time': end_time}
-        path = fr"media/events/{self.location}/new_{self.sta}_{self.lta}"
+        path = fr"results/new_{self.sta}_{self.lta}"
 
         if not os.path.exists(path):
             os.makedirs(path)
         for name, trace in self.traces.items():
             if not os.path.exists(f'{path}/{start_time}'):
                 os.makedirs(f'{path}/{start_time}')
-            for ind, tr in enumerate(trace[1]):
-                np.save(f'{path}/{start_time}/{trace[0]}_{ind}', tr)
+            for channel in trace:
+                np.save(f'{path}/{start_time}/{name}_{channel[0]}', channel[1])
         with open(path + f'/{start_time}/info.json', 'w') as outfile:
             json.dump(js, outfile)
