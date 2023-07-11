@@ -58,6 +58,8 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'seismo_helper.urls'
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1000000000
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
