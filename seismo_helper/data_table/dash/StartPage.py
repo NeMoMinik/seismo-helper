@@ -3,13 +3,13 @@ from django_plotly_dash import DjangoDash
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 import plotly.express as px
-from data_table.dash.Pageblank import footer, navbar
+from data_table.dash.Pageblank import footer, navbar, stylesheets
 import os
 from seismo_helper.settings import ALLOWED_HOSTS
 import dash_mantine_components as dmc
 import base64
 
-app = DjangoDash('StartPage',external_stylesheets=[dbc.themes.LUMEN])
+app = DjangoDash('StartPage',external_stylesheets=stylesheets)
 
 BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/'
 

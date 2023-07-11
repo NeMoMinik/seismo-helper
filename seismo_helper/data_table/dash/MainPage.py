@@ -5,22 +5,20 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Output, Input, State
 import pandas as pd
 import plotly.express as px
-from data_table.dash.Pageblank import footer, navbar
+from data_table.dash.Pageblank import footer, navbar, stylesheets
 import base64
 import os
 import requests as rq
 from seismo_helper.settings import ALLOWED_HOSTS
-from django.shortcuts import render
-from plotly.subplots import make_subplots
 import numpy as np
 from sklearn.linear_model import LinearRegression
+from data_table.Upload_Miniseed import upload_miniseed
 
 global vv
 global mdf
-external_stylesheets_downl = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-UPLOAD_DIRECTORY = os.getcwd() + "\\media\\"
+UPLOAD_DIRECTORY = os.getcwd() + "\\media\\MiniSeed\\"
 
-app = DjangoDash('DashDatatable', external_stylesheets=[dbc.themes.LUMEN, external_stylesheets_downl])
+app = DjangoDash('DashDatatable', external_stylesheets=stylesheets)
 DATABASE_API = f'http://{ALLOWED_HOSTS[0]}:8000/api/'
 BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/Events/'
 
@@ -82,21 +80,28 @@ fig = go.Figure()
 
 app.layout = html.Div(
     [navbar, html.Div(id="page-content",
-                      children=[dcc.Dropdown(['Все'], 'Все', id='loc-dropdown'), dcc.Graph(figure=fig, id='mapD'), ]),
-     html.Div(id="redirDiv"), footer]
+                      children=[dcc.Dropdown(['Все локации'], 'Все локации', id='loc-dropdown'),
+                                dcc.Dropdown(['Станция'], 'Станция', id='Stations-dropdown'),
+                                  dcc.Graph(figure=fig, id='mapD'), ]),
+    html.Div(id="redirDiv"),
+    html.Div(id="redirDiv2"),
+    footer]
 )
 
 
 @app.callback(Output('store', 'data'),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
-              State('upload-data', 'last_modified'))
-def update_outputfile(contents, list_of_names, list_of_dates):
-    if contents is None:
+              State('upload-data', 'last_modified'),
+              State('loc-dropdown', 'value'))
+def update_outputfile(contents, list_of_names, list_of_dates, location):
+    if contents is None or location == 'Все локации':
         return None
-    with open(UPLOAD_DIRECTORY + list_of_names, "wb") as fh:
+    if not os.path.exists(UPLOAD_DIRECTORY + "\\" + location + "\\"): os.makedirs(UPLOAD_DIRECTORY + "\\" + location + "\\") 
+    with open(UPLOAD_DIRECTORY + "\\" + location + "\\" + list_of_names, "wb") as fh:
         data = contents.encode("utf8").split(b";base64,")[1]
         fh.write(base64.decodebytes(data))
+        upload_miniseed(UPLOAD_DIRECTORY + "\\" + location + "\\" + list_of_names)
 
 
 @app.callback(Output("redirDiv", "children"),
@@ -107,29 +112,37 @@ def update_contents(clickData):
         link = f'Events/{event_id}'
         return dcc.Location(pathname=link, id="sid")
 
+@app.callback(Output("redirDiv2", "children"),
+              Input('MagTimeGraph', 'clickData'))
+def redir_from_graph(clickData):
+    if clickData:
+        event_id = clickData['points'][0]['customdata'][0]
+        link = f'Events/{event_id}'
+        return dcc.Location(pathname=link, id="sid")    
 
 # UPDATE
 
 @app.callback(
     Output('page-content', 'children'),
-    Input('loc-dropdown', 'value')
+    Input('loc-dropdown', 'value'),
+    State('Stations-dropdown', 'value')
 )
-def update_output(value):
+def update_output(value, v2):
     global vv, mdf
     vv = rq.get(DATABASE_API + 'events/').json()['results']
-
     station_coords = rq.get(DATABASE_API + 'stations/').json()['results']
 
     site_lat = []
     site_lon = []
+    Stat_n = []
     for i in station_coords:
         site_lat.append(i['x'])
         site_lon.append(i['y'])
-
+        Stat_n.append(i['name'])
     MTGrapg = []
     W = [[], [], [], [], [], [], [], [], []]
     for i in vv:
-        if i['location'] == value or value == 'Все':
+        if i['location'] == value or value == 'Все локации':
             W[0].append(f"[{i['id']}]({BASE_LINK}{i['id']})")
             W[1].append(i['location'])
             W[2].append(i['start'])
@@ -139,7 +152,7 @@ def update_output(value):
             W[6].append(i['z'])
             W[7].append(i['magnitude'])
             W[8].append(i['id'])
-            MTGrapg.append({'Time': i['start'], 'Magnitude': i['magnitude']})
+            MTGrapg.append({'Time': i['start'], 'Magnitude': i['magnitude'], 'id':i['id']})
 
     mdf = pd.DataFrame(W).T.sort_values(0)
     df = pd.DataFrame(W[:8]).T.sort_values(0)
@@ -166,7 +179,7 @@ def update_output(value):
     fig.update_layout(mapbox_style="open-street-map",
                       mapbox_zoom=3)
     fig.update_layout(height=500, margin={"r": 0, "t": 0, "l": 0, "b": 0})
-    pxMagTimeGraph = px.line(MTGrapg, x="Time", y="Magnitude", title="Магнитуда от времени")
+    pxMagTimeGraph = px.line(MTGrapg, x="Time", y="Magnitude", hover_data="id", title="Магнитуда от времени")
     pxMagTimeGraph.update_traces(mode="markers", hovertemplate=None)
 
     MagCount = [0 for _ in range(100)]
@@ -193,15 +206,19 @@ def update_output(value):
     pxMagCountGrapf.add_traces(go.Scatter(x=x_range, y=y_range, name='Тренд'))
 
     divs_children = [
-        html.Div(dbc.NavItem(
+        dbc.Row([
+            dbc.Col(html.Div(dcc.Dropdown(['Все локации'] + list(set([x for x in mdf['Локация']])), value, id='loc-dropdown'),
+                 style={'textAlign': 'center',
+                        'margin': '12px', 'height': '40px'})),
+            dbc.Col(html.Div(dbc.NavItem(
             dbc.NavLink("Добавить станции", href=f'http://{ALLOWED_HOSTS[0]}:8000/Stations/', target='_blank',
                         style={'color': 'Black', 'width': '100%',
                                'height': '40px', 'lineHeight': '40px', 'borderWidth': '1px', 'borderStyle': 'dashed',
                                'borderRadius': '5px', 'textAlign': 'center', 'vertical-align': 'middle',
                                'margin': '10px'})),
-                 style={'width': '15%', 'display': 'inline-block', 'float': 'left', 'textAlign': 'center',
-                        'margin-right': '15px'}),
-        html.Div(dcc.Upload(
+                 style={'textAlign': 'center',
+                        'margin-right': '15px'})),
+            dbc.Col(html.Div(dcc.Upload(
             id='upload-data',
             children=html.Div([
                 'Drag and Drop or ',
@@ -219,10 +236,12 @@ def update_output(value):
                 'vertical-align': 'middle'
             },
             multiple=False
-        ), style={'width': '40%', 'display': 'inline-block'}),
-        html.Div(dcc.Dropdown(['Все'] + list(set([x for x in mdf['Локация']])), value, id='loc-dropdown'),
-                 style={'width': '40%', 'display': 'inline-block', 'float': 'right', 'textAlign': 'center',
-                        'margin': '12px', 'height': '40px'}),
+        ))),
+        dbc.Col(html.Div(dcc.Dropdown(['Станция'] + Stat_n, v2, id='Stations-dropdown'),
+                 style={'textAlign': 'center',
+                        'margin': '12px', 'height': '40px'}))        
+        ]),
+        
 
         html.Div(dcc.Graph(figure=fig, id='mapD')),
         dbc.Row([

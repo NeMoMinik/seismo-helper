@@ -5,11 +5,11 @@ import plotly.graph_objects as go
 import numpy as np
 from plotly.subplots import make_subplots
 import requests as rq
-from data_table.dash.Pageblank import navbar, footer
+from data_table.dash.Pageblank import navbar, footer, stylesheets
 import dash_bootstrap_components as dbc
 from seismo_helper.settings import ALLOWED_HOSTS
 
-app = DjangoDash('Chart', external_stylesheets=[dbc.themes.LUMEN])
+app = DjangoDash('Chart', external_stylesheets=stylesheets)
 
 app.layout = html.Div([
     navbar,
