@@ -14,7 +14,7 @@ app.layout = html.Div([
     html.P('Seismo-helper - сервис для автоматизированного мониторинга сейсмической активности'),
     html.Div([
         dcc.Input(id='username', placeholder='Имя пользователя', type='text'),
-        # dcc.Input(id='email', placeholder='Почта', type='email'),
+        dcc.Input(id='email', placeholder='Почта', type='email'),
         dcc.Input(id='password', placeholder='Пароль', type='password'),
         html.Button('Регистрация', id='submit_val', n_clicks=0)]),
     dcc.Store(id="session", data=''),
@@ -27,18 +27,24 @@ app.layout = html.Div([
     Output("hidden_div_for_callback", "children"),
     Input('submit_val', 'n_clicks'),
     State('username', 'value'),
-    # State('email', 'value'),
+    State('email', 'value'),
     State('password', 'value'),
     State('session', 'data'),
     prevent_initial_call=True,
 )
-def register(clicks, username, password, data):  # email
+def register(clicks, username, email, password, data):
     print(data)
     r = rq.post("http://127.0.0.1:8000/auth/users/", data={
         "username": username,
-        # "email": email,
+        "email": email,
         "password": password
     }
             )
-    print(r.content)
-    return dcc.Location(pathname="About/", id="someid_doesnt_matter")
+    if r.status_code == 400:
+        return no_update
+    r = rq.post("http://127.0.0.1:8000/auth/token/login/", data={"username": username, "password": password}).json()
+    if "auth_token" in r:
+        r = rq.get("http://127.0.0.1:8000/auth/users/me/", headers={"Authorization": f"Token {r['auth_token']}"}).json()
+        return dcc.Location(pathname=f"Logging/{r['id']}", id="someid_doesnt_matter")
+    else:
+        return no_update
