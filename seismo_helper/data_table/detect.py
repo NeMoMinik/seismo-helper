@@ -24,7 +24,7 @@ threshold : float
     Пороговое значение sta/lta, число больше которого считается активностью
     """
 
-    def __init__(self, paths: list, n_sta: int = 500, n_lta: int = 10000, threshold: float = 5, eps: int = 20):
+    def __init__(self, paths: list, n_sta: int = 500, n_lta: int = 10000, threshold: float = 5, eps: int = 1000):
         self.paths = paths
         self.n_sta = n_sta
         self.n_lta = n_lta
@@ -33,10 +33,11 @@ threshold : float
         self.start_end_time = dict()
         self.stations = []
         self.station_name = []
+        self.channel = []
 
     def detection(self) -> list:
         sta_lta = []
-        seismic_stations = self.reading_miniseeds(self.paths)
+        seismic_stations= self.reading_miniseeds(self.paths)
         filtered_stations = self.using_preprocessing(seismic_stations)
         for filtered_traces in filtered_stations:
             if len(filtered_traces) != 3:
@@ -55,10 +56,13 @@ threshold : float
         seismic_stations = []
         for path in paths:
             trace = []
+            channel = []
             data = obspy.read(path)
             self.station_name.append(data[0].stats.station)
             for sign in data:
                 trace.append(sign)
+                channel = sign.stats.channel
+            self.channel.append(channel)
             seismic_stations.append(trace.copy())
         return seismic_stations
 
@@ -162,8 +166,8 @@ threshold : float
             for ind_st, traces in enumerate(seismic_traces):
                 if ind_st in indexes_st:
                     detect_trace[self.station_name[ind_st]] = []
-                    for trace in traces:
-                        detect_trace[self.station_name[ind_st]].append(trace[start:end])
+                    for ind_tr, trace in enumerate(traces):
+                        detect_trace[self.station_name[ind_st]].append([self.channel[ind_tr], trace[start:end]])
             detect_traces.append(
                 Event(
                     ind_event,
@@ -209,9 +213,10 @@ traces : dict
 
         if not os.path.exists(path):
             os.makedirs(path)
-        for trace in self.traces.items():
+        for name, trace in self.traces.items():
             if not os.path.exists(f'{path}/{start_time}'):
                 os.makedirs(f'{path}/{start_time}')
-            np.save(f'{path}/{start_time}/{trace[0]}', trace[1])
+            for channel in trace:
+                np.save(f'{path}/{start_time}/{name}_{channel[0]}', channel[1])
         with open(path + f'/{start_time}/info.json', 'w') as outfile:
             json.dump(js, outfile)
