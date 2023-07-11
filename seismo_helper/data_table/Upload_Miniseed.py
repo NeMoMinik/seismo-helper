@@ -1,6 +1,7 @@
 import obspy
 import numpy as np
 from datetime import datetime
+from data_table.detect import Detect
 
 def upload_miniseed(paths):
     Files = []
@@ -11,10 +12,21 @@ def upload_miniseed(paths):
         Files.append([date,i])
         Times.append(date)
     sorted_files = []
+    Times = list(set(Times))
     for i in Times:
         A = []
         for j in Files:
             if j[0] == i:
                 A.append(j[1])
         sorted_files.append(A)
-    
+    print(sorted_files)
+    for list_names in sorted_files:
+        print('list_names', list_names)
+        detect_obj = Detect(list_names)
+        events_list = detect_obj.detection()
+        print(events_list)
+        if events_list:
+            for event in events_list:
+                event.save()
+                print(event)
+        print("))))))")
