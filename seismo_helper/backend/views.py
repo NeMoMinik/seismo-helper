@@ -9,9 +9,9 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 def get_token(request):
-    token = ''
+    token = {"dash_context": {"session": {'data': ""}}}
     if request.user.is_authenticated:
-        token = Token.objects.get(user=request.user).key
+        token["dash_context"]["session"]["data"] = Token.objects.get(user=request.user).key
     return token
 
 
@@ -35,7 +35,6 @@ def get_tutor(request):
 
 def get_about(request):
     template = 'datatable/AboutPage.html'
-    print(request.session)
     print(request.user)
     return render(request, template)
 
