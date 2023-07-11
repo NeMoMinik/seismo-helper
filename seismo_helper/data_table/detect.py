@@ -5,7 +5,7 @@ from datetime import timedelta
 import numpy as np
 import obspy
 
-from preprocessing import Preprocessing
+from data_table.preprocessing import Preprocessing
 
 
 class Detect:
@@ -24,7 +24,7 @@ threshold : float
     Пороговое значение sta/lta, число больше которого считается активностью
     """
 
-    def __init__(self, paths: list, n_sta: int = 500, n_lta: int = 10000, threshold: float = 5, eps: int = 20):
+    def __init__(self, paths: list, n_sta: int = 500, n_lta: int = 10000, threshold: float = 5, eps: int = 1000):
         self.paths = paths
         self.n_sta = n_sta
         self.n_lta = n_lta
@@ -37,15 +37,22 @@ threshold : float
     def detection(self) -> list:
         sta_lta = []
         seismic_stations = self.reading_miniseeds(self.paths)
+        print('seismic_stations',seismic_stations)
         filtered_stations = self.using_preprocessing(seismic_stations)
+        print('filtered_stations', filtered_stations)
         for filtered_traces in filtered_stations:
             if len(filtered_traces) != 3:
                 continue
             sta_lta.append(self.calculation_sta_lta(filtered_traces))
+        print('sta_lta',sta_lta)
         detect_sta_lta = self.detection_on_sta_lta(sta_lta)
+        print('detect_sta_lta',detect_sta_lta)
         event = self.event_aggregation(detect_sta_lta)
+        print('event',event)
         event_st = self.event_on_seismic_traces(event)
+        print('event_st', event_st)
         event_sample = self.event_on_samples(event_st)
+        print('event_sample', event_sample)
         event_time = self.event_on_time(event_st, seismic_stations)
         detect_event = self.detection_on_seismic_traces(event_sample, filtered_stations)
         return detect_event
