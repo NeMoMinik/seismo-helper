@@ -104,7 +104,7 @@ def update_outputfile(contents, list_of_names, list_of_dates, location):
                 data = contents[i].encode("utf8").split(b";base64,")[1]
                 fh.write(base64.decodebytes(data))
                 Paths.append(UPLOAD_DIRECTORY + str(location) + "\\" + list_of_names[i])
-    upload_miniseed(Paths)
+    upload_miniseed(Paths, location)
 
 @app.callback(Output("redirDiv", "children"),
               Input('mapD', 'clickData'))
@@ -183,7 +183,8 @@ def update_output(value):
     MagCount = [0 for _ in range(100)]
     MagCountdf = []
     for i in range(len(W[0])):
-        MagCount[int(W[7][i] * 100 // 10)] += 1
+        if W[7][i]:
+            MagCount[int(W[7][i] * 100 // 10)] += 1
     MagCountX = []
     MagCountY = []
     for i in range(100):

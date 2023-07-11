@@ -19,7 +19,7 @@ class LocationSerializer(serializers.ModelSerializer):
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        fields = ('name', 'x', 'y', 'z', 'start', 'end', 'magnitude', 'location', 'id')
+        fields = ('name', 'x', 'y', 'z', 'start', 'end', 'magnitude', 'location', 'id', 'traces')
 
 
 class TraceSerializer(serializers.ModelSerializer):

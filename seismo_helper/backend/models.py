@@ -20,10 +20,10 @@ class Location(models.Model):
 
 
 class Event(models.Model):
-    x = models.FloatField()
-    y = models.FloatField()
-    z = models.FloatField()
-    magnitude = models.FloatField()
+    x = models.FloatField(blank=True, null=True)
+    y = models.FloatField(blank=True, null=True)
+    z = models.FloatField(blank=True, null=True)
+    magnitude = models.FloatField(blank=True, null=True)
     start = models.DateTimeField()
     end = models.DateTimeField()
     name = models.CharField(max_length=32)
@@ -31,13 +31,14 @@ class Event(models.Model):
         Location,
         on_delete=models.CASCADE
     )
+    # traces = Trace
 
 
 class Station(models.Model):
     name = models.CharField(max_length=32)
-    x = models.FloatField(null=True)
-    y = models.FloatField(null=True)
-    z = models.FloatField(null=True)
+    x = models.FloatField()
+    y = models.FloatField()
+    z = models.FloatField()
 
     location = models.ForeignKey(
         Location,
