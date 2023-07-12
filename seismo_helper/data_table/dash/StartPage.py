@@ -25,7 +25,7 @@ app.layout = html.Div([
     navbar,
     html.H1('SEISMO-HELPER', style={'text-align': 'center','background':'#137ea7','margin':'0px'}),
     html.Div(dbc.NavItem(dbc.NavLink("Мониторинг", href=BASE_LINK+'Events/', target='_blank', style={'color':'#000000','lineHeight': '50px', 'borderStyle': 'inset', 'margin-top':'15px', 'borderWidth': '5px', 'font-size':'28px'}),
-                         style={'background':'#FFFFFF'}), style={'width': '40%', 'position': 'absolute', 'right':'30%', 'textAlign': 'center', 'height': '40px',}),
+                         style={'background':'#FFFFFF'}), style={'width': '40%', 'position': 'absolute', 'right':'30%', 'textAlign': 'center', 'height': '40px'}),
     dbc.Row([dbc.Col(ImgTeam)]),
     footer
 ])

@@ -10,18 +10,29 @@ app = DjangoDash("SignUpPage", external_stylesheets=stylesheets)
 
 app.layout = html.Div([
     navbar,
-    html.H1('Сервис Seismo-helper'),
-    html.P('Seismo-helper - сервис для автоматизированного мониторинга сейсмической активности'),
+    html.H1('Регистрация', style={'margin-top':'10%','text-align':'center', 'font-size':'25px'}),
     html.Div([
-        dcc.Input(id='username', placeholder='Имя пользователя', type='text'),
-        dcc.Input(id='email', placeholder='Почта', type='email'),
-        dcc.Input(id='password', placeholder='Пароль', type='password'),
-        html.Button('Регистрация', id='submit_val', n_clicks=0)]),
+        dbc.Col([
+        dbc.Row(dcc.Input(id='username', placeholder='Имя пользователя', type='text'), style={'margin-top':'1%'}),
+        dbc.Row(dcc.Input(id='email', placeholder='Почта', type='email'), style={'margin-top':'1%'}),
+        dbc.Row(dcc.Input(id='password', placeholder='Пароль', type='password'), style={'margin-top':'1%'}),
+        dbc.Row(html.Button('Регистрация', id='submit_val', n_clicks=0),
+                style={'margin-top':'1%'}),
+        dbc.Row(html.Button('Войти', id='signinbutton', n_clicks=0), style={'margin-right':'auto','text-align':'center' , 'margin-left':'auto', 'margin-top':'5%', 'width':'60%'}),
+                ])], style={'margin-right':'auto', 'margin-left':'auto', 'width':'20%'}),
     dcc.Store(id="session", data=''),
     html.Div(id="hidden_div_for_callback"),
+    html.Div(id="redirdiv"),
     footer
 ])
 
+@app.callback(
+    Output("redirdiv", "children"),
+    Input("signinbutton", "n_clicks"),
+    prevent_initial_call=True
+)
+def signupredir(n):
+    return dcc.Location(pathname='Login', id="sid")
 
 @app.callback(
     Output("hidden_div_for_callback", "children"),
