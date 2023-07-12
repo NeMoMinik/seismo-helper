@@ -211,14 +211,18 @@ traces : dict
         start_time = self.start_time.strftime("%Y-%m-%d %H-%M-%S")
         end_time = self.end_time.strftime("%Y-%m-%d %H-%M-%S")
         js = {'name_event': self.name, 'start_time': start_time, 'end_time': end_time}
-        path = fr"media/events/{self.location}"
-
+        path = fr"media/events/{self.location}/{start_time}/"
+        paths = []  # C'est le pathes Das ist Paths This is paths Это пути Ci sono gli pathi
         if not os.path.exists(path):
             os.makedirs(path)
         for name, trace in self.traces.items():
             if not os.path.exists(f'{path}/{start_time}'):
                 os.makedirs(f'{path}/{start_time}')
+            names = []
             for channel in trace:
-                np.save(f'{path}/{start_time}/{name}_{channel[0]}', channel[1])
-        with open(path + f'/{start_time}/info.json', 'w') as outfile:
+                np.save(f'{path}/{name}_{channel[0]}', channel[1])
+                names.append(f'{name}_{channel[0]}.npy')
+            paths.append(names)
+        with open(path + f'/info.json', 'w') as outfile:
             json.dump(js, outfile)
+        return path, paths

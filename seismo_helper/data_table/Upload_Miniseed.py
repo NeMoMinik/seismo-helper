@@ -29,10 +29,19 @@ def upload_miniseed(paths, location):
         events_list = detect_obj.detection()
         if events_list:
             for event in events_list:
-                event.save()
-                r = rq.post(DATABASE_API+'events/', data={
+                path, paths = event.save()
+                event_r = rq.post(DATABASE_API+'events/', data={
                     'name': 'event',
                     'start': event.start_time,
                     'end': event.end_time,
                     'location': location
-                })
+                }).json()
+                for i in paths:
+                    r = rq.post('http://127.0.0.1:8000/api/traces/', json={
+                        "path": path,
+                        "station": 1,
+                        "channels": [{"path": i[0]},
+                                     {"path": i[1]},
+                                     {"path": i[2]}],
+                        "event": event_r['id']
+                    })

@@ -45,9 +45,10 @@ class PostTraceSerializer(serializers.ModelSerializer):
         fields = ('path', 'station', 'channels', 'event', 'id')
 
     def create(self, validated_data):
-        print(validated_data)
+        # print(validated_data)
         channels = validated_data.pop('channels')
-        trace = super().create(validated_data)
+        trace = Trace.objects.create(**validated_data)
+        print(channels)
         for i in channels:
             c = Channel(path=i["path"], trace=trace)
             c.save()
