@@ -39,7 +39,7 @@ def upload_miniseed(paths, location):
                 for i in paths:
                     r = rq.post('http://127.0.0.1:8000/api/traces/', json={
                         "path": path,
-                        "station": 1,
+                        "station": 1,#  Нужно добавить станции
                         "channels": [{"path": i[0]},
                                      {"path": i[1]},
                                      {"path": i[2]}],
