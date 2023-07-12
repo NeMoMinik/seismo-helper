@@ -219,7 +219,6 @@ traces : dict
             if not os.path.exists(f'{path}'):
                 os.makedirs(f'{path}')
             names = []
-            print(trace)
             for channel in trace:
                 np.save(f'{path}/{name}_{channel[0]}', channel[1])
                 names.append(f'{name}_{channel[0]}.npy')

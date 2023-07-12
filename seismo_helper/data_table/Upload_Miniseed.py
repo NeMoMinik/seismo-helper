@@ -24,7 +24,6 @@ def upload_miniseed(paths, location):
                 A.append(j[1])
         sorted_files.append(A)
     for list_names in sorted_files:
-        print('list_names', list_names)
         detect_obj = Detect(list_names, str(location))
         events_list = detect_obj.detection()
         if events_list:
