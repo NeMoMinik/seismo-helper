@@ -27,10 +27,10 @@ DATABASE_API = f'http://{ALLOWED_HOSTS[0]}:8000/api/'
     Input('id_event', 'value')
 )
 def update_line_chart(value):
-    colors = [
-        'rgb(255,0,0)',
-        'rgb(0,255,0)',
-        'rgb(0,0,255)'
+    colors = [  #https://colorscheme.ru/#4f52Pw0w0w0w0
+        '#6C48D7',
+        '#FF4540',
+        '#39E444'
     ]
     data = rq.get(f'{DATABASE_API}traces/?event={value}').json()['results']
     fig = make_subplots(rows=len(data), cols=1, shared_xaxes=True, shared_yaxes=True)
@@ -40,7 +40,7 @@ def update_line_chart(value):
             fig.add_trace(go.Scatter(x=[i for i in range(0, len(d) * 5, 5)], y=d,
                                      mode='lines',
                                      name=j.split('.')[0],
-                                     fillcolor=colors[color]
+                                     line=dict(color=colors[color])
                                      ),
                           col=1,
                           row=n + 1
