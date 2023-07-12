@@ -68,11 +68,11 @@ def upd_dd(value):
     A = [{'label': x['name'], 'value':x['id']} for x in vv]
     df = pd.DataFrame(S).T.sort_values(0)
     return [dcc.Dropdown(options=A, value=value, id='dd'),
-            dcc.Input(id='name', placeholder='Название', type='text'),
-            dcc.Input(id='X', placeholder='Широта', type='float'),
-            dcc.Input(id='Y', placeholder='Долгота', type='float'),
-            dcc.Input(id='Z', placeholder='Высота над уровнем моря', type='float'),
-            html.Button('Добавить', id='submit-val', n_clicks=0),
+            dcc.Input(id='name', placeholder='Название', type='text', style={'margin-left':'1%'}),
+            dcc.Input(id='X', placeholder='Широта', type='float', style={'margin-left':'1%'}),
+            dcc.Input(id='Y', placeholder='Долгота', type='float', style={'margin-left':'1%'}),
+            dcc.Input(id='Z', placeholder='Высота над уровнем моря', type='float', style={'margin-left':'1%', 'width':'13%'}),
+            html.Button('Добавить', id='submit-val', n_clicks=0, style={'margin-left':'1%'}),
             html.Div(id='tableDiv', children=[dash_table.DataTable(
                 id='datatable',
                 columns=table_columns,
