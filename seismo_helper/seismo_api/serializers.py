@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from backend.models import Station, Location, Event, Trace, Corporation
+from backend.models import Station, Location, Event, Trace, Corporation, Channel
 
 
 class StationSerializer(serializers.ModelSerializer):
@@ -22,6 +22,12 @@ class EventSerializer(serializers.ModelSerializer):
         fields = ('name', 'x', 'y', 'z', 'start', 'end', 'magnitude', 'location', 'id', 'traces')
 
 
+class ChannelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Channel
+        fields = ('path', )
+
+
 class TraceSerializer(serializers.ModelSerializer):
     station = serializers.StringRelatedField(read_only=True)
     channels = serializers.StringRelatedField(many=True, read_only=True)
@@ -29,6 +35,23 @@ class TraceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Trace
         fields = ('path', 'station', 'channels', 'event')
+
+
+class PostTraceSerializer(serializers.ModelSerializer):
+    channels = ChannelSerializer(many=True, )
+
+    class Meta:
+        model = Trace
+        fields = ('path', 'station', 'channels', 'event', 'id')
+
+    def create(self, validated_data):
+        print(validated_data)
+        channels = validated_data.pop('channels')
+        trace = super().create(validated_data)
+        for i in channels:
+            c = Channel(path=i["path"], trace=trace)
+            c.save()
+        return trace
 
 
 class CorporationSerializer(serializers.ModelSerializer):

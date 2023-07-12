@@ -7,7 +7,7 @@ from data_table.dash.Pageblank import footer, navbar, stylesheets
 from dash.dependencies import Output, Input, State
 import requests as rq
 import json
-app = DjangoDash('LoginPage',external_stylesheets=stylesheets)
+app = DjangoDash('LoginPage', external_stylesheets=stylesheets)
 
 app.layout = html.Div([
     navbar,

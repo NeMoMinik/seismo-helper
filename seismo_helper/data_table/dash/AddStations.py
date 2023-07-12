@@ -122,7 +122,6 @@ def update_output(n_clicks, x, y, z, name, loc_id):
             S[3].append(i['y'])
             S[4].append(i['z'])
         df = pd.DataFrame(S).T.sort_values(0)
-        print('aaaaaaaaaaaaa')
         return [dash_table.DataTable(
                 id='datatable',
                 columns=table_columns,
