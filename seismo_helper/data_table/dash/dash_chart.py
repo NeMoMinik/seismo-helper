@@ -19,7 +19,7 @@ app.layout = html.Div([
     footer
     ]
 )
-DATABASE_API =  f'http://{ALLOWED_HOSTS[0]}:8000/api/'
+DATABASE_API = f'http://{ALLOWED_HOSTS[0]}:8000/api/'
 
 
 @app.callback(
@@ -42,4 +42,5 @@ def update_line_chart(value):
                           row=n + 1
                           )
             fig.update_yaxes(title_text=i['station'], col=1, row=n + 1)
+    fig.update_layout(height=500 * len(data))
     return fig
