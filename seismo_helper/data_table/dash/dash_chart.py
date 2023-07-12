@@ -42,5 +42,5 @@ def update_line_chart(value):
                           row=n + 1
                           )
             fig.update_yaxes(title_text=i['station'], col=1, row=n + 1)
-    fig.update_layout(height=500 * len(data))
+    fig.update_layout(height=356 * len(data))
     return fig
