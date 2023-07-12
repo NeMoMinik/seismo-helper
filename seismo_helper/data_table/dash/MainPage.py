@@ -141,19 +141,31 @@ def update_output(value):
     W = [[], [], [], [], [], [], [], [], []]
     for i in vv:
         if i['location'] == value or value == 'Все локации':
-            W[0].append(f"[{i['id']}]({BASE_LINK}{i['id']})")
-            W[1].append(i['location'])
-            W[2].append(i['start'])
-            W[3].append(i['end'])
-            W[4].append(i['x'])
-            W[5].append(i['y'])
-            W[6].append(i['z'])
-            W[7].append(i['magnitude'])
-            W[8].append(i['id'])
+            if i['magnitude'] != None:
+                W[0].append(f"[{i['id']}]({BASE_LINK}{i['id']})")
+                W[1].append(i['location'])
+                W[2].append(i['start'])
+                W[3].append(i['end'])
+                W[4].append(i['x'])
+                W[5].append(i['y'])
+                W[6].append(i['z'])
+                W[7].append(i['magnitude'])
+                W[8].append(i['id'])
+    S = [[], [], [], [], [], [], [], [], []]
+    for i in vv:
+        if i['location'] == value or value == 'Все локации':
+            S[0].append(f"[{i['id']}]({BASE_LINK}{i['id']})")
+            S[1].append(i['location'])
+            S[2].append(i['start'])
+            S[3].append(i['end'])
+            S[4].append(i['x'])
+            S[5].append(i['y'])
+            S[6].append(i['z'])
+            S[7].append(i['magnitude'])
+            S[8].append(i['id'])
             MTGrapg.append({'Time': i['start'], 'Magnitude': i['magnitude'], 'id':i['id']})
-
     mdf = pd.DataFrame(W).T.sort_values(0)
-    df = pd.DataFrame(W[:8]).T.sort_values(0)
+    df = pd.DataFrame(S[:8]).T.sort_values(0)
     Size = [W[7][i] for i in range(len(W[7]))]
     mdf.columns = ['№', 'Локация', 'Начало', 'Конец', 'X', 'Y', 'Z', 'Магнитуда', 'id']
     fig = go.Figure()
