@@ -7,9 +7,9 @@ import os
 
 BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/'
 
-external_stylesheets_downl = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+# external_stylesheets_downl = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 global stylesheets
-stylesheets = [dbc.themes.LUMEN, external_stylesheets_downl]
+stylesheets = [dbc.themes.LUMEN]
 
 def openImg(path):
     with open(os.getcwd()+ path, "rb") as image_file:
