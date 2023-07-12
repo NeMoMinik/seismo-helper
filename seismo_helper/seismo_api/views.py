@@ -3,6 +3,7 @@ from .serializers import StationSerializer, LocationSerializer, EventSerializer,
 from rest_framework import viewsets
 import django_filters.rest_framework
 
+
 class GetStation(viewsets.ModelViewSet):
     queryset = Station.objects.all()
     serializer_class = StationSerializer
@@ -22,8 +23,9 @@ class GetTrace(viewsets.ModelViewSet):
     queryset = Trace.objects.all()
     # serializer_class = TraceSerializer
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_fields = ['path', 'event']
+
     def get_serializer_class(self):
-        print(self.request.POST, ";dmf;ldf")
         if self.request.method == "GET":
             return TraceSerializer
         else:
