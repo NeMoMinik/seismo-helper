@@ -51,6 +51,7 @@ class Station(models.Model):
 
 class Trace(models.Model):
     path = models.CharField(max_length=256)
+    timedelta = models.PositiveIntegerField(default=5)
     event = models.ForeignKey(
         Event,
         on_delete=models.CASCADE,

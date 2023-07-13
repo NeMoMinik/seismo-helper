@@ -4,9 +4,11 @@ from backend.models import Corporation
 
 
 class CustomUser(AbstractUser):
-    email = models.EmailField(_("email address"), unique=True)
-    third_name = models.CharField(_('first name'), max_length=150, blank=True)
-    USERNAME_FIELD = "email"
+    email = models.EmailField("email address", unique=True)
+    first_name = models.CharField('first name', max_length=150, blank=True)
+    second_name = models.CharField('first name', max_length=150, blank=True)
+    third_name = models.CharField('first name', max_length=150, blank=True)
+    # USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["email"]
 
     corporation = models.ForeignKey(
