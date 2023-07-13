@@ -81,7 +81,7 @@ fig = go.Figure()
 app.layout = html.Div(
     [navbar, html.Div(id="page-content",
                       children=[dcc.Dropdown(['Все локации'], 'Все локации', id='loc-dropdown'),
-                                  dcc.Graph(figure=fig, id='mapD'), ]),
+                                  dcc.Graph(figure=fig, id='mapD'), ], style={'margin-bottom':'10%'}),
     html.Div(id="redirDiv"),
     html.Div(id="redirDiv2"),
     footer]
@@ -258,8 +258,8 @@ def update_output(value):
 
         html.Div(dcc.Graph(figure=fig, id='mapD')),
         dbc.Row([
-            dbc.Col(dcc.Graph(id="MagTimeGraph", figure=pxMagTimeGraph)),
-                 dbc.Col(dcc.Graph(id="MagCountGrapf", figure=pxMagCountGrapf))
+            dbc.Col(dcc.Graph(id="MagTimeGraph", figure=pxMagTimeGraph),style={'width':'50%'}),
+            dbc.Col(dcc.Graph(id="MagCountGrapf", figure=pxMagCountGrapf),style={'width':'50%'})
                  ]),
 
         dash_table.DataTable(
