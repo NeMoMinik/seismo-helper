@@ -5,13 +5,12 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 from data_table.dash.Pageblank import footer, navbar, stylesheets
 import os
-from seismo_helper.settings import ALLOWED_HOSTS
+from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK
 import dash_mantine_components as dmc
 import base64
 
 app = DjangoDash('StartPage',external_stylesheets=stylesheets)
 
-BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/'
 
 with open((os.getcwd()+'\\media\\Photos_for_Front\\M1.jpg'), "rb") as image_file:
     img_data = base64.b64encode(image_file.read())

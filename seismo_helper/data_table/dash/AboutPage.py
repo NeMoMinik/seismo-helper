@@ -5,7 +5,7 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 from data_table.dash.Pageblank import footer, navbar, stylesheets
 import os
-from seismo_helper.settings import ALLOWED_HOSTS
+from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK
 import base64
 
 def openImg(path):
@@ -16,7 +16,6 @@ def openImg(path):
         return html.Img(id="tag_id", src=img_data, alt="my image", width='100%', height='100%', className="T1", style={'margin':'0px'})
 
 
-BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/'
 
 app = DjangoDash('AboutPage',external_stylesheets=stylesheets)
 

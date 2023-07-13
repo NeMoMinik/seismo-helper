@@ -1,11 +1,9 @@
 import dash_mantine_components as dmc
 import dash_bootstrap_components as dbc
 from dash import html, dcc, no_update, Dash, dash_table, callback
-from seismo_helper.settings import ALLOWED_HOSTS
+from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK
 import base64
 import os
-
-BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/'
 
 # external_stylesheets_downl = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 global stylesheets

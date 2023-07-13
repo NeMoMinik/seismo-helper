@@ -7,10 +7,8 @@ from data_table.dash.Pageblank import footer, navbar, stylesheets
 from dash.dependencies import Output, Input, State
 import requests as rq
 import json
-from seismo_helper.settings import ALLOWED_HOSTS
+from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK
 app = DjangoDash('LoginPage', external_stylesheets=stylesheets)
-BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/'
-
 
 app.layout = html.Div([
     navbar,

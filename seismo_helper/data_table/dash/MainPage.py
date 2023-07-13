@@ -9,7 +9,7 @@ from data_table.dash.Pageblank import footer, navbar, stylesheets
 import base64
 import os
 import requests as rq
-from seismo_helper.settings import ALLOWED_HOSTS
+from seismo_helper.settings import ALLOWED_HOSTS, DATABASE_API, BASE_LINK
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from data_table.Upload_Miniseed import upload_miniseed
@@ -19,8 +19,6 @@ global mdf
 UPLOAD_DIRECTORY = os.getcwd() + "\\media\\MiniSeed\\"
 
 app = DjangoDash('DashDatatable', external_stylesheets=stylesheets)
-DATABASE_API = f'http://{ALLOWED_HOSTS[0]}:8000/api/'
-BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/Events/'
 
 table_columns = [
     {
@@ -142,7 +140,7 @@ def update_output(value):
     for i in vv:
         if i['location'] == value or value == 'Все локации':
             if i['magnitude'] != None:
-                W[0].append(f"[{i['id']}]({BASE_LINK}{i['id']})")
+                W[0].append(f"[{i['id']}]({BASE_LINK + 'Events/'}{i['id']})")
                 W[1].append(i['location'])
                 W[2].append(i['start'])
                 W[3].append(i['end'])
@@ -154,7 +152,7 @@ def update_output(value):
     S = [[], [], [], [], [], [], [], [], []]
     for i in vv:
         if i['location'] == value or value == 'Все локации':
-            S[0].append(f"[{i['id']}]({BASE_LINK}{i['id']})")
+            S[0].append(f"[{i['id']}]({BASE_LINK + 'Events/'}{i['id']})")
             S[1].append(i['location'])
             S[2].append(i['start'])
             S[3].append(i['end'])

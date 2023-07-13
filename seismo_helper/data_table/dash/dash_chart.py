@@ -7,7 +7,7 @@ from plotly.subplots import make_subplots
 import requests as rq
 from data_table.dash.Pageblank import navbar, footer, stylesheets
 import dash_bootstrap_components as dbc
-from seismo_helper.settings import ALLOWED_HOSTS
+from seismo_helper.settings import ALLOWED_HOSTS, DATABASE_API
 
 app = DjangoDash('Chart', external_stylesheets=stylesheets)
 
@@ -19,7 +19,6 @@ app.layout = html.Div([
     footer
     ]
 )
-DATABASE_API = f'http://{ALLOWED_HOSTS[0]}:8000/api/'
 
 
 @app.callback(
