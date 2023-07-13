@@ -214,7 +214,7 @@ def update_output(value):
     x_range = np.linspace(MagCountX.min(), MagCountX.max(), 100)
     y_range = model.predict(x_range.reshape(-1, 1))
 
-    pxMagCountGrapf = px.scatter(MagCountdf, x="Magnitude", y="Count", title="Количество от магнитуды")
+    pxMagCountGrapf = px.scatter(MagCountdf, x="Magnitude", y="Count", title="Количество от магнитуды", log_y=True)
     pxMagCountGrapf.add_traces(go.Scatter(x=x_range, y=y_range, name='Тренд'))
 
     locrq = rq.get(DATABASE_API + 'locations/').json()['results']
