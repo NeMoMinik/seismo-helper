@@ -8,6 +8,7 @@ import requests as rq
 import pandas as pd
 
 app = DjangoDash('AddStations',external_stylesheets=stylesheets)
+
 table_columns = [
     {
         'id': '0',

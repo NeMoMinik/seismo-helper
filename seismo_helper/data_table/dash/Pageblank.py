@@ -1,11 +1,12 @@
 import dash_mantine_components as dmc
 import dash_bootstrap_components as dbc
-from dash import html, dcc, no_update, Dash, dash_table, callback
+from dash import html
 from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK
 import base64
 import os
 
 # external_stylesheets_downl = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
 global stylesheets
 stylesheets = [dbc.themes.LUMEN]
 
@@ -17,7 +18,7 @@ def openImg(path):
         return html.Img(id="tag_id", src=img_data, alt="my image", width='305px', height='100px', className="T1", style={'margin':'0px'})
 
 bvlogo = openImg('\\media\\Photos_for_Front\\BV_logo.png')
-#dbc.DropdownMenu(children=[dbc.DropdownMenuItem("More pages", header=True),dbc.DropdownMenuItem("Page 2", href="#"),dbc.DropdownMenuItem("Page 3", href="#"),],nav=True,in_navbar=True,label="More",),
+
 navbar = dbc.NavbarSimple(
     children=[
         dbc.NavItem(dbc.NavLink("Main Page", href=BASE_LINK+'Events/', target='_blank')),

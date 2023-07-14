@@ -9,18 +9,14 @@ from data_table.dash.Pageblank import footer, navbar, stylesheets
 import base64
 import os
 import requests as rq
-from seismo_helper.settings import ALLOWED_HOSTS, DATABASE_API, BASE_LINK
+from seismo_helper.settings import ALLOWED_HOSTS, DATABASE_API, BASE_LINK, UPLOAD_DIRECTORY
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from data_table.Upload_Miniseed import upload_miniseed
 
-global vv
-global mdf
-UPLOAD_DIRECTORY = os.getcwd() + "\\media\\MiniSeed\\"
-
 app = DjangoDash('DashDatatable', external_stylesheets=stylesheets)
 
-table_columns = [
+table_columns = [ #  Формат колонок для таблицы
     {
         'id': '0',
         'name': '№',
@@ -77,12 +73,15 @@ table_css = [
 fig = go.Figure()
 
 app.layout = html.Div(
-    [navbar, html.Div(id="page-content",
-                      children=[dcc.Dropdown(['Все локации'], 'Все локации', id='loc-dropdown'),
-                                  dcc.Graph(figure=fig, id='mapD'), ], style={'margin-bottom':'10%'}),
+    [
+    navbar,
+    html.Div(id="page-content",children=[
+        dcc.Dropdown(['Все локации'], 'Все локации', id='loc-dropdown'),
+        dcc.Graph(figure=fig, id='mapD'), ], style={'margin-bottom':'10%'}),
     html.Div(id="redirDiv"),
     html.Div(id="redirDiv2"),
-    footer]
+    footer
+    ]
 )
 
 
@@ -91,22 +90,24 @@ app.layout = html.Div(
               State('upload-data', 'filename'),
               State('upload-data', 'last_modified'),
               State('loc-dropdown', 'value'))
-def update_outputfile(contents, list_of_names, list_of_dates, location):
+def update_outputfile(contents, list_of_names, list_of_dates, location): #  Функция, загружающая miniseed-файлы
     if contents is None or location == 'Все локации':
         return None
+    if not os.path.exists(UPLOAD_DIRECTORY + str(location) + "\\"): os.makedirs(UPLOAD_DIRECTORY + str(location) + "\\")
+
     Paths = []
-    if not os.path.exists(UPLOAD_DIRECTORY + str(location) + "\\"): os.makedirs(UPLOAD_DIRECTORY + str(location) + "\\")        
-    for i in range(len(list_of_names)):
-        if list_of_names[i][list_of_names[i].rfind('.'):] == '.miniseed':
-            with open(UPLOAD_DIRECTORY + str(location) + "\\" + list_of_names[i], "wb") as fh:
-                data = contents[i].encode("utf8").split(b";base64,")[1]
-                fh.write(base64.decodebytes(data))
-                Paths.append(UPLOAD_DIRECTORY + str(location) + "\\" + list_of_names[i])
+    for file_index in range(len(list_of_names)):
+        if list_of_names[file_index][list_of_names[file_index].rfind('.'):] == '.miniseed':
+            with open(UPLOAD_DIRECTORY + str(location) + "\\" + list_of_names[file_index], "wb") as miniseed_file:
+                data = contents[file_index].encode("utf8").split(b";base64,")[1]
+                miniseed_file.write(base64.decodebytes(data))
+                Paths.append(UPLOAD_DIRECTORY + str(location) + "\\" + list_of_names[file_index])
+
     upload_miniseed(Paths, location)
 
 @app.callback(Output("redirDiv", "children"),
               Input('mapD', 'clickData'))
-def update_contents(clickData):
+def update_contents(clickData): #  Функция для перехода с карты на страницу отдельного события
     if clickData:
         event_id = clickData['points'][0]['customdata'][0]
         link = f'Events/{event_id}'
@@ -114,61 +115,53 @@ def update_contents(clickData):
 
 @app.callback(Output("redirDiv2", "children"),
               Input('MagTimeGraph', 'clickData'))
-def redir_from_graph(clickData):
+def redir_from_graph(clickData): #  Функция для перехода с графика на страницу отдельного события
     if clickData:
         event_id = clickData['points'][0]['customdata'][0]
         link = f'Events/{event_id}'
         return dcc.Location(pathname=link, id="sid")    
 
-# UPDATE
-
 @app.callback(
     Output('page-content', 'children'),
     Input('loc-dropdown', 'value'),
 )
-def update_output(value):
-    global vv, mdf
-    vv = rq.get(DATABASE_API + 'events/').json()['results']
-    station_coords = rq.get(DATABASE_API + 'stations/').json()['results']
-    site_lat = []
-    site_lon = []
-    for i in station_coords:
-        site_lat.append(i['x'])
-        site_lon.append(i['y'])
-    MTGrapg = []
-    W = [[], [], [], [], [], [], [], [], []]
-    for i in vv:
-        if i['location'] == value or value == 'Все локации':
-            if i['magnitude'] != None:
-                W[0].append(f"[{i['id']}]({BASE_LINK + 'Events/'}{i['id']})")
-                W[1].append(i['location'])
-                W[2].append(i['start'])
-                W[3].append(i['end'])
-                W[4].append(i['x'])
-                W[5].append(i['y'])
-                W[6].append(i['z'])
-                W[7].append(i['magnitude'])
-                W[8].append(i['id'])
-    S = [[], [], [], [], [], [], [], [], []]
-    for i in vv:
-        if i['location'] == value or value == 'Все локации':
-            S[0].append(f"[{i['id']}]({BASE_LINK + 'Events/'}{i['id']})")
-            S[1].append(i['location'])
-            S[2].append(i['start'])
-            S[3].append(i['end'])
-            S[4].append(i['x'])
-            S[5].append(i['y'])
-            S[6].append(i['z'])
-            S[7].append(i['magnitude'])
-            S[8].append(i['id'])
-            MTGrapg.append({'Time': i['start'], 'Magnitude': i['magnitude'], 'id':i['id']})
-    mdf = pd.DataFrame(W).T.sort_values(0)
-    df = pd.DataFrame(S[:8]).T.sort_values(0)
-    Size = [W[7][i] for i in range(len(W[7]))]
-    mdf.columns = ['№', 'Локация', 'Начало', 'Конец', 'X', 'Y', 'Z', 'Магнитуда', 'id']
+def update_output(value): #  Функция для обновления карты, графиков и таблицы
+    #  Запросы в базу данных:
+    events_list = rq.get(DATABASE_API + 'events/').json()['results']
+    stations_list = rq.get(DATABASE_API + 'stations/').json()['results']
+
+    locations_requested = rq.get(DATABASE_API + 'locations/').json()['results']
+    locations_for_dropdown = [{'label': x['name'], 'value':x['id']} for x in locations_requested]
+
+    site_lat = [i['x'] for i in stations_list]
+    site_lon = [i['y'] for i in stations_list]
+
+    magnitude_time_graph_df = [{'Time': i['start'], 'Magnitude': i['magnitude'], 'id':i['id']} for i in events_list]
+    events_list_table = []
+    for event in events_list:
+        if event['magnitude'] != None:
+            events_list_table.append([f"[{event['id']}]({BASE_LINK + 'Events/'}{event['id']})",
+                                    event['location'],
+                                    event['start'],
+                                    event['end'],
+                                    event['x'],
+                                    event['y'],
+                                    event['z'],
+                                    event['magnitude'],
+                                    event['id']])
+    events_list_graphs = [[f"[{i['id']}]({BASE_LINK + 'Events/'}{i['id']})", i['location'], i['start'], i['end'], i['x'], i['y'], i['z'], i['magnitude'], i['id']] for i in events_list]
+    
+    map_df = pd.DataFrame(events_list_table).sort_values(0)
+    datatable_df = pd.DataFrame(events_list_graphs[:8]).sort_values(0)
+    markers_size_list = [event[7] for event in events_list_table]
+    map_df.columns = ['№', 'Локация', 'Начало', 'Конец', 'X', 'Y', 'Z', 'Магнитуда', 'id']
     fig = go.Figure()
 
-    fig.add_traces(list(px.scatter_mapbox(mdf, lat='Y', lon='X', size=Size, hover_data="id",
+    fig.add_traces(list(px.scatter_mapbox(map_df,
+                                          lat='Y',
+                                          lon='X',
+                                          size=markers_size_list,
+                                          hover_data="id",
                                           color='Магнитуда',
                                           color_continuous_scale=px.colors.cyclical.IceFire).select_traces()))
 
@@ -185,88 +178,97 @@ def update_output(value):
         hoverinfo='none'
     )))
 
-    fig.update_layout(mapbox_style="open-street-map",
-                      mapbox_zoom=3)
+    fig.update_layout(mapbox_style="open-street-map", mapbox_zoom=3)
     fig.update_layout(height=500, margin={"r": 0, "t": 0, "l": 0, "b": 0})
-    pxMagTimeGraph = px.line(MTGrapg, x="Time", y="Magnitude", hover_data="id", title="Магнитуда от времени")
-    pxMagTimeGraph.update_traces(mode="markers", hovertemplate=None)
 
-    MagCount = [0 for _ in range(100)]
-    MagCountdf = []
-    for i in range(len(W[0])):
-        if W[7][i]:
-            MagCount[int(W[7][i] * 100 // 10)] += 1
-    MagCountX = []
-    MagCountY = []
+    magnitude_time_graph = px.line(magnitude_time_graph_df, x="Time", y="Magnitude", hover_data="id", title="Магнитуда от времени")
+    magnitude_time_graph.update_traces(mode="markers", hovertemplate=None)
+
+    magnitude_count_list = [0 for _ in range(100)]
+    magnitude_count_df = []
+    for event in events_list_table:
+        if event[7]:
+            magnitude_count_list[int(event[7] * 100 // 10)] += 1
+    
+    magnitudes_list = []
+    magnitudes_count_list = []
     for i in range(100):
-        if (MagCount[i] != 0):
-            MagCountdf.append({'Magnitude': i / 10, 'Count': MagCount[i]})
-            MagCountX.append(i / 10)
-            MagCountY.append(MagCount[i])
-    MCdf = pd.DataFrame(MagCount)
-    MagCountX = np.array(MagCountX)
-    MagCountX = MagCountX.reshape(-1, 1)
+        if (magnitude_count_list[i] != 0):
+            magnitude_count_df.append({'Magnitude': i / 10, 'Count': magnitude_count_list[i]})
+            magnitudes_list.append(i / 10)
+            magnitudes_count_list.append(magnitude_count_list[i])
+    
+    magnitudes_list = np.array(magnitudes_list)
+    magnitudes_list = magnitudes_list.reshape(-1, 1)
 
-    model = LinearRegression()
-    model.fit(MagCountX, MagCountY)
-    x_range = np.linspace(MagCountX.min(), MagCountX.max(), 100)
-    y_range = model.predict(x_range.reshape(-1, 1))
+    magn_count_trend = LinearRegression()
+    magn_count_trend.fit(magnitudes_list, magnitudes_count_list)
+    x_range = np.linspace(magnitudes_list.min(), magnitudes_list.max(), 100)
+    y_range = magn_count_trend.predict(x_range.reshape(-1, 1))
 
-    pxMagCountGrapf = px.scatter(MagCountdf, x="Magnitude", y="Count", title="Количество от магнитуды", log_y=True)
+    pxMagCountGrapf = px.scatter(magnitude_count_df, x="Magnitude", y="Count", title="Количество от магнитуды", log_y=True)
     pxMagCountGrapf.add_traces(go.Scatter(x=x_range, y=y_range, name='Тренд'))
 
-    locrq = rq.get(DATABASE_API + 'locations/').json()['results']
-    locations_for_dd = [{'label': x['name'], 'value':x['id']} for x in locrq]
 
     divs_children = [
         dbc.Row([
-            dbc.Col(html.Div(dbc.NavItem(
-            dbc.NavLink("Добавить станции", href=f'http://{ALLOWED_HOSTS[0]}:8000/Stations/', target='_blank',
-                        style={'color': 'Black', 'width': '100%',
-                               'height': '40px', 'lineHeight': '40px', 'borderWidth': '1px', 'borderStyle': 'dashed',
-                               'borderRadius': '5px', 'textAlign': 'center', 'vertical-align': 'middle',
-                               'margin': '10px'})),
-                 style={'textAlign': 'center',
-                        'margin-right': '15px'})),
-            dbc.Col(html.Div(dcc.Dropdown([{'label': 'Все локации', 'value': 'Все локации'}] + locations_for_dd, value, id='loc-dropdown'),
-                 style={'textAlign': 'center',
-                        'margin': '12px', 'height': '40px'})),
+            dbc.Col(html.Div(
+                dbc.NavItem(
+                    dbc.NavLink("Добавить станции",
+                                href=f'http://{ALLOWED_HOSTS[0]}:8000/Stations/',
+                                target='_blank',
+                                style={'color': 'Black', 'width': '100%',
+                                    'height': '40px',
+                                    'lineHeight': '40px',
+                                    'borderWidth': '1px',
+                                    'borderStyle': 'dashed',
+                                    'borderRadius': '5px',
+                                    'textAlign': 'center',
+                                    'vertical-align': 'middle',
+                                    'margin': '10px'})),
+                        style={'textAlign': 'center',
+                                'margin-right': '15px'})),
+            
+            dbc.Col(html.Div(dcc.Dropdown([{'label': 'Все локации', 'value': 'Все локации'}] + locations_for_dropdown, value, id='loc-dropdown'),
+                style={'textAlign': 'center',
+                        'margin': '12px',
+                        'height': '40px'})),
+            
             dbc.Col(html.Div(dcc.Upload(
-            id='upload-data',
-            children=html.Div([
-                'Drag and Drop or ',
-                html.A('Select Miniseed Files')
-            ]),
-            style={
-                'width': '95%',
-                'height': '40px',
-                'lineHeight': '40px',
-                'borderWidth': '1px',
-                'borderStyle': 'dashed',
-                'borderRadius': '5px',
-                'textAlign': 'center',
-                'margin': '10px',
-                'float':'left0',
-                'vertical-align': 'middle'
-            },
-            multiple=True
-        )))     
+                id='upload-data',
+                children=html.Div([
+                    'Drag and Drop or ',
+                    html.A('Select Miniseed Files')
+                ]),
+                style={
+                    'width': '95%',
+                    'height': '40px',
+                    'lineHeight': '40px',
+                    'borderWidth': '1px',
+                    'borderStyle': 'dashed',
+                    'borderRadius': '5px',
+                    'textAlign': 'center',
+                    'margin': '10px',
+                    'float':'left0',
+                    'vertical-align': 'middle'
+                },
+                multiple=True
+                )))
         ]),
-        
 
         html.Div(dcc.Graph(figure=fig, id='mapD')),
         dbc.Row([
-            dbc.Col(dcc.Graph(id="MagTimeGraph", figure=pxMagTimeGraph),style={'width':'50%'}),
+            dbc.Col(dcc.Graph(id="MagTimeGraph", figure=magnitude_time_graph),style={'width':'50%'}),
             dbc.Col(dcc.Graph(id="MagCountGrapf", figure=pxMagCountGrapf),style={'width':'50%'})
-                 ]),
+        ]),
 
         dash_table.DataTable(
             id='datatable-interactivity',
             columns=table_columns,
-            css=[{"selector": "p", "rule": "text-Align: center"}] + [
-                {'selector': f'th[data-dash-column="{col}"] span.column-header--sort', 'rule': 'display: none',
-                 'textAlign': 'center'} for col in non_sortable_column_ids],
-            data=df.to_dict('records'),
+            css=[{"selector": "p",
+                "rule": "text-Align: center"}] + [
+                {'selector': f'th[data-dash-column="{col}"] span.column-header--sort','rule': 'display: none', 'textAlign': 'center'} for col in non_sortable_column_ids],
+            data=datatable_df.to_dict('records'),
             sort_action="native",
             sort_mode="single",
             style_cell={'textAlign': 'center'},

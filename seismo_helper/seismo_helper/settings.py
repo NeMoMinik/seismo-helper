@@ -35,6 +35,7 @@ DATABASE_API = f'http://{ALLOWED_HOSTS[0]}:8000/api/'
 
 BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/'
 
+UPLOAD_DIRECTORY = os.getcwd() + "\\media\\MiniSeed\\"
 
 # Application definition
 
