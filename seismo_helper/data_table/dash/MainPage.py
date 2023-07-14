@@ -121,43 +121,34 @@ def redir_from_graph(clickData): #  Функция для перехода с г
         link = f'Events/{event_id}'
         return dcc.Location(pathname=link, id="sid")    
 
-@app.callback(
-    Output('page-content', 'children'),
-    Input('loc-dropdown', 'value'),
-)
-def update_output(value): #  Функция для обновления карты, графиков и таблицы
-    #  Запросы в базу данных:
-    events_list = rq.get(DATABASE_API + 'events/').json()['results']
-    stations_list = rq.get(DATABASE_API + 'stations/').json()['results']
 
-    locations_requested = rq.get(DATABASE_API + 'locations/').json()['results']
-    locations_for_dropdown = [{'label': x['name'], 'value':x['id']} for x in locations_requested]
+def update_map(requested_events, requested_stations, location): #  Обновление карты
+    site_lat = [i['x'] for i in requested_stations]
+    site_lon = [i['y'] for i in requested_stations]
 
-    site_lat = [i['x'] for i in stations_list]
-    site_lon = [i['y'] for i in stations_list]
 
-    magnitude_time_graph_df = [{'Time': i['start'], 'Magnitude': i['magnitude'], 'id':i['id']} for i in events_list]
-    events_list_table = []
-    for event in events_list:
-        if event['magnitude'] != None:
-            events_list_table.append([f"[{event['id']}]({BASE_LINK + 'Events/'}{event['id']})",
-                                    event['location'],
-                                    event['start'],
-                                    event['end'],
-                                    event['x'],
-                                    event['y'],
-                                    event['z'],
-                                    event['magnitude'],
-                                    event['id']])
-    events_list_graphs = [[f"[{i['id']}]({BASE_LINK + 'Events/'}{i['id']})", i['location'], i['start'], i['end'], i['x'], i['y'], i['z'], i['magnitude'], i['id']] for i in events_list]
-    
     map_df = pd.DataFrame(events_list_table).sort_values(0)
-    datatable_df = pd.DataFrame(events_list_graphs[:8]).sort_values(0)
+
     markers_size_list = [event[7] for event in events_list_table]
     map_df.columns = ['№', 'Локация', 'Начало', 'Конец', 'X', 'Y', 'Z', 'Магнитуда', 'id']
-    fig = go.Figure()
 
-    fig.add_traces(list(px.scatter_mapbox(map_df,
+    events_list_table = []
+    for event in requested_events:
+        if event['location'] == location or location == 'Все локации':
+            if event['magnitude'] != None:
+                events_list_table.append([f"[{event['id']}]({BASE_LINK + 'Events/'}{event['id']})",
+                                        event['location'],
+                                        event['start'],
+                                        event['end'],
+                                        event['x'],
+                                        event['y'],
+                                        event['z'],
+                                        event['magnitude'],
+                                        event['id']])
+    
+    map_figure = go.Figure()
+
+    map_figure.add_traces(list(px.scatter_mapbox(map_df,
                                           lat='Y',
                                           lon='X',
                                           size=markers_size_list,
@@ -165,7 +156,7 @@ def update_output(value): #  Функция для обновления карт
                                           color='Магнитуда',
                                           color_continuous_scale=px.colors.cyclical.IceFire).select_traces()))
 
-    fig.add_traces((go.Scattermapbox(
+    map_figure.add_traces((go.Scattermapbox(
         lat=site_lon,
         lon=site_lat,
         name = 'Станции',
@@ -178,15 +169,35 @@ def update_output(value): #  Функция для обновления карт
         hoverinfo='none'
     )))
 
-    fig.update_layout(mapbox_style="open-street-map", mapbox_zoom=3)
-    fig.update_layout(height=500, margin={"r": 0, "t": 0, "l": 0, "b": 0})
+    map_figure.update_layout(mapbox_style="open-street-map", mapbox_zoom=3)
+    map_figure.update_layout(height=500, margin={"r": 0, "t": 0, "l": 0, "b": 0})
+
+    return map_figure
+
+@app.callback(
+    Output('page-content', 'children'),
+    Input('loc-dropdown', 'value'),
+)
+def update_output(value): #  Функция для обновления карты, графиков и таблицы
+    #  Запросы в базу данных:
+    events_list = rq.get(DATABASE_API + 'events/').json()['results']
+    stations_list = rq.get(DATABASE_API + 'stations/').json()['results']
+
+    locations_requested = rq.get(DATABASE_API + 'locations/').json()['results']
+    locations_for_dropdown = [{'label': x['name'], 'value':x['id']} for x in locations_requested]
+
+    magnitude_time_graph_df = [{'Time': i['start'], 'Magnitude': i['magnitude'], 'id':i['id']} for i in events_list]
+    
+    events_list_graphs = [[f"[{i['id']}]({BASE_LINK + 'Events/'}{i['id']})", i['location'], i['start'], i['end'], i['x'], i['y'], i['z'], i['magnitude'], i['id']] for i in events_list]
+    
+    datatable_df = pd.DataFrame(events_list_graphs[:8]).sort_values(0)
 
     magnitude_time_graph = px.line(magnitude_time_graph_df, x="Time", y="Magnitude", hover_data="id", title="Магнитуда от времени")
     magnitude_time_graph.update_traces(mode="markers", hovertemplate=None)
 
     magnitude_count_list = [0 for _ in range(100)]
     magnitude_count_df = []
-    for event in events_list_table:
+    for event in events_list_graphs:
         if event[7]:
             magnitude_count_list[int(event[7] * 100 // 10)] += 1
     
@@ -206,8 +217,8 @@ def update_output(value): #  Функция для обновления карт
     x_range = np.linspace(magnitudes_list.min(), magnitudes_list.max(), 100)
     y_range = magn_count_trend.predict(x_range.reshape(-1, 1))
 
-    pxMagCountGrapf = px.scatter(magnitude_count_df, x="Magnitude", y="Count", title="Количество от магнитуды", log_y=True)
-    pxMagCountGrapf.add_traces(go.Scatter(x=x_range, y=y_range, name='Тренд'))
+    magn_count_graph = px.scatter(magnitude_count_df, x="Magnitude", y="Count", title="Количество от магнитуды", log_y=True)
+    magn_count_graph.add_traces(go.Scatter(x=x_range, y=y_range, name='Тренд'))
 
 
     divs_children = [
@@ -256,10 +267,10 @@ def update_output(value): #  Функция для обновления карт
                 )))
         ]),
 
-        html.Div(dcc.Graph(figure=fig, id='mapD')),
+        html.Div(dcc.Graph(figure=update_map(events_list, stations_list, value), id='mapD')),
         dbc.Row([
             dbc.Col(dcc.Graph(id="MagTimeGraph", figure=magnitude_time_graph),style={'width':'50%'}),
-            dbc.Col(dcc.Graph(id="MagCountGrapf", figure=pxMagCountGrapf),style={'width':'50%'})
+            dbc.Col(dcc.Graph(id="MagCountGrapf", figure=magn_count_graph),style={'width':'50%'})
         ]),
 
         dash_table.DataTable(
