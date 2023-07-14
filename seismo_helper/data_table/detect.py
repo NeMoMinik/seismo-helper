@@ -24,7 +24,8 @@ threshold : float
     Пороговое значение sta/lta, число больше которого считается активностью
     """
 
-    def __init__(self, paths: list, location: str, n_sta: int = 500, n_lta: int = 10000, threshold: float = 5, eps: int = 1000):
+    def __init__(self, paths: list, location: str, n_sta: int = 500, n_lta: int = 10000, threshold: float = 5,
+                 eps: int = 1000):
         self.paths = paths
         self.location = location
         self.n_sta = n_sta

@@ -7,7 +7,7 @@ from dash.dependencies import Output, Input, State
 import requests as rq
 import pandas as pd
 
-app = DjangoDash('AddStations',external_stylesheets=stylesheets)
+app = DjangoDash('AddStations', external_stylesheets=stylesheets)
 
 table_columns = [
     {
@@ -49,6 +49,7 @@ app.layout = html.Div([
     footer
 ])
 
+
 @app.callback(
     Output('ddd', 'children'),
     Input('dd', 'value')
@@ -64,14 +65,15 @@ def upd_dd(value):
         S[2].append(i['x'])
         S[3].append(i['y'])
         S[4].append(i['z'])
-    A = [{'label': x['name'], 'value':x['id']} for x in vv]
+    A = [{'label': x['name'], 'value': x['id']} for x in vv]
     df = pd.DataFrame(S).T.sort_values(0)
     return [dcc.Dropdown(options=A, value=value, id='dd'),
-            dcc.Input(id='name', placeholder='Название', type='text', style={'margin-left':'1%'}),
-            dcc.Input(id='X', placeholder='Широта', type='float', style={'margin-left':'1%'}),
-            dcc.Input(id='Y', placeholder='Долгота', type='float', style={'margin-left':'1%'}),
-            dcc.Input(id='Z', placeholder='Высота над уровнем моря', type='float', style={'margin-left':'1%', 'width':'13%'}),
-            html.Button('Добавить', id='submit-val', n_clicks=0, style={'margin-left':'1%'}),
+            dcc.Input(id='name', placeholder='Название', type='text', style={'margin-left': '1%'}),
+            dcc.Input(id='X', placeholder='Широта', type='float', style={'margin-left': '1%'}),
+            dcc.Input(id='Y', placeholder='Долгота', type='float', style={'margin-left': '1%'}),
+            dcc.Input(id='Z', placeholder='Высота над уровнем моря', type='float',
+                      style={'margin-left': '1%', 'width': '13%'}),
+            html.Button('Добавить', id='submit-val', n_clicks=0, style={'margin-left': '1%'}),
             html.Div(id='tableDiv', children=[dash_table.DataTable(
                 id='datatable',
                 columns=table_columns,
@@ -106,7 +108,7 @@ def update_output(n_clicks, x, y, z, name, loc_id):
         }
         r = rq.post(DATABASE_API + 'stations/', data=data)
         text = "Успешно"
-        txtstyle = {'color':'Green'}
+        txtstyle = {'color': 'Green'}
         if r.status_code == 400:
             text = ''
             for i in r.json():
@@ -122,11 +124,11 @@ def update_output(n_clicks, x, y, z, name, loc_id):
             S[4].append(i['z'])
         df = pd.DataFrame(S).T.sort_values(0)
         return [dash_table.DataTable(
-                id='datatable',
-                columns=table_columns,
-                sort_action="native",
-                sort_mode="single",
-                data=df.to_dict('records'),
-                style_cell={'textAlign': 'center'}),
-                text]
+            id='datatable',
+            columns=table_columns,
+            sort_action="native",
+            sort_mode="single",
+            data=df.to_dict('records'),
+            style_cell={'textAlign': 'center'}),
+            text]
     return no_update

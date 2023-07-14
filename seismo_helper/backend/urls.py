@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.urls import path, include
-from .views import get_table, get_chart, get_tutor, get_about, get_start, get_profile, logging, get_stations, get_login, get_auth
+from .views import get_table, get_chart, get_tutor, get_about, get_start, get_profile, logging, get_stations, get_login, \
+    get_auth
+
 urlpatterns = [
     path('Events/', get_table),
     path('Events/<int:id_event>', get_chart),
