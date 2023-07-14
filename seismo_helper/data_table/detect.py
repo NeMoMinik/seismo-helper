@@ -38,7 +38,7 @@ threshold : float
 
     def detection(self) -> list:
         sta_lta = []
-        seismic_stations= self.reading_miniseeds(self.paths)
+        seismic_stations = self.reading_miniseeds(self.paths)
         filtered_stations = self.using_preprocessing(seismic_stations)
         for filtered_traces in filtered_stations:
             if len(filtered_traces) != 3:
@@ -67,7 +67,8 @@ threshold : float
             seismic_stations.append(trace.copy())
         return seismic_stations
 
-    def using_preprocessing(self, seismic_stations: list) -> list:
+    @staticmethod
+    def using_preprocessing(seismic_stations: list) -> list:
         """Использование фильтрации"""
         filtered_station = []
         for station in seismic_stations:

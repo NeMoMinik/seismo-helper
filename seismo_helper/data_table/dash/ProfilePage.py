@@ -14,14 +14,20 @@ app.layout = html.Div([
     navbar,
     html.H2('Ваш профиль'),
     html.Div(id='usrn', children=[]),
-    dcc.Store(id="session", data=''),
+    dcc.Store(id="session", data=None),
+    html.Div(id="hidden_div_for_callback"),
     footer
 ])
+
+
 @app.callback(
     Output('usrn', 'children'),
-    State('session', 'data')    
+    Input('session', 'data'),
 )
 def load_profile(aboba):
-    data = rq.get(f'http://{ALLOWED_HOSTS[0]}:8000/auth/users/me', headers={'Authorization':'Token ' + aboba})
-    print(data)
-    return str(data)
+    if aboba is not None:
+        data = rq.get(f'http://{ALLOWED_HOSTS[0]}:8000/auth/users/me', headers={'Authorization': 'Token ' + aboba}).json()
+        print(data)
+        return [dcc.Input(id="username", value=data['username']), dcc.Input(id="email", value=data['email'], disabled=True), dbc.Button(title="сменить почту", ), str(data)]
+    else:
+        return dcc.Location(pathname=f"Login/", id="someid_doesnt_matter")
