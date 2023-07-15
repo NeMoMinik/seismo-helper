@@ -23,7 +23,7 @@ app.layout = html.Div([
     Input('id_event', 'value')
 )
 def update_line_chart(value):
-    colors = [  #https://colorscheme.ru/#4f52Pw0w0w0w0
+    colors = [  # https://colorscheme.ru/#4f52Pw0w0w0w0
         '#6C48D7',
         '#FF4540',
         '#39E444'
@@ -35,11 +35,11 @@ def update_line_chart(value):
         for color, j in enumerate(i['channels']):
             d = np.load(i['path'] + j)
             fig.add_trace(go.Scatter(x=[i for i in range(0, len(d) * 5, 5)],
-                                    y=d,
-                                    mode='lines',
-                                    name=j.split('.')[0],
-                                    line=dict(color=colors[color])
-                                    ),
+                                     y=d,
+                                     mode='lines',
+                                     name=j.split('.')[0],
+                                     line=dict(color=colors[color])
+                                     ),
                           col=1,
                           row=n + 1
                           )

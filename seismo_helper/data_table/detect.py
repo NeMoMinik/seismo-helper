@@ -24,7 +24,8 @@ threshold : float
     Пороговое значение sta/lta, число больше которого считается активностью
     """
 
-    def __init__(self, paths: list, location: str, n_sta: int = 500, n_lta: int = 10000, threshold: float = 5, eps: int = 1000):
+    def __init__(self, paths: list, location: str, n_sta: int = 500, n_lta: int = 10000, threshold: float = 5,
+                 eps: int = 1000):
         self.paths = paths
         self.location = location
         self.n_sta = n_sta
@@ -38,7 +39,7 @@ threshold : float
 
     def detection(self) -> list:
         sta_lta = []
-        seismic_stations= self.reading_miniseeds(self.paths)
+        seismic_stations = self.reading_miniseeds(self.paths)
         filtered_stations = self.using_preprocessing(seismic_stations)
         for filtered_traces in filtered_stations:
             if len(filtered_traces) != 3:
@@ -67,7 +68,8 @@ threshold : float
             seismic_stations.append(trace.copy())
         return seismic_stations
 
-    def using_preprocessing(self, seismic_stations: list) -> list:
+    @staticmethod
+    def using_preprocessing(seismic_stations: list) -> list:
         """Использование фильтрации"""
         filtered_station = []
         for station in seismic_stations:

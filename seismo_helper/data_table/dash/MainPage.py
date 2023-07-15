@@ -16,7 +16,7 @@ from data_table.Upload_Miniseed import upload_miniseed
 
 app = DjangoDash('DashDatatable', external_stylesheets=stylesheets)
 
-table_columns = [ #  Формат колонок для таблицы
+table_columns = [  # Формат колонок для таблицы
     {
         'id': '0',
         'name': '№',

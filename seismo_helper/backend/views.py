@@ -7,8 +7,9 @@ import requests as rq
 from django.contrib.auth import login
 from django.views.decorators.csrf import csrf_exempt
 
+
 def get_token(request):
-    token = {"dash_context": {"session": {'data': ""}}}
+    token = {"dash_context": {"session": {'data': None}}}
     if request.user.is_authenticated:
         token["dash_context"]["session"]["data"] = Token.objects.get(user=request.user).key
     return token
