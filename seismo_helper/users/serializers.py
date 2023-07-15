@@ -3,7 +3,6 @@ from django.contrib.auth import get_user_model
 from djoser.conf import settings
 from rest_framework import serializers
 
-
 User = get_user_model()
 
 
@@ -18,6 +17,8 @@ class CustomUserSerializer(UserSerializer):
             "first_name",
             "second_name",
             "third_name",
-            "corporation"
+            "corporation",
+            "bio",
+            "id"
         )
         read_only_fields = (settings.LOGIN_FIELD,)
