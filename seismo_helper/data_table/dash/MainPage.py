@@ -74,13 +74,13 @@ fig = go.Figure()
 
 app.layout = html.Div(
     [
-    navbar,
-    html.Div(id="page-content",children=[
-        dcc.Dropdown(['Все локации'], 'Все локации', id='loc-dropdown'),
-        dcc.Graph(figure=fig, id='mapD'), ], style={'margin-bottom':'10%'}),
-    html.Div(id="redirDiv"),
-    html.Div(id="redirDiv2"),
-    footer
+        navbar,
+        html.Div(id="page-content", children=[
+            dcc.Dropdown(['Все локации'], 'Все локации', id='loc-dropdown'),
+            dcc.Graph(figure=fig, id='mapD'), ], style={'margin-bottom': '10%'}),
+        html.Div(id="redirDiv"),
+        html.Div(id="redirDiv2"),
+        footer
     ]
 )
 
@@ -90,10 +90,11 @@ app.layout = html.Div(
               State('upload-data', 'filename'),
               State('upload-data', 'last_modified'),
               State('loc-dropdown', 'value'))
-def update_outputfile(contents, list_of_names, list_of_dates, location): #  Функция, загружающая miniseed-файлы
+def update_outputfile(contents, list_of_names, list_of_dates, location):  # Функция, загружающая miniseed-файлы
     if contents is None or location == 'Все локации':
         return None
-    if not os.path.exists(UPLOAD_DIRECTORY + str(location) + "\\"): os.makedirs(UPLOAD_DIRECTORY + str(location) + "\\")
+    if not os.path.exists(UPLOAD_DIRECTORY + str(location) + "\\"):
+        os.makedirs(UPLOAD_DIRECTORY + str(location) + "\\")
 
     Paths = []
     for file_index in range(len(list_of_names)):
@@ -105,27 +106,28 @@ def update_outputfile(contents, list_of_names, list_of_dates, location): #  Фу
 
     upload_miniseed(Paths, location)
 
+
 @app.callback(Output("redirDiv", "children"),
               Input('mapD', 'clickData'))
-def update_contents(clickData): #  Функция для перехода с карты на страницу отдельного события
+def update_contents(clickData):  # Функция для перехода с карты на страницу отдельного события
     if clickData:
         event_id = clickData['points'][0]['customdata'][0]
         link = f'Events/{event_id}'
         return dcc.Location(pathname=link, id="sid")
 
+
 @app.callback(Output("redirDiv2", "children"),
               Input('MagTimeGraph', 'clickData'))
-def redir_from_graph(clickData): #  Функция для перехода с графика на страницу отдельного события
+def redir_from_graph(clickData):  # Функция для перехода с графика на страницу отдельного события
     if clickData:
         event_id = clickData['points'][0]['customdata'][0]
         link = f'Events/{event_id}'
-        return dcc.Location(pathname=link, id="sid")    
+        return dcc.Location(pathname=link, id="sid")
 
 
-def update_map(requested_events, requested_stations, location): #  Обновление карты
+def update_map(requested_events, requested_stations, location):  # Обновление карты
     site_lat = [i['x'] for i in requested_stations]
     site_lon = [i['y'] for i in requested_stations]
-
 
     map_df = pd.DataFrame(events_list_table).sort_values(0)
 
@@ -135,31 +137,31 @@ def update_map(requested_events, requested_stations, location): #  Обновл�
     events_list_table = []
     for event in requested_events:
         if event['location'] == location or location == 'Все локации':
-            if event['magnitude'] != None:
+            if event['magnitude'] is not None:
                 events_list_table.append([f"[{event['id']}]({BASE_LINK + 'Events/'}{event['id']})",
-                                        event['location'],
-                                        event['start'],
-                                        event['end'],
-                                        event['x'],
-                                        event['y'],
-                                        event['z'],
-                                        event['magnitude'],
-                                        event['id']])
-    
+                                          event['location'],
+                                          event['start'],
+                                          event['end'],
+                                          event['x'],
+                                          event['y'],
+                                          event['z'],
+                                          event['magnitude'],
+                                          event['id']])
+
     map_figure = go.Figure()
 
     map_figure.add_traces(list(px.scatter_mapbox(map_df,
-                                          lat='Y',
-                                          lon='X',
-                                          size=markers_size_list,
-                                          hover_data="id",
-                                          color='Магнитуда',
-                                          color_continuous_scale=px.colors.cyclical.IceFire).select_traces()))
+                                                 lat='Y',
+                                                 lon='X',
+                                                 size=markers_size_list,
+                                                 hover_data="id",
+                                                 color='Магнитуда',
+                                                 color_continuous_scale=px.colors.cyclical.IceFire).select_traces()))
 
     map_figure.add_traces((go.Scattermapbox(
         lat=site_lon,
         lon=site_lat,
-        name = 'Станции',
+        name='Станции',
         mode='markers',
         marker=go.scattermapbox.Marker(
             size=15,
@@ -174,25 +176,29 @@ def update_map(requested_events, requested_stations, location): #  Обновл�
 
     return map_figure
 
+
 @app.callback(
     Output('page-content', 'children'),
     Input('loc-dropdown', 'value'),
 )
-def update_output(value): #  Функция для обновления карты, графиков и таблицы
+def update_output(value):  # Функция для обновления карты, графиков и таблицы
     #  Запросы в базу данных:
     events_list = rq.get(DATABASE_API + 'events/').json()['results']
     stations_list = rq.get(DATABASE_API + 'stations/').json()['results']
 
     locations_requested = rq.get(DATABASE_API + 'locations/').json()['results']
-    locations_for_dropdown = [{'label': x['name'], 'value':x['id']} for x in locations_requested]
+    locations_for_dropdown = [{'label': x['name'], 'value': x['id']} for x in locations_requested]
 
-    magnitude_time_graph_df = [{'Time': i['start'], 'Magnitude': i['magnitude'], 'id':i['id']} for i in events_list]
-    
-    events_list_graphs = [[f"[{i['id']}]({BASE_LINK + 'Events/'}{i['id']})", i['location'], i['start'], i['end'], i['x'], i['y'], i['z'], i['magnitude'], i['id']] for i in events_list]
-    
+    magnitude_time_graph_df = [{'Time': i['start'], 'Magnitude': i['magnitude'], 'id': i['id']} for i in events_list]
+
+    events_list_graphs = [
+        [f"[{i['id']}]({BASE_LINK + 'Events/'}{i['id']})", i['location'], i['start'], i['end'], i['x'], i['y'], i['z'],
+         i['magnitude'], i['id']] for i in events_list]
+
     datatable_df = pd.DataFrame(events_list_graphs[:8]).sort_values(0)
 
-    magnitude_time_graph = px.line(magnitude_time_graph_df, x="Time", y="Magnitude", hover_data="id", title="Магнитуда от времени")
+    magnitude_time_graph = px.line(magnitude_time_graph_df, x="Time", y="Magnitude", hover_data="id",
+                                   title="Магнитуда от времени")
     magnitude_time_graph.update_traces(mode="markers", hovertemplate=None)
 
     magnitude_count_list = [0 for _ in range(100)]
@@ -200,15 +206,15 @@ def update_output(value): #  Функция для обновления карт
     for event in events_list_graphs:
         if event[7]:
             magnitude_count_list[int(event[7] * 100 // 10)] += 1
-    
+
     magnitudes_list = []
     magnitudes_count_list = []
     for i in range(100):
-        if (magnitude_count_list[i] != 0):
+        if magnitude_count_list[i] != 0:
             magnitude_count_df.append({'Magnitude': i / 10, 'Count': magnitude_count_list[i]})
             magnitudes_list.append(i / 10)
             magnitudes_count_list.append(magnitude_count_list[i])
-    
+
     magnitudes_list = np.array(magnitudes_list)
     magnitudes_list = magnitudes_list.reshape(-1, 1)
 
@@ -217,9 +223,9 @@ def update_output(value): #  Функция для обновления карт
     x_range = np.linspace(magnitudes_list.min(), magnitudes_list.max(), 100)
     y_range = magn_count_trend.predict(x_range.reshape(-1, 1))
 
-    magn_count_graph = px.scatter(magnitude_count_df, x="Magnitude", y="Count", title="Количество от магнитуды", log_y=True)
+    magn_count_graph = px.scatter(magnitude_count_df, x="Magnitude", y="Count", title="Количество от магнитуды",
+                                  log_y=True)
     magn_count_graph.add_traces(go.Scatter(x=x_range, y=y_range, name='Тренд'))
-
 
     divs_children = [
         dbc.Row([
@@ -229,22 +235,24 @@ def update_output(value): #  Функция для обновления карт
                                 href=f'http://{ALLOWED_HOSTS[0]}:8000/Stations/',
                                 target='_blank',
                                 style={'color': 'Black', 'width': '100%',
-                                    'height': '40px',
-                                    'lineHeight': '40px',
-                                    'borderWidth': '1px',
-                                    'borderStyle': 'dashed',
-                                    'borderRadius': '5px',
-                                    'textAlign': 'center',
-                                    'vertical-align': 'middle',
-                                    'margin': '10px'})),
-                        style={'textAlign': 'center',
-                                'margin-right': '15px'})),
-            
-            dbc.Col(html.Div(dcc.Dropdown([{'label': 'Все локации', 'value': 'Все локации'}] + locations_for_dropdown, value, id='loc-dropdown'),
+                                       'height': '40px',
+                                       'lineHeight': '40px',
+                                       'borderWidth': '1px',
+                                       'borderStyle': 'dashed',
+                                       'borderRadius': '5px',
+                                       'textAlign': 'center',
+                                       'vertical-align': 'middle',
+                                       'margin': '10px'})),
                 style={'textAlign': 'center',
-                        'margin': '12px',
-                        'height': '40px'})),
-            
+                       'margin-right': '15px'})),
+
+            dbc.Col(html.Div(
+                dcc.Dropdown([{'label': 'Все локации', 'value': 'Все локации'}] + locations_for_dropdown, value,
+                             id='loc-dropdown'),
+                style={'textAlign': 'center',
+                       'margin': '12px',
+                       'height': '40px'})),
+
             dbc.Col(html.Div(dcc.Upload(
                 id='upload-data',
                 children=html.Div([
@@ -260,25 +268,26 @@ def update_output(value): #  Функция для обновления карт
                     'borderRadius': '5px',
                     'textAlign': 'center',
                     'margin': '10px',
-                    'float':'left0',
+                    'float': 'left0',
                     'vertical-align': 'middle'
                 },
                 multiple=True
-                )))
+            )))
         ]),
 
         html.Div(dcc.Graph(figure=update_map(events_list, stations_list, value), id='mapD')),
         dbc.Row([
-            dbc.Col(dcc.Graph(id="MagTimeGraph", figure=magnitude_time_graph),style={'width':'50%'}),
-            dbc.Col(dcc.Graph(id="MagCountGrapf", figure=magn_count_graph),style={'width':'50%'})
+            dbc.Col(dcc.Graph(id="MagTimeGraph", figure=magnitude_time_graph), style={'width': '50%'}),
+            dbc.Col(dcc.Graph(id="MagCountGrapf", figure=magn_count_graph), style={'width': '50%'})
         ]),
 
         dash_table.DataTable(
             id='datatable-interactivity',
             columns=table_columns,
             css=[{"selector": "p",
-                "rule": "text-Align: center"}] + [
-                {'selector': f'th[data-dash-column="{col}"] span.column-header--sort','rule': 'display: none', 'textAlign': 'center'} for col in non_sortable_column_ids],
+                  "rule": "text-Align: center"}] + [
+                    {'selector': f'th[data-dash-column="{col}"] span.column-header--sort', 'rule': 'display: none',
+                     'textAlign': 'center'} for col in non_sortable_column_ids],
             data=datatable_df.to_dict('records'),
             sort_action="native",
             sort_mode="single",

@@ -8,7 +8,9 @@ class CustomUser(AbstractUser):
     first_name = models.CharField('first name', max_length=150, blank=True)
     second_name = models.CharField('first name', max_length=150, blank=True)
     third_name = models.CharField('first name', max_length=150, blank=True)
+    bio = models.CharField("bio", max_length=512, blank=True)
     # USERNAME_FIELD = "email"
+    EMAIL_FIELD = ["email"]
     REQUIRED_FIELDS = ["email"]
 
     corporation = models.ForeignKey(
