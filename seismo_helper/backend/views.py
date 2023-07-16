@@ -26,7 +26,8 @@ def get_table(request):
 
 def get_chart(request, id_event):
     template = 'datatable/Chart.html'
-    context = {'dash_context': {'id_event': {'value': id_event}}}
+    token = get_token(request)
+    context = {'dash_context': {'id_event': {'value': id_event}, 'session': {"data": token['dash_context']['session']['data']}}}
     response = render(request, template, context=context)
     return response
 
