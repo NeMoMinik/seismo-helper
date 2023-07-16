@@ -101,7 +101,8 @@ def update_output(n_clicks, x, y, z, name, loc_id, token):
              "y": "Долгота",
              "A valid number is required.": "введите ЧИСЛЕННОЕ значение.",
              "name": "Название",
-             "This field may not be blank.": "Поле не может быть пустым."}
+             "This field may not be blank.": "Поле не может быть пустым.",
+             "This field is required.": "Это поле обязательно"}
     if (x or y or z) is not None and loc_id != 'Локация':
         data = {
             "name": name,
@@ -119,7 +120,7 @@ def update_output(n_clicks, x, y, z, name, loc_id, token):
                 text += f"{stuff[i]}: {stuff[r.json()[i][0]]}\n"
                 txtstyle = {'color': 'Red'}
         S = [[], [], [], [], []]
-        dt = rq.get(DATABASE_API + 'stations/').json()['results']
+        dt = rq.get(DATABASE_API + 'stations/', headers={"Authorization": f"Token {token}"}).json()['results']
         for i in dt:
             S[0].append(i['id'])
             S[1].append(i['name'])
