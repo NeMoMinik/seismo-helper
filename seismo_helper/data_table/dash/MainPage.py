@@ -187,7 +187,6 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
                                           event['z'],
                                           event['magnitude'],
                                           event['id']])
-    map_figure.add_traces(list(px.scatter_mapbox().select_traces()))
     if len(events_list_table) != 0:
         print(events_list_table)
         map_df = pd.DataFrame(events_list_table)#.sort_values(0)
@@ -203,18 +202,18 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
                                                      color='Магнитуда',
                                                      color_continuous_scale=px.colors.cyclical.IceFire).select_traces()))
 
-        map_figure.add_traces((go.Scattermapbox(
-            lat=site_lon,
-            lon=site_lat,
-            name='Станции',
-            mode='markers',
-            marker=go.scattermapbox.Marker(
-                size=15,
-                color='rgb(0, 255, 0)',
-                opacity=1
-            ),
-            hoverinfo='none'
-        )))
+    map_figure.add_traces((go.Scattermapbox(
+        lat=site_lon,
+        lon=site_lat,
+        name='Станции',
+        mode='markers',
+        marker=go.scattermapbox.Marker(
+            size=15,
+            color='rgb(0, 255, 0)',
+            opacity=1
+        ),
+        hoverinfo='none'
+    )))
 
     return map_figure
 
