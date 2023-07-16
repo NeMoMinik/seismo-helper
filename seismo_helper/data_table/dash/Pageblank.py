@@ -29,6 +29,7 @@ navbar = dbc.NavbarSimple(
         dbc.NavItem(dbc.NavLink("About", href=BASE_LINK + 'About/', target='_blank')),
         dbc.NavItem(dbc.NavLink("Profile", href=BASE_LINK + 'Profile/', target='_blank')),
         dbc.NavItem(dbc.NavLink("Log In", href=BASE_LINK + 'Login/', target='_blank')),
+        dbc.NavItem(dbc.NavLink("Log Out", href=BASE_LINK + 'Logout/'))
     ],
     brand="Seismo-helper",
     brand_href=BASE_LINK,
