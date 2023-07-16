@@ -16,9 +16,12 @@ def get_token(request):
 
 
 def get_table(request):
-    update_output('Все локации')
-    template = 'datatable/Datatable.html'
-    return render(request, template)
+    if request.user.is_authenticated:
+        token = get_token(request)
+        update_output('Все локации', token["dash_context"]["session"]["data"])
+        template = 'datatable/Datatable.html'
+        return render(request, template, context=token)
+    return redirect('http://127.0.0.1:8000/Login/')
 
 
 def get_chart(request, id_event):
@@ -52,7 +55,9 @@ def get_login(request):
 
 def get_stations(request):
     template = 'datatable/AddStations.html'
-    return render(request, template)
+    context = get_token(request)
+    print(request.user)
+    return render(request, template, context=context)
 
 
 def get_start(request):

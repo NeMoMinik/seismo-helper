@@ -54,6 +54,7 @@ def register(clicks, username, email, password, data):
         "password": password
     }
                 )
+    print(r.content)
     if r.status_code == 400:
         return no_update
     r = rq.post("http://127.0.0.1:8000/auth/token/login/", data={"username": username, "password": password}).json()

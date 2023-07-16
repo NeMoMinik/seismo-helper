@@ -46,18 +46,21 @@ app.layout = html.Div([
     html.H1('Добавление станций приёма сигнала'),
     html.Div(id='ddd', children=[dcc.Dropdown(['Локация'], 'Локация', id='dd')]),
     html.Div(id='container-button-basic'),
+    dcc.Store(id="session", data=''),
     footer
 ])
 
 
 @app.callback(
     Output('ddd', 'children'),
-    Input('dd', 'value')
+    Input('dd', 'value'),
+    State('session', 'data')
 )
-def upd_dd(value):
+def upd_dd(value, aboba):
     global fupd
-    vv = rq.get(DATABASE_API + 'locations/').json()['results']
-    dt = rq.get(DATABASE_API + 'stations/').json()['results']
+    print(aboba)
+    vv = rq.get(DATABASE_API + 'locations/', headers={"Authorization": f"Token {aboba}"}).json()['results']
+    dt = rq.get(DATABASE_API + 'stations/', headers={"Authorization": f"Token {aboba}"}).json()['results']
     S = [[], [], [], [], []]
     for i in dt:
         S[0].append(i['id'])
@@ -89,9 +92,10 @@ def upd_dd(value):
     State('Y', 'value'),
     State('Z', 'value'),
     State('name', 'value'),
-    State('dd', 'value')
+    State('dd', 'value'),
+    State('session', 'data')
 )
-def update_output(n_clicks, x, y, z, name, loc_id):
+def update_output(n_clicks, x, y, z, name, loc_id, aboba):
     stuff = {"z": "Высота",
              "x": "Широта",
              "y": "Долгота",
@@ -106,7 +110,7 @@ def update_output(n_clicks, x, y, z, name, loc_id):
             "z": z,
             "location": loc_id,
         }
-        r = rq.post(DATABASE_API + 'stations/', data=data)
+        r = rq.post(DATABASE_API + 'stations/', headers={"Authorization": f"Token {aboba}"}, data=data)
         text = "Успешно"
         txtstyle = {'color': 'Green'}
         if r.status_code == 400:

@@ -7,14 +7,15 @@ from seismo_helper.settings import ALLOWED_HOSTS, DATABASE_API
 
 #  Функция, обрабатывающая загруженные miniseed-файлы и вызывающая детектор
 
-def upload_miniseed(paths, location):
+
+def upload_miniseed(paths, location, aboba):
     Files = []
     Times = []
 
     for i in paths:
         tarce = str(obspy.read(i)[0])
         date = datetime.strptime(tarce[tarce.find('| ')+2:tarce.find(' - ')-8], '%Y-%m-%dT%H:%M:%S')
-        Files.append([date,i])
+        Files.append([date, i])
         Times.append(date)
     
     sorted_files = []
@@ -38,20 +39,22 @@ def upload_miniseed(paths, location):
                     'start': event.start_time,
                     'end': event.end_time,
                     'location': location
-                }).json()
+                },
+                                  headers=aboba).json()
 
-                stations_requsted = rq.get(DATABASE_API + 'stations/').json()['results']
+                stations_requsted = rq.get(DATABASE_API + 'stations/', headers=aboba).json()['results']
                 stations_dict = {}
                 for station in stations_requsted:
-                    stations_dict[station['name']]= station['id']
+                    stations_dict[station['name']] = station['id']
                 for traces_files_index in range(len(paths)):
                     r = rq.post(f'{DATABASE_API}traces/',
-                        json={
-                            "path": path,
-                            "station": stations_dict[stations[traces_files_index]],#  Нужно добавить станции
-                            "channels": [{"path": paths[traces_files_index][0]},
-                                        {"path": paths[traces_files_index][1]},
-                                        {"path": paths[traces_files_index][2]}],
-                            "event": event_r['id']
-                        }
+                                json={
+                                    "path": path,
+                                    "station": stations_dict[stations[traces_files_index]],  # Нужно добавить станции
+                                    "channels": [{"path": paths[traces_files_index][0]},
+                                                 {"path": paths[traces_files_index][1]},
+                                                 {"path": paths[traces_files_index][2]}],
+                                    "event": event_r['id']
+                                },
+                                headers=aboba
                     )
