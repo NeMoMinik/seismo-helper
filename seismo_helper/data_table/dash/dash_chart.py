@@ -12,7 +12,7 @@ app = DjangoDash('Chart', external_stylesheets=stylesheets)
 app.layout = html.Div([
     navbar,
     html.H1('Сейсмотрасса'),
-    dcc.Graph(id="graph"),
+    html.Div(dcc.Graph(id="graph"),style={'margin-bottom':'10%'}),
     dcc.Input(id='id_event', type='hidden', value=''),
     dcc.Store(id='session', data=''),
     footer
