@@ -14,6 +14,20 @@ def upload_miniseed(paths, location, token):
 
     for i in paths:
         tarce = str(obspy.read(i)[0])
+        stations_requsted = rq.get(DATABASE_API + 'stations/').json()['results']
+        stations_dict = {}
+        for station in stations_requsted:
+            stations_dict[station['name']]= station['id']
+        if not tarce.split('.')[1] in stations_dict:
+            data = {
+                "name": tarce.split('.')[1],
+                "x": None,
+                "y": None,
+                "z": None,
+                "location": location,
+            }
+            r = rq.post(DATABASE_API + 'stations/', data=data)
+        
         date = datetime.strptime(tarce[tarce.find('| ')+2:tarce.find(' - ')-8], '%Y-%m-%dT%H:%M:%S')
         Files.append([date, i])
         Times.append(date)
