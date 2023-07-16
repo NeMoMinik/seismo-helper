@@ -75,9 +75,6 @@ fig = go.Figure()
 app.layout = html.Div(
     [
         navbar,
-        html.Div(id="page-content", children=[
-            dcc.Dropdown([{'label': 'Все локации', 'value': 'Все локации'}], 'Все локации', id='loc-dropdown'),
-            dcc.Graph(figure=fig, id='mapD'), ], style={'margin-bottom': '10%'}),
         html.Div(id='static-content', children=[
             dbc.Col(html.Div(dcc.Upload(
                 id='upload-data',
@@ -117,6 +114,9 @@ app.layout = html.Div(
                        'margin-right': '15px'})),
         ],
                  ),
+        html.Div(id="page-content", children=[
+            dcc.Dropdown([{'label': 'Все локации', 'value': 'Все локации'}], 'Все локации', id='loc-dropdown'),
+            dcc.Graph(figure=fig, id='mapD'), ], style={'margin-bottom': '10%'}),
         html.Div(id="redirDiv"),
         html.Div(id="redirDiv2"),
         dcc.Store(id='session', data=None),
@@ -132,7 +132,7 @@ app.layout = html.Div(
               State('loc-dropdown', 'value'),
               State('session', 'data')
               )
-def update_outputfile(contents, list_of_names, list_of_dates, location, aboba):  # Функция, загружающая miniseed-файлы
+def update_outputfile(contents, list_of_names, list_of_dates, location, token):  # Функция, загружающая miniseed-файлы
     if contents is None or location == 'Все локации':
         return None
     if not os.path.exists(UPLOAD_DIRECTORY + str(location) + "\\"):
@@ -146,7 +146,7 @@ def update_outputfile(contents, list_of_names, list_of_dates, location, aboba): 
                 miniseed_file.write(base64.decodebytes(data))
                 Paths.append(UPLOAD_DIRECTORY + str(location) + "\\" + list_of_names[file_index])
 
-    upload_miniseed(Paths, location, {"Authorization": f"Token {aboba}"})
+    upload_miniseed(Paths, location, {"Authorization": f"Token {token}"})
 
 
 @app.callback(Output("redirDiv", "children"),
@@ -294,12 +294,12 @@ def create_dropdown(locations_requested, value):
     Input('loc-dropdown', 'value'),
     State('session', 'data')
 )
-def update_output(value, aboba):  # Функция для обновления карты, графиков и таблицы
+def update_output(value, token):  # Функция для обновления карты, графиков и таблицы
     # Запросы в базу данных:
     divs_children = []
-    events_list = rq.get(DATABASE_API + 'events/', headers={"Authorization": f"Token {aboba}"}).json()['results']
-    stations_list = rq.get(DATABASE_API + 'stations/', headers={"Authorization": f"Token {aboba}"}).json()['results']
-    locations_requested = rq.get(DATABASE_API + 'locations/', headers={"Authorization": f"Token {aboba}"}).json()['results']
+    events_list = rq.get(DATABASE_API + 'events/', headers={"Authorization": f"Token {token}"}).json()['results']
+    stations_list = rq.get(DATABASE_API + 'stations/', headers={"Authorization": f"Token {token}"}).json()['results']
+    locations_requested = rq.get(DATABASE_API + 'locations/', headers={"Authorization": f"Token {token}"}).json()['results']
     print(locations_requested)
     if len(events_list) == 0 or len(stations_list) == 0:
         divs_children = [create_dropdown(locations_requested, value),
@@ -315,7 +315,4 @@ def update_output(value, aboba):  # Функция для обновления �
         dcc.Store(id='store'),
         html.Div(id='contents'),
     ]
-    for i in divs_children:
-        print(">>>>")
-        print(i)
     return divs_children

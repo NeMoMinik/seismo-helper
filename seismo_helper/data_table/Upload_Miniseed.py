@@ -8,7 +8,7 @@ from seismo_helper.settings import ALLOWED_HOSTS, DATABASE_API
 #  Функция, обрабатывающая загруженные miniseed-файлы и вызывающая детектор
 
 
-def upload_miniseed(paths, location, aboba):
+def upload_miniseed(paths, location, token):
     Files = []
     Times = []
 
@@ -34,15 +34,15 @@ def upload_miniseed(paths, location, aboba):
         if events_list:
             for event in events_list:
                 path, paths, stations = event.save()
-                event_r = rq.post(DATABASE_API+'events/', data={
+                event_r = rq.post(DATABASE_API +'events/', data={
                     'name': 'event',
                     'start': event.start_time,
                     'end': event.end_time,
                     'location': location
                 },
-                                  headers=aboba).json()
+                                  headers=token).json()
 
-                stations_requsted = rq.get(DATABASE_API + 'stations/', headers=aboba).json()['results']
+                stations_requsted = rq.get(DATABASE_API + 'stations/', headers=token).json()['results']
                 stations_dict = {}
                 for station in stations_requsted:
                     stations_dict[station['name']] = station['id']
@@ -56,5 +56,5 @@ def upload_miniseed(paths, location, aboba):
                                                  {"path": paths[traces_files_index][2]}],
                                     "event": event_r['id']
                                 },
-                                headers=aboba
+                                headers=token
                     )

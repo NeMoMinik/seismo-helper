@@ -56,11 +56,11 @@ app.layout = html.Div([
     Input('dd', 'value'),
     State('session', 'data')
 )
-def upd_dd(value, aboba):
+def upd_dd(value, token):
     global fupd
-    print(aboba)
-    vv = rq.get(DATABASE_API + 'locations/', headers={"Authorization": f"Token {aboba}"}).json()['results']
-    dt = rq.get(DATABASE_API + 'stations/', headers={"Authorization": f"Token {aboba}"}).json()['results']
+    print(token)
+    vv = rq.get(DATABASE_API + 'locations/', headers={"Authorization": f"Token {token}"}).json()['results']
+    dt = rq.get(DATABASE_API + 'stations/', headers={"Authorization": f"Token {token}"}).json()['results']
     S = [[], [], [], [], []]
     for i in dt:
         S[0].append(i['id'])
@@ -95,7 +95,7 @@ def upd_dd(value, aboba):
     State('dd', 'value'),
     State('session', 'data')
 )
-def update_output(n_clicks, x, y, z, name, loc_id, aboba):
+def update_output(n_clicks, x, y, z, name, loc_id, token):
     stuff = {"z": "Высота",
              "x": "Широта",
              "y": "Долгота",
@@ -110,7 +110,7 @@ def update_output(n_clicks, x, y, z, name, loc_id, aboba):
             "z": z,
             "location": loc_id,
         }
-        r = rq.post(DATABASE_API + 'stations/', headers={"Authorization": f"Token {aboba}"}, data=data)
+        r = rq.post(DATABASE_API + 'stations/', headers={"Authorization": f"Token {token}"}, data=data)
         text = "Успешно"
         txtstyle = {'color': 'Green'}
         if r.status_code == 400:
