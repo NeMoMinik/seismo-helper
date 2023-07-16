@@ -36,9 +36,9 @@ class Event(models.Model):
 
 class Station(models.Model):
     name = models.CharField(max_length=32)
-    x = models.FloatField()
-    y = models.FloatField()
-    z = models.FloatField()
+    x = models.FloatField(null=True, blank=True)
+    y = models.FloatField(null=True, blank=True)
+    z = models.FloatField(null=True, blank=True)
 
     location = models.ForeignKey(
         Location,

@@ -49,7 +49,6 @@ def get_profile(request):
 
 def get_login(request):
     template = 'datatable/LoginPage.html'
-    print(request.COOKIES)
     return render(request, template, context=get_token(request))
 
 

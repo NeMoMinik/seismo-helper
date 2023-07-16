@@ -14,7 +14,7 @@ def upload_miniseed(paths, location, token):
 
     for i in paths:
         tarce = str(obspy.read(i)[0])
-        stations_requsted = rq.get(DATABASE_API + 'stations/').json()['results']
+        stations_requsted = rq.get(DATABASE_API + 'stations/', headers=token).json()['results']
         stations_dict = {}
         for station in stations_requsted:
             stations_dict[station['name']]= station['id']
