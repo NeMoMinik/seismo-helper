@@ -76,6 +76,7 @@ app.layout = html.Div(
     [
         navbar,
         html.Div(id='static-content', children=[
+            dbc.Row([
             dbc.Col(html.Div(dcc.Upload(
                 id='upload-data',
                 children=html.Div([
@@ -111,7 +112,7 @@ app.layout = html.Div(
                                        'vertical-align': 'middle',
                                        'margin': '10px'})),
                 style={'textAlign': 'center',
-                       'margin-right': '15px'})),
+                       'margin-right': '15px'}))])
         ],
                  ),
         html.Div(id="page-content", children=[
@@ -186,6 +187,7 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
                                           event['z'],
                                           event['magnitude'],
                                           event['id']])
+    map_figure.add_traces(list(px.scatter_mapbox().select_traces()))
     if len(events_list_table) != 0:
         print(events_list_table)
         map_df = pd.DataFrame(events_list_table)#.sort_values(0)
