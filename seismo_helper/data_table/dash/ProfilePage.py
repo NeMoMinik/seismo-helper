@@ -16,6 +16,7 @@ app.layout = html.Div([
     html.H2('Ваш профиль', style={'margin-right': 'auto', 'margin-left': 'auto'}),
     html.Div(id='usrn', style={'margin-right': 'auto', 'margin-left': 'auto', 'width': '20%'}, children=[]),
     dcc.Store(id="session", data=None),
+    dbc.Row(html.Button("Редактировать", id="edit"), style={'margin-top':'1%', 'margin-right': 'auto', 'margin-left': 'auto', 'width': '20%'},),
     html.Div(id="q", style={'margin-right': 'auto', 'margin-left': 'auto', 'width': '20%'}, children=[html.Div(id="q2")]),
     html.Div(id="hidden_div_for_callback"),
     footer
@@ -41,7 +42,6 @@ def load_profile(aboba):
             dbc.Row(html.P(data['third_name']), id="third_name", style={'margin-top': '1%', 'color':'#000000'}),
             dbc.Row(html.P(data['bio']), id="bio", style={'margin-top': '1%', 'color':'#000000'}),
             dbc.Row(html.P(data['corporation']), id='corp', style={'margin-top': '1%', 'color':'#000000'}),
-            dbc.Row(html.Button("Редактировать", id="edit"), style={'margin-top': '1%'}),
             dcc.Store('id', data=data['id'])]
         )
     else:
@@ -87,4 +87,4 @@ def update_profile(n, user_id, aboba, *dat):
     if len(d):
         r = rq.patch(f'http://{ALLOWED_HOSTS[0]}:8000/auth/users/{user_id}/', headers={'Authorization': 'Token ' + aboba}, data=d)
         print(r.content)
-        return [html.Div(id="q2")]
+        return no_update
