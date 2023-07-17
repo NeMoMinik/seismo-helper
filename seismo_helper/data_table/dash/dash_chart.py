@@ -31,7 +31,7 @@ def update_line_chart(value, token):
         '#39E444'
     ]
 
-    traces_requested = rq.get(f'{DATABASE_API}traces/?event={value}', headers={"Authorization": f"Token {token}"}).json()['results']
+    traces_requested = rq.get(f'{DATABASE_API}traces/?event={value}', headers=token).json()['results']
     fig = make_subplots(rows=len(traces_requested), cols=1, shared_xaxes=True, shared_yaxes=True)
     for n, i in enumerate(traces_requested):
         for color, j in enumerate(i['channels']):

@@ -5,13 +5,12 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model
 import requests as rq
 from django.contrib.auth import login, logout
-from django.views.decorators.csrf import csrf_exempt
 
 
 def get_token(request):
-    token = {"dash_context": {"session": {'data': None}}}
+    token = {"dash_context": {"session": {'data': {"Authorization": ""}}}}
     if request.user.is_authenticated:
-        token["dash_context"]["session"]["data"] = Token.objects.get(user=request.user).key
+        token["dash_context"]["session"]["data"]["Authorization"] = f"Token {Token.objects.get(user=request.user).key}"
     return token
 
 
@@ -81,3 +80,10 @@ def get_logout(request):
     print(r)
     logout(request)
     return redirect("http://127.0.0.1:8000/About/")
+
+
+def get_locations(request):
+    template = 'datatable/AddLocations.html'
+    context = get_token(request)
+    print(request.user)
+    return render(request, template, context=context)
