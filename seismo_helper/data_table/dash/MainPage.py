@@ -10,9 +10,12 @@ import base64
 import os
 import requests as rq
 from seismo_helper.settings import ALLOWED_HOSTS, DATABASE_API, BASE_LINK, UPLOAD_DIRECTORY
-import numpy as np
 from sklearn.linear_model import LinearRegression
 from data_table.Upload_Miniseed import upload_miniseed
+from data_table.hypocentre import converting_geographic_coordinates, hypocentre_search
+from data_table.FiveNeuro import NeuralNetworkUse
+import numpy as np
+from torch import Tensor
 
 app = DjangoDash('DashDatatable', external_stylesheets=stylesheets)
 
@@ -139,12 +142,12 @@ app.layout = html.Div(
                  children=[
                      dcc.Dropdown([{'label': 'Все локации', 'value': 'Все локации'}], 'Все локации', id='loc-dropdown'),
                      dcc.Graph(figure=fig, id='mapD'),
-                     html.Button('Рассчитать', id='submit-val', n_clicks=0, style={'margin-left': '1%'})
                  ],
                  style={'margin-bottom': '10%'}
                  ),
         html.Div(id="redirDiv"),
         html.Div(id="redirDiv2"),
+        html.Div(id="redirDiv3"),
         dcc.Store(id='session', data=None),
         footer
     ]
@@ -341,16 +344,33 @@ def update_output(value, token):  # Функция для обновления �
         create_magnitude_graphs(events_list),
         dcc.Store(id='store'),
         html.Div(id='contents'),
+        html.Button('Рассчитать', id='submit-val', n_clicks=0, style={'margin-left': '1%'})
     ]
     return divs_children
 
 
 @app.callback(
-    Output('eefkelr', 'ermgle'),
+    Output('redirDiv3', 'ermgle'),
     Input('submit-val', 'n_clicks'),
-    State('session', 'data')
+    State('session', 'data'),
+    prevent_initial_call=True
 )
 def analyze(n, token):
     events = rq.get(DATABASE_API + "events/", headers=token).json()['results']
-    events = [i for i in events if len(i['traces']) > 2]
+    print(events[3]['traces'])
+    events = [i for i in events if len(i['traces']) > 2 and i['x'] is None]
+    nn = NeuralNetworkUse('C:/Users/User/Desktop/seismo-helper/seismo_helper/data_table/modelnew.mdl')
+    for i in events:
+        traces = i['traces']
+        hypo_data = []
+        for j in traces:
+            trace = rq.get(DATABASE_API + f"traces/{j}", headers=token).json()
+            station = rq.get(DATABASE_API + f"stations/{trace['station']}", headers=token).json()
+            hypo_data.append(
+                    (station['x'], station['y'], station['z']) + (nn.find_peaks(Tensor(list(np.load(trace['path'] + i) for i in trace['channels'])))[0], )
+            )
+        print(hypo_data)
+        res = hypocentre_search(hypo_data).x
+        rq.patch(DATABASE_API + f"events/{i['id']}/", json={"x": res[0], "y": res[1], "z": res[2]}, headers=token)
 
+    return no_update

@@ -154,5 +154,5 @@ def drawing():
 
 
 # perebor()
-drawing()
+# drawing()
 # print(hypocentre_search())

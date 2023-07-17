@@ -29,7 +29,7 @@ class ChannelSerializer(serializers.ModelSerializer):
 
 
 class TraceSerializer(serializers.ModelSerializer):
-    station = serializers.StringRelatedField(read_only=True)
+    # station = serializers.StringRelatedField(read_only=True)
     channels = serializers.StringRelatedField(many=True, read_only=True)
 
     class Meta:
