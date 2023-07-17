@@ -4,7 +4,7 @@ from data_table.dash.ProfilePage import load_profile
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model
 import requests as rq
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -73,4 +73,11 @@ def get_auth(request):
 def logging(request, user_id):
     u = get_user_model().objects.get(id=user_id)
     login(request, u)
+    return redirect("http://127.0.0.1:8000/About/")
+
+
+def get_logout(request):
+    r = rq.post("http://127.0.0.1:8000/auth/token/logout/").json()
+    print(r)
+    logout(request)
     return redirect("http://127.0.0.1:8000/About/")

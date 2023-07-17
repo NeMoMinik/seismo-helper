@@ -7,7 +7,7 @@ User = get_user_model()
 
 
 class CustomUserSerializer(UserSerializer):
-    corporation = serializers.StringRelatedField(read_only=True)
+    # corporation = serializers.StringRelatedField()
 
     class Meta:
         model = User
