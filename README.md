@@ -6,6 +6,8 @@
 ## Автоматический анализ сейсмической активности геологических сред
 Наш партнёр: [Газпромнефть](https://www.gazprom-neft.ru/)
 
+![ГРП](https://github.com/NeMoMinik/seismo-helper/project_data/ГРП.gif)
+
 Наша цель:
 Создание сервиса для автоматического мониторинга сейсмической активности
 
@@ -19,4 +21,4 @@
 * 4 Web-сервис
   + Написали backend и frontend с RestAPI, создали дизайн
 
-![M1](https://github.com/NeMoMinik/seismo-helper/assets/75312001/9d868994-89c9-4248-96b6-532f1c311ef6)
+![M1](https://github.com/NeMoMinik/seismo-helper/project_data/M!.jpg)
