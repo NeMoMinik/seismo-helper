@@ -43,10 +43,9 @@ def signupredir(n):
     Input("submit_val", "n_clicks"),
     State("username", "value"),
     State("password", "value"),
-    State("session", "data"),
     prevent_initial_call=True,
 )
-def log_in(n_clicks, username, password, data):
+def log_in(n_clicks, username, password):
     r = rq.post("http://127.0.0.1:8000/auth/token/login/", data={"username": username, "password": password}).json()
     if "auth_token" in r:
         r = rq.get("http://127.0.0.1:8000/auth/users/me/", headers={"Authorization": f"Token {r['auth_token']}"}).json()

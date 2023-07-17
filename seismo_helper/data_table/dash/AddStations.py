@@ -59,8 +59,8 @@ app.layout = html.Div([
 def upd_dd(value, token):
     global fupd
     print(token)
-    vv = rq.get(DATABASE_API + 'locations/', headers={"Authorization": f"Token {token}"}).json()['results']
-    dt = rq.get(DATABASE_API + 'stations/', headers={"Authorization": f"Token {token}"}).json()['results']
+    vv = rq.get(DATABASE_API + 'locations/', headers=token).json()['results']
+    dt = rq.get(DATABASE_API + 'stations/', headers=token).json()['results']
     S = [[], [], [], [], []]
     for i in dt:
         S[0].append(i['id'])
@@ -111,7 +111,7 @@ def update_output(n_clicks, x, y, z, name, loc_id, token):
             "z": z,
             "location": loc_id,
         }
-        r = rq.post(DATABASE_API + 'stations/', headers={"Authorization": f"Token {token}"}, data=data)
+        r = rq.post(DATABASE_API + 'stations/', headers=token, data=data)
         text = "Успешно"
         txtstyle = {'color': 'Green'}
         if r.status_code == 400:
@@ -120,7 +120,7 @@ def update_output(n_clicks, x, y, z, name, loc_id, token):
                 text += f"{stuff[i]}: {stuff[r.json()[i][0]]}\n"
                 txtstyle = {'color': 'Red'}
         S = [[], [], [], [], []]
-        dt = rq.get(DATABASE_API + 'stations/', headers={"Authorization": f"Token {token}"}).json()['results']
+        dt = rq.get(DATABASE_API + 'stations/', headers=token).json()['results']
         for i in dt:
             S[0].append(i['id'])
             S[1].append(i['name'])

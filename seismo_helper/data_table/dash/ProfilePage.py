@@ -25,6 +25,7 @@ app.layout = html.Div([
     Input('session', 'data'),
 )
 def load_profile(aboba):
+    style = {'margin-top': '1%', 'color': '#000000'}
     print(">>>>>..")
     if aboba is not None:
         data = rq.get(f'http://{ALLOWED_HOSTS[0]}:8000/auth/users/me',
@@ -33,18 +34,19 @@ def load_profile(aboba):
         profile_data = data
         print(data)
         return dbc.Col([
-            dbc.Row(html.P(data['username']), id="username", style={'margin-top': '1%', 'color':'#000000'}),
-            dbc.Row(html.P(data['email']), id="email",  style={'margin-top': '1%', 'color':'#000000'}),
-            dbc.Row(html.P(data['first_name']), id="first_name", style={'margin-top': '1%', 'color':'#000000'}),
-            dbc.Row(html.P(data['second_name']), id="second_name", style={'margin-top': '1%', 'color':'#000000'}),
-            dbc.Row(html.P(data['third_name']), id="third_name", style={'margin-top': '1%', 'color':'#000000'}),
-            dbc.Row(html.P(data['bio']), id="bio", style={'margin-top': '1%', 'color':'#000000'}),
-            dbc.Row(html.P(data['corporation']), id='corp', style={'margin-top': '1%', 'color':'#000000'}),
+            dbc.Row(html.P(data['username']), id="username", style=style),
+            dbc.Row(html.P(data['email']), id="email",  style=style),
+            dbc.Row(html.P(data['first_name']), id="first_name", style=style),
+            dbc.Row(html.P(data['second_name']), id="second_name", style=style),
+            dbc.Row(html.P(data['third_name']), id="third_name", style=style),
+            dbc.Row(html.P(data['bio']), id="bio", style=style),
+            dbc.Row(html.P(data['corporation']), id='corp', style=style),
             dbc.Row(html.Button("Редактировать", id="edit"), style={'margin-top': '1%'}),
             dcc.Store('id', data=data['id'])]
         )
     else:
         return dcc.Location(pathname=f"Login/", id="someid_doesnt_matter")
+
 
 @app.callback(
     Output('q', 'children'),
@@ -61,6 +63,7 @@ def edit_profile(n):
             dbc.Row(dcc.Input(id='corp', value=data['corporation'], placeholder="Нет корпорации", disabled=True), style={'margin-top': '1%'}),
             dbc.Row(html.Button("Сохранить", id="save"), style={'margin-top': '1%'})]
 
+
 @app.callback(
     Output("q", 'children'),
     Input("save", "n_clicks"),
@@ -71,7 +74,7 @@ def edit_profile(n):
     State('third_name', 'value'),
     State('bio', 'value'), prevent_initial_call=True
 )
-def update_profile(n, user_id, aboba, *dat):
+def update_profile(n, user_id, token, *dat):
     d = {
         'first_name': '',
         'second_name': '',
@@ -84,6 +87,6 @@ def update_profile(n, user_id, aboba, *dat):
         else:
             d.pop(i)
     if len(d):
-        r = rq.patch(f'http://{ALLOWED_HOSTS[0]}:8000/auth/users/{user_id}/', headers={'Authorization': 'Token ' + aboba}, data=d)
+        r = rq.patch(f'http://{ALLOWED_HOSTS[0]}:8000/auth/users/{user_id}/', headers=token, data=d)
         print(r.content)
         return []

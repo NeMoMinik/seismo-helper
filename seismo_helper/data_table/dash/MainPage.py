@@ -77,47 +77,72 @@ app.layout = html.Div(
         navbar,
         html.Div(id='static-content', children=[
             dbc.Row([
-            dbc.Col(html.Div(dcc.Upload(
-                id='upload-data',
-                children=html.Div([
-                    'Drag and Drop or ',
-                    html.A('Select Miniseed Files')
-                ]),
-                style={
-                    'width': '95%',
-                    'height': '40px',
-                    'lineHeight': '40px',
-                    'borderWidth': '1px',
-                    'borderStyle': 'dashed',
-                    'borderRadius': '5px',
-                    'textAlign': 'center',
-                    'margin': '10px',
-                    'float': 'left0',
-                    'vertical-align': 'middle'
-                },
-                multiple=True
-            ))),
-            dbc.Col(html.Div(
-                dbc.NavItem(
-                    dbc.NavLink("Добавить станции",
-                                href=f'http://{ALLOWED_HOSTS[0]}:8000/Stations/',
-                                target='_blank',
-                                style={'color': 'Black', 'width': '100%',
-                                       'height': '40px',
-                                       'lineHeight': '40px',
-                                       'borderWidth': '1px',
-                                       'borderStyle': 'dashed',
-                                       'borderRadius': '5px',
-                                       'textAlign': 'center',
-                                       'vertical-align': 'middle',
-                                       'margin': '10px'})),
-                style={'textAlign': 'center',
-                       'margin-right': '15px'}))])
+                dbc.Col(html.Div(dcc.Upload(
+                    id='upload-data',
+                    children=html.Div([
+                        'Drag and Drop or ',
+                        html.A('Select Miniseed Files')
+                    ]),
+                    style={
+                        'width': '95%',
+                        'height': '40px',
+                        'lineHeight': '40px',
+                        'borderWidth': '1px',
+                        'borderStyle': 'dashed',
+                        'borderRadius': '5px',
+                        'textAlign': 'center',
+                        'margin': '10px',
+                        'float': 'left0',
+                        'vertical-align': 'middle'
+                    },
+                    multiple=True
+                ))),
+                dbc.Col(html.Div(
+                    [dbc.NavItem(
+                        dbc.NavLink("Добавить станции",
+                                    href=f'http://{ALLOWED_HOSTS[0]}:8000/Stations/',
+                                    target='_blank',
+                                    style={'color': 'Black', 'width': '100%',
+                                           'height': '40px',
+                                           'lineHeight': '40px',
+                                           'borderWidth': '1px',
+                                           'borderStyle': 'dashed',
+                                           'borderRadius': '5px',
+                                           'textAlign': 'center',
+                                           'vertical-align': 'middle',
+                                           'margin': '10px'}
+                                    )
+                    ),
+                        dbc.NavItem(
+                            dbc.NavLink("Добавить локации",
+                                        href=f'http://{ALLOWED_HOSTS[0]}:8000/Locations/',
+                                        target='_blank',
+                                        style={'color': 'Black', 'width': '100%',
+                                               'height': '40px',
+                                               'lineHeight': '40px',
+                                               'borderWidth': '1px',
+                                               'borderStyle': 'dashed',
+                                               'borderRadius': '5px',
+                                               'textAlign': 'center',
+                                               'vertical-align': 'middle',
+                                               'margin': '10px'}
+                                        )
+                        )
+                    ]
+                )
+                )
+            ]
+            )
         ],
                  ),
-        html.Div(id="page-content", children=[
-            dcc.Dropdown([{'label': 'Все локации', 'value': 'Все локации'}], 'Все локации', id='loc-dropdown'),
-            dcc.Graph(figure=fig, id='mapD'), ], style={'margin-bottom': '10%'}),
+        html.Div(id="page-content",
+                 children=[
+                     dcc.Dropdown([{'label': 'Все локации', 'value': 'Все локации'}], 'Все локации', id='loc-dropdown'),
+                     dcc.Graph(figure=fig, id='mapD'),
+                     html.Button('Рассчитать', id='submit-val', n_clicks=0, style={'margin-left': '1%'})
+                 ],
+                 style={'margin-bottom': '10%'}
+                 ),
         html.Div(id="redirDiv"),
         html.Div(id="redirDiv2"),
         dcc.Store(id='session', data=None),
@@ -147,7 +172,7 @@ def update_outputfile(contents, list_of_names, list_of_dates, location, token): 
                 miniseed_file.write(base64.decodebytes(data))
                 Paths.append(UPLOAD_DIRECTORY + str(location) + "\\" + list_of_names[file_index])
 
-    upload_miniseed(Paths, location, {"Authorization": f"Token {token}"})
+    upload_miniseed(Paths, location, token)
 
 
 @app.callback(Output("redirDiv", "children"),
@@ -189,7 +214,7 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
                                           event['id']])
     if len(events_list_table) != 0:
         print(events_list_table)
-        map_df = pd.DataFrame(events_list_table)#.sort_values(0)
+        map_df = pd.DataFrame(events_list_table)  # .sort_values(0)
 
         markers_size_list = [event[7] for event in events_list_table if event[7] is not None]
         map_df.columns = ['№', 'Локация', 'Начало', 'Конец', 'X', 'Y', 'Z', 'Магнитуда', 'id']
@@ -240,7 +265,7 @@ def create_magnitude_graphs(events_list):
             magnitudes_list.append(i / 10)
             magnitudes_count_list.append(magnitude_count_list[i])
     magn_count_graph = px.scatter(magnitude_count_df, x="Magnitude", y="Count", title="Количество от магнитуды",
-                                      log_y=True)
+                                  log_y=True)
     magnitudes_list = np.array(magnitudes_list)
     magnitudes_list = magnitudes_list.reshape(-1, 1)
     print(magnitudes_list)
@@ -297,10 +322,11 @@ def create_dropdown(locations_requested, value):
 )
 def update_output(value, token):  # Функция для обновления карты, графиков и таблицы
     # Запросы в базу данных:
-    divs_children = []
-    events_list = rq.get(DATABASE_API + 'events/', headers={"Authorization": f"Token {token}"}).json()['results']
-    stations_list = rq.get(DATABASE_API + 'stations/', headers={"Authorization": f"Token {token}"}).json()['results']
-    locations_requested = rq.get(DATABASE_API + 'locations/', headers={"Authorization": f"Token {token}"}).json()['results']
+    events_list = rq.get(DATABASE_API + 'events/', headers=token).json()['results']
+    stations_list = rq.get(DATABASE_API + 'stations/', headers=token).json()['results']
+    user = rq.get(f'http://{ALLOWED_HOSTS[0]}:8000/auth/users/me', headers=token).json()
+    locations_requested = rq.get(DATABASE_API + f'locations/?corporation={user["corporation"]}', headers=token).json()[
+        'results']
     print(locations_requested)
     if len(events_list) == 0 or len(stations_list) == 0:
         divs_children = [create_dropdown(locations_requested, value),
@@ -317,3 +343,14 @@ def update_output(value, token):  # Функция для обновления �
         html.Div(id='contents'),
     ]
     return divs_children
+
+
+@app.callback(
+    Output('eefkelr', 'ermgle'),
+    Input('submit-val', 'n_clicks'),
+    State('session', 'data')
+)
+def analyze(n, token):
+    events = rq.get(DATABASE_API + "events/", headers=token).json()['results']
+    events = [i for i in events if len(i['traces']) > 2]
+
