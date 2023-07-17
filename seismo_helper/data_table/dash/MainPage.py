@@ -9,7 +9,7 @@ from data_table.dash.Pageblank import footer, navbar, stylesheets
 import base64
 import os
 import requests as rq
-from seismo_helper.settings import ALLOWED_HOSTS, DATABASE_API, BASE_LINK, UPLOAD_DIRECTORY
+from seismo_helper.settings import ALLOWED_HOSTS, DATABASE_API, BASE_LINK, UPLOAD_DIRECTORY, MODEL_DIR
 from sklearn.linear_model import LinearRegression
 from data_table.Upload_Miniseed import upload_miniseed
 from data_table.hypocentre import converting_geographic_coordinates, hypocentre_search
@@ -80,32 +80,46 @@ app.layout = html.Div(
         navbar,
         html.Div(id='static-content', children=[
             dbc.Row([
-                dbc.Col(html.Div(dcc.Upload(
+                dbc.Col([html.Div(dcc.Upload(
                     id='upload-data',
                     children=html.Div([
                         'Drag and Drop or ',
                         html.A('Select Miniseed Files')
                     ]),
                     style={
-                        'width': '95%',
+                        'color': 'Black', 'width': '100%',
                         'height': '40px',
                         'lineHeight': '40px',
                         'borderWidth': '1px',
                         'borderStyle': 'dashed',
                         'borderRadius': '5px',
                         'textAlign': 'center',
+                        'vertical-align': 'middle',
                         'margin': '10px',
-                        'float': 'left0',
-                        'vertical-align': 'middle'
                     },
                     multiple=True
-                ))),
+                )),
+                html.Div(html.Button('Рассчитать', id='submit-val', n_clicks=0, style={
+                        'color': 'Black', 'width': '100%',
+                        'height': '40px',
+                        'lineHeight': '40px',
+                        'borderWidth': '1px',
+                        'borderStyle': 'dashed',
+                        'borderRadius': '5px',
+                        'textAlign': 'center',
+                        'vertical-align': 'middle',
+                        'margin-left': '10px',
+                        'margin-right': '10px',
+                        'background-color': 'white'
+                                           }))
+                
+                ]),
                 dbc.Col(html.Div(
                     [dbc.NavItem(
                         dbc.NavLink("Добавить станции",
                                     href=f'http://{ALLOWED_HOSTS[0]}:8000/Stations/',
                                     target='_blank',
-                                    style={'color': 'Black', 'width': '100%',
+                                    style={'color': 'Black', 'width': '95%',
                                            'height': '40px',
                                            'lineHeight': '40px',
                                            'borderWidth': '1px',
@@ -120,7 +134,7 @@ app.layout = html.Div(
                             dbc.NavLink("Добавить локации",
                                         href=f'http://{ALLOWED_HOSTS[0]}:8000/Locations/',
                                         target='_blank',
-                                        style={'color': 'Black', 'width': '100%',
+                                        style={'color': 'Black', 'width': '95%',
                                                'height': '40px',
                                                'lineHeight': '40px',
                                                'borderWidth': '1px',
@@ -216,7 +230,6 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
                                           event['magnitude'],
                                           event['id']])
     if len(events_list_table) != 0:
-        print(events_list_table)
         map_df = pd.DataFrame(events_list_table)  # .sort_values(0)
 
         markers_size_list = [event[7] for event in events_list_table if event[7] is not None]
@@ -271,7 +284,6 @@ def create_magnitude_graphs(events_list):
                                   log_y=True)
     magnitudes_list = np.array(magnitudes_list)
     magnitudes_list = magnitudes_list.reshape(-1, 1)
-    print(magnitudes_list)
     if len(magnitudes_list) != 0:
         magn_count_trend = LinearRegression()
         magn_count_trend.fit(magnitudes_list, magnitudes_count_list)
@@ -307,7 +319,6 @@ def create_datatable(events_list):
 def create_dropdown(locations_requested, value):
     locations_for_dropdown = [{'label': x['name'], 'value': x['id']} for x in locations_requested]
     locations_for_dropdown.insert(0, {'label': 'Все локации', 'value': 'Все локации'})
-    print(locations_for_dropdown, value)
     return dbc.Row([
         dbc.Col(html.Div(
             dcc.Dropdown(options=locations_for_dropdown, value=value,
@@ -330,7 +341,6 @@ def update_output(value, token):  # Функция для обновления �
     user = rq.get(f'http://{ALLOWED_HOSTS[0]}:8000/auth/users/me', headers=token).json()
     locations_requested = rq.get(DATABASE_API + f'locations/?corporation={user["corporation"]}', headers=token).json()[
         'results']
-    print(locations_requested)
     if len(events_list) == 0 or len(stations_list) == 0:
         divs_children = [create_dropdown(locations_requested, value),
                          dcc.Store(id='store'),
@@ -343,8 +353,7 @@ def update_output(value, token):  # Функция для обновления �
         create_datatable(events_list),
         create_magnitude_graphs(events_list),
         dcc.Store(id='store'),
-        html.Div(id='contents'),
-        html.Button('Рассчитать', id='submit-val', n_clicks=0, style={'margin-left': '1%'})
+        html.Div(id='contents')
     ]
     return divs_children
 
@@ -357,9 +366,8 @@ def update_output(value, token):  # Функция для обновления �
 )
 def analyze(n, token):
     events = rq.get(DATABASE_API + "events/", headers=token).json()['results']
-    print(events[3]['traces'])
     events = [i for i in events if len(i['traces']) > 2 and i['x'] is None]
-    nn = NeuralNetworkUse('C:/Users/User/Desktop/seismo-helper/seismo_helper/data_table/modelnew.mdl')
+    nn = NeuralNetworkUse(MODEL_DIR)
     for i in events:
         traces = i['traces']
         hypo_data = []
@@ -369,7 +377,6 @@ def analyze(n, token):
             hypo_data.append(
                     (station['x'], station['y'], station['z']) + (nn.find_peaks(Tensor(list(np.load(trace['path'] + i) for i in trace['channels'])))[0], )
             )
-        print(hypo_data)
         res = hypocentre_search(hypo_data).x
         rq.patch(DATABASE_API + f"events/{i['id']}/", json={"x": res[0], "y": res[1], "z": res[2]}, headers=token)
 

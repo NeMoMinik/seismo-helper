@@ -37,6 +37,8 @@ BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/'
 
 UPLOAD_DIRECTORY = os.getcwd() + "\\media\\MiniSeed\\"
 
+MODEL_DIR = os.getcwd() + '\\data_table\\modelnew.mdl'
+
 # Application definition
 
 INSTALLED_APPS = [
