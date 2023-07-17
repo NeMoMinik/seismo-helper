@@ -9,12 +9,14 @@ from seismo_helper.settings import ALLOWED_HOSTS
 
 app = DjangoDash('ProfilePage', external_stylesheets=stylesheets)
 global profile_data
+global nn
+nn = 0
 app.layout = html.Div([
     navbar,
     html.H2('Ваш профиль', style={'margin-right': 'auto', 'margin-left': 'auto'}),
     html.Div(id='usrn', style={'margin-right': 'auto', 'margin-left': 'auto', 'width': '20%'}, children=[]),
     dcc.Store(id="session", data=None),
-    html.Div(id="q", style={'margin-right': 'auto', 'margin-left': 'auto', 'width': '20%'}),
+    html.Div(id="q", style={'margin-right': 'auto', 'margin-left': 'auto', 'width': '20%'}, children=[html.Div(id="q2")]),
     html.Div(id="hidden_div_for_callback"),
     footer
 ])
@@ -22,10 +24,9 @@ app.layout = html.Div([
 
 @app.callback(
     Output('usrn', 'children'),
-    Input('session', 'data'),
+    Input('session', 'data') 
 )
 def load_profile(aboba):
-    print(">>>>>..")
     if aboba is not None:
         data = rq.get(f'http://{ALLOWED_HOSTS[0]}:8000/auth/users/me',
                       headers={'Authorization': 'Token ' + aboba}).json()
@@ -47,7 +48,7 @@ def load_profile(aboba):
         return dcc.Location(pathname=f"Login/", id="someid_doesnt_matter")
 
 @app.callback(
-    Output('q', 'children'),
+    Output('q2', 'children'),
     Input("edit", "n_clicks"), prevent_initial_call=True)
 def edit_profile(n):
     global profile_data
@@ -86,4 +87,4 @@ def update_profile(n, user_id, aboba, *dat):
     if len(d):
         r = rq.patch(f'http://{ALLOWED_HOSTS[0]}:8000/auth/users/{user_id}/', headers={'Authorization': 'Token ' + aboba}, data=d)
         print(r.content)
-        return []
+        return [html.Div(id="q2")]
