@@ -73,5 +73,5 @@ def upload_miniseed(paths, location, token):
                                 },
                                 headers=token
                     )
-    return "Загружено успешно"
     print("FINISHED UPLOADING")
+    return "Загружено успешно"

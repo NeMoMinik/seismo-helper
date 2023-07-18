@@ -26,6 +26,21 @@ def hypocentre_search(stations: list[list]) -> scipy.optimize:
     x, y, z, t = res.x
     x, y = coordinate_shift[0] * 100000 + x, coordinate_shift[1] * 100000 + y
     x, y = convert_to_lonlat(x, y)
+
+    S = 0
+    n = 0
+    for xi, yi, zi, ti in stations:
+        a = (yi - y)**0.5 + (xi - x)**0.5
+        print(xi, yi, zi, ti)
+        print(a)
+        c = (t * 0.005)*velocity
+        print(c)
+        z0 = zi - (c**2 - a)**0.5
+        S += abs(z0)
+        print(z0)
+        n += 1
+    z = S / n
+    print(z)
     print("FINISHED HYPO")
     return x, y, z, t
 

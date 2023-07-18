@@ -394,7 +394,7 @@ def analyze(n, token):
             res = hypocentre_search(hypo_data)
         except TypeError:
             return "Проверьте правильность координат станций"
-        rq.patch(DATABASE_API + f"events/{i['id']}/", json={"x": res[1], "y": res[0], "z": res[2]}, headers=token)
+        rq.patch(DATABASE_API + f"events/{i['id']}/", json={"x": res[0], "y": res[1], "z": res[2]}, headers=token)
     if len(events) == 0:
         return "Нет событий для обработки."
     return "Успешно обработано"

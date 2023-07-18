@@ -47,23 +47,25 @@ def update_line_chart(value, token):
                           row=n + 1
                           )
             fig.update_yaxes(title_text=st, col=1, row=n + 1)
-        fig.add_trace(go.Scatter(x=[i["p_peak"] * i["timedelta"]],
-                                 y=[0],
-                                 mode='markers',
-                                 line=dict(color="#000000", width=20),
-                                 name="P PEAK"
-                                 ),
-                      col=1,
-                      row=n + 1
-                      )
-        fig.add_trace(go.Scatter(x=[i["s_peak"] * i["timedelta"]],
-                                 y=[0],
-                                 mode='markers',
-                                 line=dict(color="#000000", width=20),
-                                 name="S PEAK"
-                                 ),
-                      col=1,
-                      row=n + 1
-                      )
+        if i["p_peak"] is not None:
+            fig.add_trace(go.Scatter(x=[i["p_peak"] * i["timedelta"]],
+                                     y=[0],
+                                     mode='markers',
+                                     line=dict(color="#000000", width=20),
+                                     name="P PEAK"
+                                     ),
+                          col=1,
+                          row=n + 1
+                          )
+        if i["s_peak"] is not None:
+            fig.add_trace(go.Scatter(x=[i["s_peak"] * i["timedelta"]],
+                                     y=[0],
+                                     mode='markers',
+                                     line=dict(color="#000000", width=20),
+                                     name="S PEAK"
+                                     ),
+                          col=1,
+                          row=n + 1
+                          )
     fig.update_layout(height=356 * len(traces_requested))
     return fig
