@@ -1,5 +1,11 @@
 <!DOCTYPE html>
 <html lang="ru">
+    <style>
+        @font-face {
+    font-family: 'MyWebFont';
+    src: url('/media/Fonts/Gilroy-Regular.ttf') format('truetype');
+    }
+    </style>
     <div>
         {%load plotly_dash%}
         {%plotly_app name='Chart' initial_arguments=dash_context ratio=1 %}
