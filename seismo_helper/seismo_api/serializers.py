@@ -34,7 +34,7 @@ class TraceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Trace
-        fields = ('path', 'station', 'channels', 'event')
+        fields = ('path', 'station', 'channels', 'event', 'timedelta', 'p_peak', 's_peak', 'id')
 
 
 class PostTraceSerializer(serializers.ModelSerializer):
@@ -42,7 +42,7 @@ class PostTraceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Trace
-        fields = ('path', 'station', 'channels', 'event', 'id')
+        fields = ('path', 'station', 'channels', 'event', 'id', 'timedelta', 'p_peak', 's_peak')
 
     def create(self, validated_data):
         # print(validated_data)

@@ -34,9 +34,10 @@ def update_line_chart(value, token):
     traces_requested = rq.get(f'{DATABASE_API}traces/?event={value}', headers=token).json()['results']
     fig = make_subplots(rows=len(traces_requested), cols=1, shared_xaxes=True, shared_yaxes=True)
     for n, i in enumerate(traces_requested):
+        st = rq.get(f"http://{ALLOWED_HOSTS[0]}:8000/api/stations/{i['station']}/", headers=token).json()['name']
         for color, j in enumerate(i['channels']):
             d = np.load(i['path'] + j)
-            fig.add_trace(go.Scatter(x=[i for i in range(0, len(d) * 5, 5)],
+            fig.add_trace(go.Scatter(x=[i for i in range(0, len(d) * i["timedelta"], i["timedelta"])],
                                      y=d,
                                      mode='lines',
                                      name=j.split('.')[0],
@@ -45,6 +46,24 @@ def update_line_chart(value, token):
                           col=1,
                           row=n + 1
                           )
-            fig.update_yaxes(title_text=i['station'], col=1, row=n + 1)
+            fig.update_yaxes(title_text=st, col=1, row=n + 1)
+        fig.add_trace(go.Scatter(x=[i["p_peak"] * i["timedelta"]],
+                                 y=[0],
+                                 mode='markers',
+                                 line=dict(color="#000000", width=20),
+                                 name="P PEAK"
+                                 ),
+                      col=1,
+                      row=n + 1
+                      )
+        fig.add_trace(go.Scatter(x=[i["s_peak"] * i["timedelta"]],
+                                 y=[0],
+                                 mode='markers',
+                                 line=dict(color="#000000", width=20),
+                                 name="S PEAK"
+                                 ),
+                      col=1,
+                      row=n + 1
+                      )
     fig.update_layout(height=356 * len(traces_requested))
     return fig

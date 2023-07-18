@@ -64,7 +64,7 @@ threshold : float
             for sign in data:
                 trace.append(sign)
                 channel = sign.stats.channel
-            self.channel.append(channel)
+                self.channel.append(channel)
             seismic_stations.append(trace.copy())
         return seismic_stations
 
@@ -170,7 +170,7 @@ threshold : float
                 if ind_st in indexes_st:
                     detect_trace[self.station_name[ind_st]] = []
                     for ind_tr, trace in enumerate(traces):
-                        detect_trace[self.station_name[ind_st]].append([self.channel[ind_tr], trace[start:end]])
+                        detect_trace[self.station_name[ind_st]].append([self.channel[ind_tr + 3 * ind_st], trace[start:end]])
             detect_traces.append(
                 Event(
                     ind_event, self.location,

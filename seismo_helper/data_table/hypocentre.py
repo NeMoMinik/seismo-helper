@@ -22,10 +22,11 @@ def hypocentre_search(stations: list[list]) -> scipy.optimize:
         func, np.array([10000, 10000, 100, 40]),
         niter=10000,
         minimizer_kwargs={'method': 'BFGS'},
-        disp=True)
+        disp=False)
     x, y, z, t = res.x
     x, y = coordinate_shift[0] * 100000 + x, coordinate_shift[1] * 100000 + y
     x, y = convert_to_lonlat(x, y)
+    print("FINISHED HYPO")
     return x, y, z, t
 
 

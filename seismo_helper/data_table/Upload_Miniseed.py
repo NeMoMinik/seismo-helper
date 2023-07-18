@@ -49,7 +49,7 @@ def upload_miniseed(paths, location, token):
         if events_list:
             for event in events_list:
                 path, paths, stations = event.save()
-                event_r = rq.post(DATABASE_API +'events/', data={
+                event_r = rq.post(DATABASE_API + 'events/', data={
                     'name': 'event',
                     'start': event.start_time,
                     'end': event.end_time,
@@ -73,3 +73,5 @@ def upload_miniseed(paths, location, token):
                                 },
                                 headers=token
                     )
+    return "Загружено успешно"
+    print("FINISHED UPLOADING")

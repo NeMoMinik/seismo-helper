@@ -12,7 +12,7 @@ import requests as rq
 from seismo_helper.settings import ALLOWED_HOSTS, DATABASE_API, BASE_LINK, UPLOAD_DIRECTORY, MODEL_DIR
 from sklearn.linear_model import LinearRegression
 from data_table.Upload_Miniseed import upload_miniseed
-from data_table.hypocentre import converting_geographic_coordinates, hypocentre_search
+from data_table.hypocentre import hypocentre_search
 from data_table.FiveNeuro import NeuralNetworkUse
 import numpy as np
 from torch import Tensor
@@ -149,7 +149,9 @@ app.layout = html.Div(
                 )
                 )
             ]
-            )
+            ),
+            html.Plaintext(id='balls', children=""),
+            html.Plaintext(id='balls2', children="")
         ],
                  ),
         html.Div(id="page-content",
@@ -161,23 +163,27 @@ app.layout = html.Div(
                  ),
         html.Div(id="redirDiv"),
         html.Div(id="redirDiv2"),
-        html.Div(id="redirDiv3"),
+        html.Div(id="redirDiv3", children=[]),
         dcc.Store(id='session', data=None),
         footer
     ]
 )
 
 
-@app.callback(Output('store', 'data'),
+@app.callback(
+              Output('balls', "children"),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
               State('upload-data', 'last_modified'),
               State('loc-dropdown', 'value'),
-              State('session', 'data')
+              State('session', 'data'),
+              prevent_initial_call=True
               )
 def update_outputfile(contents, list_of_names, list_of_dates, location, token):  # Функция, загружающая miniseed-файлы
-    if contents is None or location == 'Все локации':
-        return None
+    if contents is None:
+        return "Вы не загрузили файлы"
+    if location == 'Все локации':
+        return "Выберите локацию"
     if not os.path.exists(UPLOAD_DIRECTORY + str(location) + "\\"):
         os.makedirs(UPLOAD_DIRECTORY + str(location) + "\\")
 
@@ -189,7 +195,8 @@ def update_outputfile(contents, list_of_names, list_of_dates, location, token): 
                 miniseed_file.write(base64.decodebytes(data))
                 Paths.append(UPLOAD_DIRECTORY + str(location) + "\\" + list_of_names[file_index])
 
-    upload_miniseed(Paths, location, token)
+    resp = upload_miniseed(Paths, location, token)
+    return resp
 
 
 @app.callback(Output("redirDiv", "children"),
@@ -214,8 +221,7 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
     map_figure = go.Figure()
     map_figure.update_layout(mapbox_style="open-street-map", mapbox_zoom=3)
     map_figure.update_layout(height=500, margin={"r": 0, "t": 0, "l": 0, "b": 0})
-    site_lat = [i['x'] for i in requested_stations]
-    site_lon = [i['y'] for i in requested_stations]
+    site_coords = [(i['x'], i['y']) for i in requested_stations if i['x'] is not None and i['y'] is not None]
     events_list_table = []
     for event in requested_events:
         if event['location'] == location or location == 'Все локации':
@@ -229,6 +235,7 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
                                           event['z'],
                                           event['magnitude'],
                                           event['id']])
+    print(events_list_table)
     if len(events_list_table) != 0:
         map_df = pd.DataFrame(events_list_table)  # .sort_values(0)
 
@@ -242,10 +249,10 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
                                                      hover_data="id",
                                                      color='Магнитуда',
                                                      color_continuous_scale=px.colors.cyclical.IceFire).select_traces()))
-
+    print(site_coords)
     map_figure.add_traces((go.Scattermapbox(
-        lat=site_lon,
-        lon=site_lat,
+        lat=[i[0] for i in site_coords],
+        lon=[i[1] for i in site_coords],
         name='Станции',
         mode='markers',
         marker=go.scattermapbox.Marker(
@@ -341,8 +348,10 @@ def update_output(value, token):  # Функция для обновления �
     user = rq.get(f'http://{ALLOWED_HOSTS[0]}:8000/auth/users/me', headers=token).json()
     locations_requested = rq.get(DATABASE_API + f'locations/?corporation={user["corporation"]}', headers=token).json()[
         'results']
+    print(events_list)
     if len(events_list) == 0 or len(stations_list) == 0:
         divs_children = [create_dropdown(locations_requested, value),
+                         html.Div(dcc.Graph(figure=update_map(events_list, stations_list, value), id='mapD')),
                          dcc.Store(id='store'),
                          html.Div(id='contents'),
                          ]
@@ -359,12 +368,13 @@ def update_output(value, token):  # Функция для обновления �
 
 
 @app.callback(
-    Output('redirDiv3', 'ermgle'),
+    Output('balls2', "children"),
     Input('submit-val', 'n_clicks'),
     State('session', 'data'),
     prevent_initial_call=True
 )
 def analyze(n, token):
+    print('dlrkgaelkrgrli b nr j qpeorjqerjqe po')
     events = rq.get(DATABASE_API + "events/", headers=token).json()['results']
     events = [i for i in events if len(i['traces']) > 2 and i['x'] is None]
     nn = NeuralNetworkUse(MODEL_DIR)
@@ -374,10 +384,17 @@ def analyze(n, token):
         for j in traces:
             trace = rq.get(DATABASE_API + f"traces/{j}", headers=token).json()
             station = rq.get(DATABASE_API + f"stations/{trace['station']}", headers=token).json()
+            peaks = nn.find_peaks(Tensor(list(np.load(trace['path'] + i) for i in trace['channels'])))
             hypo_data.append(
-                    (station['x'], station['y'], station['z']) + (nn.find_peaks(Tensor(list(np.load(trace['path'] + i) for i in trace['channels'])))[0], )
+                    (station['x'], station['y'], station['z']) + (peaks[0], )
             )
-        res = hypocentre_search(hypo_data).x
-        rq.patch(DATABASE_API + f"events/{i['id']}/", json={"x": res[0], "y": res[1], "z": res[2]}, headers=token)
-
-    return no_update
+            print(peaks, int(peaks[0]), int(peaks[1]))
+            rq.patch(DATABASE_API + f"traces/{j}/", json={"p_peak": int(peaks[0]), "s_peak": int(peaks[1])}, headers=token)
+        try:
+            res = hypocentre_search(hypo_data)
+        except TypeError:
+            return "Проверьте правильность координат станций"
+        rq.patch(DATABASE_API + f"events/{i['id']}/", json={"x": res[1], "y": res[0], "z": res[2]}, headers=token)
+    if len(events) == 0:
+        return "Нет событий для обработки."
+    return "Успешно обработано"
