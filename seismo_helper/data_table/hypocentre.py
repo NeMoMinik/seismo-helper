@@ -1,7 +1,8 @@
 import numpy as np
 import scipy
 from scipy.optimize import Bounds
-
+from scipy.optimize import fsolve
+from pyproj import Transformer
 
 def hypocentre_search(stations: list[list]) -> scipy.optimize:
     velocity = 3000
@@ -23,37 +24,45 @@ def hypocentre_search(stations: list[list]) -> scipy.optimize:
         niter=10000,
         minimizer_kwargs={'method': 'BFGS'},
         disp=False)
-    x, y, z, t = res.x
+    
+    x, y, z, t = find_hypocenter([velocity, sts[0][0],sts[0][1],sts[0][2],sts[0][3],
+                                  sts[1][0],sts[1][1],sts[1][2],sts[1][3],
+                                  sts[2][0],sts[2][1],sts[2][2],sts[2][3],
+                                  sts[3][0],sts[3][1],sts[3][2],sts[3][3],
+                                  ])
+
     x, y = coordinate_shift[0] * 100000 + x, coordinate_shift[1] * 100000 + y
     x, y = convert_to_lonlat(x, y)
 
     S = 0
     n = 0
-    for xi, yi, zi, ti in stations:
-        a = (yi - y)**0.5 + (xi - x)**0.5
-        print(xi, yi, zi, ti)
-        print(a)
-        c = (t * 0.005)*velocity
-        print(c)
-        z0 = zi - (c**2 - a)**0.5
-        S += abs(z0)
-        print(z0)
-        n += 1
-    z = S / n
-    print(z)
+    
+    print(x, y, z, t)
     print("FINISHED HYPO")
     return x, y, z, t
 
 
 def convert_to_xy(lon: float, lat: float) -> tuple:
-    from pyproj import Transformer
     transformer = Transformer.from_crs("EPSG:4326", "EPSG:3857", always_xy=True)
     x, y = transformer.transform(lon, lat)
     return x, y
 
 
 def convert_to_lonlat(x: float, y: float) -> tuple:
-    from pyproj import Transformer
     transformer = Transformer.from_crs("EPSG:3857", "EPSG:4326", always_xy=True)
     lon, lat = transformer.transform(x, y)
     return lon, lat
+
+def eq(p, args):
+    v, x1, y1, z1, t1, x2, y2, z2, t2, x3, y3, z3, t3, x4, y4, z4, t4 = args
+    x, y, z, t0 = p
+    return (
+        t1 - t0 - (1 / v) * ((x1 - x)**2 + (y1 - y)**2 + (z1 - z)**2)**0.5,
+        t2 - t0 - (1 / v) * ((x2 - x)**2 + (y2 - y)**2 + (z2 - z)**2)**0.5,
+        t3 - t0 - (1 / v) * ((x3 - x)**2 + (y3 - y)**2 + (z3 - z)**2)**0.5,
+        t4 - t0 - (1 / v) * ((x4 - x)**2 + (y4 - y)**2 + (z4 - z)**2)**0.5
+    )
+
+def find_hypocenter(args):
+    x, y, z, t0 = fsolve(eq, (0,0,0,0), args = args)
+    return x, y, z, t0
