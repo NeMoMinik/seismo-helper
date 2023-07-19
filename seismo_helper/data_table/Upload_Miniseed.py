@@ -55,7 +55,8 @@ def upload_miniseed(paths, location, token):
                     'end': event.end_time,
                     'location': location
                 },
-                                  headers=token).json()
+                                  headers=token)
+                print(event_r)
 
                 stations_requsted = rq.get(DATABASE_API + 'stations/', headers=token).json()['results']
                 stations_dict = {}
@@ -69,7 +70,7 @@ def upload_miniseed(paths, location, token):
                                     "channels": [{"path": paths[traces_files_index][0]},
                                                  {"path": paths[traces_files_index][1]},
                                                  {"path": paths[traces_files_index][2]}],
-                                    "event": event_r['id']
+                                    "event": event_r.json()['id']
                                 },
                                 headers=token
                     )

@@ -86,7 +86,8 @@ def update_output(n_clicks, name, token):
             try:
                 text += f"{stuff[i]}: {stuff[r.json()[i][0]]}\n"
             except KeyError:
-                text += r.json()[i]
+                print(r.json()[i])
+                # text += r.json()[i]
     S = [[], []]
     dt = rq.get(DATABASE_API + 'locations/', headers=token).json()['results']
     for i in dt:
