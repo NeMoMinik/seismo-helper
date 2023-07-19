@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Corporation, Location, Event, Station, Trace
+from .models import Corporation, Location, Event, Station, Trace, Channel
 
 
 @admin.register(Corporation)
@@ -13,8 +13,8 @@ class LocationAdmin(admin.ModelAdmin):
 
 
 @admin.register(Event)
-class CorporationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'x', 'y', 'z', 'magnitude', 'time')
+class EventAdmin(admin.ModelAdmin):
+    list_display = ('id', 'x', 'y', 'z', 'magnitude',)
 
 
 @admin.register(Station)
@@ -24,4 +24,9 @@ class StationAdmin(admin.ModelAdmin):
 
 @admin.register(Trace)
 class TraceAdmin(admin.ModelAdmin):
-    list_display = ('id', 'path', 'start', 'end')
+    list_display = ('id', 'path',)
+
+
+@admin.register(Channel)
+class ChannelAdmin(admin.ModelAdmin):
+    list_display = ('id', 'path')
