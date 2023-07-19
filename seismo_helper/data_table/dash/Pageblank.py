@@ -1,7 +1,7 @@
 import dash_mantine_components as dmc
 import dash_bootstrap_components as dbc
 from dash import html
-from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK
+from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK, BASE_DIR
 import base64
 import os
 
@@ -12,7 +12,7 @@ stylesheets = [dbc.themes.LUMEN]
 
 
 def openImg(path):
-    with open(os.getcwd() + path, "rb") as image_file:
+    with open(os.path.join(BASE_DIR, path), "rb") as image_file:
         img_data = base64.b64encode(image_file.read())
         img_data = img_data.decode()
         img_data = "{}{}".format("data:image/jpg;base64, ", img_data)
@@ -20,7 +20,7 @@ def openImg(path):
                         style={'margin': '0px'})
 
 
-bvlogo = openImg('\\media\\Photos_for_Front\\BV_logo.png')
+bvlogo = openImg('media/Photos_for_Front/BV_logo.png')
 
 navbar = dbc.NavbarSimple(
     children=[

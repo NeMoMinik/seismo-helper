@@ -5,12 +5,12 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 from data_table.dash.Pageblank import footer, navbar, stylesheets
 import os
-from seismo_helper.settings import ALLOWED_HOSTS
+from seismo_helper.settings import ALLOWED_HOSTS, BASE_DIR
 import base64
 
 
 def openImg(path):
-    with open(os.getcwd() + path, "rb") as image_file:
+    with open(os.path.join(BASE_DIR, path), "rb") as image_file:
         img_data = base64.b64encode(image_file.read())
         img_data = img_data.decode()
         img_data = "{}{}".format("data:image/jpg;base64, ", img_data)
@@ -20,7 +20,7 @@ def openImg(path):
 
 app = DjangoDash('AboutPage', external_stylesheets=stylesheets)
 
-images = [openImg(f'\\media\\Photos_for_Front\\A{i}.png') for i in range(1, 8)]
+images = [openImg(f'media/Photos_for_Front/A{i}.png') for i in range(1, 8)]
 
 app.layout = html.Div([
     navbar,
