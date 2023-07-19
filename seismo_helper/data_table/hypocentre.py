@@ -25,10 +25,10 @@ def hypocentre_search(stations: list[list]) -> scipy.optimize:
         minimizer_kwargs={'method': 'BFGS'},
         disp=False)
     
-    x, y, z, t = find_hypocenter([velocity, sts[0][0],sts[0][1],sts[0][2],sts[0][3],
-                                  sts[1][0],sts[1][1],sts[1][2],sts[1][3],
-                                  sts[2][0],sts[2][1],sts[2][2],sts[2][3],
-                                  sts[3][0],sts[3][1],sts[3][2],sts[3][3],
+    x, y, z, t = find_hypocenter([velocity, sts[0][0],sts[0][1],sts[0][2],sts[0][3]*0.005,
+                                  sts[1][0],sts[1][1],sts[1][2],sts[1][3]*0.005,
+                                  sts[2][0],sts[2][1],sts[2][2],sts[2][3]*0.005,
+                                  sts[3][0],sts[3][1],sts[3][2],sts[3][3]*0.005,
                                   ])
 
     x, y = coordinate_shift[0] * 100000 + x, coordinate_shift[1] * 100000 + y
