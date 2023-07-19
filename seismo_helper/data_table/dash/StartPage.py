@@ -3,12 +3,12 @@ from django_plotly_dash import DjangoDash
 import dash_bootstrap_components as dbc
 from data_table.dash.Pageblank import footer, navbar, stylesheets
 import os
-from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK
+from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK, BASE_DIR
 import base64
 
 app = DjangoDash('StartPage', external_stylesheets=stylesheets)
 
-with open((os.getcwd() + '\\media\\Photos_for_Front\\M1.jpg'), "rb") as image_file:
+with open((os.path.join(BASE_DIR, 'media/Photos_for_Front/M1.jpg')), "rb") as image_file:
     img_data = base64.b64encode(image_file.read())
     img_data = img_data.decode()
     img_data = "{}{}".format("data:image/jpg;base64, ", img_data)

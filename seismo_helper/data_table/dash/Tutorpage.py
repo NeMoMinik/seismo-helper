@@ -3,12 +3,13 @@ from django_plotly_dash import DjangoDash
 from data_table.dash.Pageblank import footer, navbar, stylesheets
 import os
 import base64
+from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK, BASE_DIR
 
 app = DjangoDash('TutorPage', external_stylesheets=stylesheets)
 
 
 def openImg(path):
-    with open(os.getcwd() + path, "rb") as image_file:
+    with open(os.path.join(BASE_DIR, path), "rb") as image_file:
         img_data = base64.b64encode(image_file.read())
         img_data = img_data.decode()
         img_data = "{}{}".format("data:image/jpg;base64, ", img_data)
@@ -16,8 +17,8 @@ def openImg(path):
                         style={'margin': '0px'})
 
 
-ImgT1 = openImg('\\media\\Photos_for_Front\\T1.png')
-ImgT2 = openImg('\\media\\Photos_for_Front\\T2.png')
+ImgT1 = openImg('media/Photos_for_Front/T1.png')
+ImgT2 = openImg('media/Photos_for_Front/T2.png')
 
 app.layout = html.Div([
     navbar,
