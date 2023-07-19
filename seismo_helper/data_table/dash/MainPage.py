@@ -16,6 +16,7 @@ from data_table.hypocentre import hypocentre_search
 from data_table.FiveNeuro import NeuralNetworkUse
 import numpy as np
 from torch import Tensor
+from data_table.magnitude import Magnitude
 
 app = DjangoDash('DashDatatable', external_stylesheets=stylesheets)
 
@@ -239,7 +240,7 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
     if len(events_list_table) != 0:
         map_df = pd.DataFrame(events_list_table)  # .sort_values(0)
 
-        markers_size_list = [event[7] for event in events_list_table if event[7] is not None]
+        markers_size_list = [round(event[7],2) for event in events_list_table if event[7] is not None]
         map_df.columns = ['№', 'Локация', 'Начало', 'Конец', 'X', 'Y', 'Z', 'Магнитуда', 'id']
 
         map_figure.add_traces(list(px.scatter_mapbox(map_df,
@@ -381,6 +382,9 @@ def analyze(n, token):
     for i in events:
         traces = i['traces']
         hypo_data = []
+        traces_raw = np.ndarray(shape=(len(traces), 3, 1500))
+        station_coords = np.ndarray(shape=(len(traces), 3))
+        trace_number = 0
         for j in traces:
             trace = rq.get(DATABASE_API + f"traces/{j}", headers=token).json()
             station = rq.get(DATABASE_API + f"stations/{trace['station']}", headers=token).json()
@@ -388,14 +392,27 @@ def analyze(n, token):
             hypo_data.append(
                     (station['x'], station['y'], station['z']) + (peaks[0] * trace['timedelta'] / 1000, )
             )
+            np.append(station_coords, [station['x'], station['y'], station['z']])
+            for q in range(3):
+                traces_raw[trace_number][q] = np.load(trace['path'] + trace['channels'][q])
+
             print(hypo_data)
             print(peaks, int(peaks[0]), int(peaks[1]))
             rq.patch(DATABASE_API + f"traces/{j}/", json={"p_peak": int(peaks[0]), "s_peak": int(peaks[1])}, headers=token)
+
+            trace_number += 1
         try:
             res = hypocentre_search(hypo_data)
         except TypeError:
             return "Проверьте правильность координат станций"
-        rq.patch(DATABASE_API + f"events/{i['id']}/", json={"x": res[0], "y": res[1], "z": res[2]}, headers=token)
+
+        stations_coords = []
+        magnitude_obj = Magnitude(station_coords, [res[0], res[1], res[2]], traces_raw)
+
+        magnitude = magnitude_obj.magnitude_calc()
+
+        rq.patch(DATABASE_API + f"events/{i['id']}/", json={"x": res[0], "y": res[1], "z": res[2], "magnitude": magnitude}, headers=token)
+
     if len(events) == 0:
         return "Нет событий для обработки."
     return "Успешно обработано"
