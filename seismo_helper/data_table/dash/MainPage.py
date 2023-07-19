@@ -386,7 +386,7 @@ def analyze(n, token):
             station = rq.get(DATABASE_API + f"stations/{trace['station']}", headers=token).json()
             peaks = nn.find_peaks(Tensor(list(np.load(trace['path'] + i) for i in trace['channels'])))
             hypo_data.append(
-                    (station['x'], station['y'], station['z']) + (peaks[0], )
+                    (station['x'], station['y'], station['z']) + (peaks[0] * trace['timedelta'] / 1000, )
             )
             print(peaks, int(peaks[0]), int(peaks[1]))
             rq.patch(DATABASE_API + f"traces/{j}/", json={"p_peak": int(peaks[0]), "s_peak": int(peaks[1])}, headers=token)
