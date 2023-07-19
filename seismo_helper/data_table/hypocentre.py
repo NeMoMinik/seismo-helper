@@ -4,41 +4,35 @@ from scipy.optimize import Bounds
 from scipy.optimize import fsolve
 from pyproj import Transformer
 
-def hypocentre_search(stations: list[list]) -> scipy.optimize:
-    velocity = 3000
-    sts = []
-    coordinate_shift = [0, 0]
-    for x, y, z, t in stations:
+def hypocentre_search(stations: list[list]) -> tuple:
+    velocity = 6
+    stations = np.array(stations)
+    modulo = [0, 0]
+    for ind_station, [x, y, z, t] in enumerate(stations):
         x, y = convert_to_xy(x, y)
-        sts.append([x % 100000, y % 100000, z, t])
-        coordinate_shift[0] += x // 100000
-        coordinate_shift[1] += y // 100000
-    coordinate_shift = [coordinate_shift[0] / len(stations), coordinate_shift[1] / len(stations)]
+        modulo[0] += x // 100000
+        modulo[1] += y // 100000
+        x, y = x % 100000 / 1000, y % 100000 / 1000
+        z /= 1000
+        stations[ind_station] = [x, y, z, t]
+    func = lambda x: sum([
+        (st[3] - (x[3] + 1 / velocity * (
+                (st[0] - x[0]) ** 2 + (st[1] - x[1]) ** 2 + (st[2] - x[2]) ** 2) ** 0.5)) ** 2
+        for st in stations]) / len(stations)
+    bound = Bounds([np.array(stations)[:, 0].min() - 2, np.array(stations)[:, 1].min() - 2, -1, np.array(stations)[:, 3].mean() - 10],
+                   [np.array(stations)[:, 0].max() + 2, np.array(stations)[:, 1].max() + 2, 4, np.array(stations)[:, 3].mean() + 5])
 
-    func = lambda x: sum(
-        [(st[3] - (x[3] + 1 / velocity * ((st[0] - x[0]) ** 2 + (st[1] - x[1]) ** 2 + (st[2] - x[2]) ** 2) ** 0.5)) ** 2
-         for st in sts])
+    res = scipy.optimize.differential_evolution(
+        func,
+        maxiter=10000,
+        tol=10e-15,
+        polish=True,
+        strategy='best2exp',
+        disp=False)
 
-    # res = scipy.optimize.basinhopping(
-    #     func, np.array([10000, 10000, 100, 40]),
-    #     niter=10000,
-    #     minimizer_kwargs={'method': 'BFGS'},
-    #     disp=False)
-    
-    x, y, z, t = find_hypocenter([velocity, sts[0][0],sts[0][1],sts[0][2],sts[0][3]*0.005,
-                                  sts[1][0],sts[1][1],sts[1][2],sts[1][3]*0.005,
-                                  sts[2][0],sts[2][1],sts[2][2],sts[2][3]*0.005,
-                                  sts[3][0],sts[3][1],sts[3][2],sts[3][3]*0.005,
-                                  ])
-
-    x, y = coordinate_shift[0] * 100000 + x, coordinate_shift[1] * 100000 + y
-    x, y = convert_to_lonlat(x, y)
-
-    S = 0
-    n = 0
-    
-    print(x, y, z, t)
-    print("FINISHED HYPO")
+    x, y, z, t = res.x
+    x, y = modulo[0] / len(stations) * 100000 + x * 1000, modulo[1] / len(stations) * 100000 + y * 1000
+    # x, y = convert_to_lonlat(x, y)
     return x, y, z, t
 
 
