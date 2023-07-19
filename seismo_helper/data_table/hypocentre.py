@@ -28,6 +28,7 @@ def hypocentre_search(stations: list[list]) -> tuple:
         tol=10e-15,
         polish=True,
         strategy='best2exp',
+        bounds=bound,
         disp=False)
 
     x, y, z, t = res.x

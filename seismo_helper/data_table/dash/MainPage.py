@@ -12,7 +12,7 @@ import requests as rq
 from seismo_helper.settings import ALLOWED_HOSTS, DATABASE_API, BASE_LINK, UPLOAD_DIRECTORY, MODEL_DIR
 from sklearn.linear_model import LinearRegression
 from data_table.Upload_Miniseed import upload_miniseed
-from data_table.hypocentre import hypocentre_search
+from data_table.hypocentre import hypocentre_search, convert_to_lonlat, convert_to_xy
 from data_table.FiveNeuro import NeuralNetworkUse
 import numpy as np
 from torch import Tensor
@@ -383,7 +383,7 @@ def analyze(n, token):
         traces = i['traces']
         hypo_data = []
         traces_raw = np.ndarray(shape=(len(traces), 3, 1500))
-        station_coords = np.ndarray(shape=(len(traces), 3))
+        station_coords = []
         trace_number = 0
         for j in traces:
             trace = rq.get(DATABASE_API + f"traces/{j}", headers=token).json()
@@ -392,26 +392,28 @@ def analyze(n, token):
             hypo_data.append(
                     (station['x'], station['y'], station['z']) + (peaks[0] * trace['timedelta'] / 1000, )
             )
-            np.append(station_coords, [station['x'], station['y'], station['z']])
+            st_c = convert_to_xy(station['x'], station['y'])
+
+            station_coords.append([st_c[0], st_c[1], station['z']])
             for q in range(3):
                 traces_raw[trace_number][q] = np.load(trace['path'] + trace['channels'][q])
 
-            print(hypo_data)
             print(peaks, int(peaks[0]), int(peaks[1]))
             rq.patch(DATABASE_API + f"traces/{j}/", json={"p_peak": int(peaks[0]), "s_peak": int(peaks[1])}, headers=token)
 
             trace_number += 1
-        try:
-            res = hypocentre_search(hypo_data)
-        except TypeError:
-            return "Проверьте правильность координат станций"
+        # try:
+        res = hypocentre_search(hypo_data)
+        # except TypeError:
+        #     return "Проверьте правильность координат станций"
 
-        stations_coords = []
-        magnitude_obj = Magnitude(station_coords, [res[0], res[1], res[2]], traces_raw)
+        magnitude_obj = Magnitude(np.array(station_coords), [res[0], res[1], res[2]], traces_raw)
 
         magnitude = magnitude_obj.magnitude_calc()
+        print(magnitude)
 
-        rq.patch(DATABASE_API + f"events/{i['id']}/", json={"x": res[0], "y": res[1], "z": res[2], "magnitude": magnitude}, headers=token)
+        x, y = convert_to_lonlat(res[0], res[1])
+        rq.patch(DATABASE_API + f"events/{i['id']}/", json={"x": x, "y": y, "z": res[2], "magnitude": magnitude}, headers=token)
 
     if len(events) == 0:
         return "Нет событий для обработки."
