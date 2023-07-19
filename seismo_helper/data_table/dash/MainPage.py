@@ -388,6 +388,7 @@ def analyze(n, token):
             hypo_data.append(
                     (station['x'], station['y'], station['z']) + (peaks[0] * trace['timedelta'] / 1000, )
             )
+            print(hypo_data)
             print(peaks, int(peaks[0]), int(peaks[1]))
             rq.patch(DATABASE_API + f"traces/{j}/", json={"p_peak": int(peaks[0]), "s_peak": int(peaks[1])}, headers=token)
         try:
