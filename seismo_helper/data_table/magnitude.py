@@ -12,6 +12,7 @@ class Magnitude:
         self.station_coords = station_coords
         self.event_coord = event_coord
         self.traces = traces
+        self.magnitude = 0
 
     def distance_calc(self) -> list:
         station_coords = self.station_coords
@@ -32,6 +33,9 @@ class Magnitude:
         return original_amplitude #амплитуда события
 
     def magnitude_calc(self) -> float:
-        magnitude = log10(self.amplitude_calc())
-        return magnitude
+        self.magnitude = log10(self.amplitude_calc())
+        return self.magnitude
 
+    def __str__(self) -> str:
+        return f"Magnitude object with coords: {self.event_coord} and magnitude: {self.magnitude}"
+    
