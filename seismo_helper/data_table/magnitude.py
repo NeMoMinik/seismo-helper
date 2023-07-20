@@ -8,7 +8,7 @@ traces - трехмерный массив сейсмотрасс события
 
 class Magnitude:
 
-    def __init__(self, station_coords: np.ndarray, event_coord: list, traces: np.ndarray, , coefficient: float):
+    def __init__(self, station_coords: np.ndarray, event_coord: list, traces: np.ndarray, coefficient: float):
         self.station_coords = station_coords
         self.event_coord = event_coord
         self.traces = traces
