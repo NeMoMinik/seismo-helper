@@ -40,7 +40,6 @@ class Station(models.Model):
     x = models.FloatField(null=True, blank=True)
     y = models.FloatField(null=True, blank=True)
     z = models.FloatField(null=True, blank=True)
-    s_peak = models.PositiveIntegerField
     location = models.ForeignKey(
         Location,
         on_delete=models.CASCADE
@@ -52,9 +51,9 @@ class Station(models.Model):
 
 class Trace(models.Model):
     path = models.CharField(max_length=256)
-    timedelta = models.PositiveIntegerField(default=5)
-    p_peak = models.PositiveIntegerField(blank=True, null=True)
-    s_peak = models.PositiveIntegerField(blank=True, null=True)
+    timedelta = models.IntegerField(default=5)
+    p_peak = models.IntegerField(blank=True, null=True)
+    s_peak = models.IntegerField(blank=True, null=True)
     event = models.ForeignKey(
         Event,
         on_delete=models.CASCADE,
