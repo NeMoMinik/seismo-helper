@@ -8,11 +8,12 @@ traces - трехмерный массив сейсмотрасс события
 
 class Magnitude:
 
-    def __init__(self, station_coords: np.ndarray, event_coord: list, traces: np.ndarray):
+    def __init__(self, station_coords: np.ndarray, event_coord: list, traces: np.ndarray, , coefficient: float):
         self.station_coords = station_coords
         self.event_coord = event_coord
         self.traces = traces
         self.magnitude = 0
+        self.coefficient = coefficient
 
     def distance_calc(self) -> list:
         station_coords = self.station_coords
@@ -33,7 +34,7 @@ class Magnitude:
         return original_amplitude #амплитуда события
 
     def magnitude_calc(self) -> float:
-        self.magnitude = log10(self.amplitude_calc())
+        self.magnitude = log10(self.amplitude_calc()) * self.coefficient
         return self.magnitude
 
     def __str__(self) -> str:
