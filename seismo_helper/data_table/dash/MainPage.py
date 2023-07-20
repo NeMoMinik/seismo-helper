@@ -197,6 +197,8 @@ def update_outputfile(contents, list_of_names, list_of_dates, location, token): 
                 Paths.append(UPLOAD_DIRECTORY + str(location) + "\\" + list_of_names[file_index])
 
     resp = upload_miniseed(Paths, location, token)
+    for i in Paths:
+        os.remove(i)
     return resp
 
 
@@ -248,8 +250,9 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
                                                      lon='Y',
                                                      size=markers_size_list,
                                                      hover_data="id",
-                                                     color='Магнитуда',
-                                                     color_continuous_scale=px.colors.cyclical.IceFire).select_traces()))
+                                                     color='Z',
+                                                     color_continuous_scale=px.colors.diverging.Portland).select_traces()))
+        map_figure.update_layout(coloraxis = {'colorscale':'rainbow_r'})
     print(site_coords)
     map_figure.add_traces((go.Scattermapbox(
         lat=[i[0] for i in site_coords],
