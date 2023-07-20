@@ -12,10 +12,11 @@ import requests as rq
 from seismo_helper.settings import ALLOWED_HOSTS, DATABASE_API, BASE_LINK, UPLOAD_DIRECTORY, MODEL_DIR
 from sklearn.linear_model import LinearRegression
 from data_table.Upload_Miniseed import upload_miniseed
-from data_table.hypocentre import hypocentre_search
+from data_table.hypocentre import hypocentre_search, convert_to_lonlat, convert_to_xy
 from data_table.FiveNeuro import NeuralNetworkUse
 import numpy as np
 from torch import Tensor
+from data_table.magnitude import Magnitude
 
 app = DjangoDash('DashDatatable', external_stylesheets=stylesheets)
 
@@ -44,17 +45,17 @@ table_columns = [  # Формат колонок для таблицы
     },
     {
         'id': '4',
-        'name': 'X',
+        'name': 'X, широта, °',
         'sortable': False,
     },
     {
         'id': '5',
-        'name': 'Y',
+        'name': 'Y, долгота, °',
         'sortable': False,
     },
     {
         'id': '6',
-        'name': 'Z',
+        'name': 'Z, глубина, км',
         'sortable': False,
     },
     {
@@ -196,6 +197,8 @@ def update_outputfile(contents, list_of_names, list_of_dates, location, token): 
                 Paths.append(UPLOAD_DIRECTORY + str(location) + "\\" + list_of_names[file_index])
 
     resp = upload_miniseed(Paths, location, token)
+    for i in Paths:
+        os.remove(i)
     return resp
 
 
@@ -239,16 +242,17 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
     if len(events_list_table) != 0:
         map_df = pd.DataFrame(events_list_table)  # .sort_values(0)
 
-        markers_size_list = [event[7] for event in events_list_table if event[7] is not None]
+        markers_size_list = [round(event[7],2) for event in events_list_table if event[7] is not None]
         map_df.columns = ['№', 'Локация', 'Начало', 'Конец', 'X', 'Y', 'Z', 'Магнитуда', 'id']
 
         map_figure.add_traces(list(px.scatter_mapbox(map_df,
-                                                     lat='Y',
-                                                     lon='X',
+                                                     lat='X',
+                                                     lon='Y',
                                                      size=markers_size_list,
                                                      hover_data="id",
-                                                     color='Магнитуда',
-                                                     color_continuous_scale=px.colors.cyclical.IceFire).select_traces()))
+                                                     color='Z',
+                                                     color_continuous_scale=px.colors.diverging.Portland).select_traces()))
+        map_figure.update_layout(coloraxis = {'colorscale':'rainbow_r'})
     print(site_coords)
     map_figure.add_traces((go.Scattermapbox(
         lat=[i[0] for i in site_coords],
@@ -308,7 +312,7 @@ def create_datatable(events_list):
     events_list_graphs = [
         [f"[{i['id']}]({BASE_LINK + 'Events/'}{i['id']})", i['location'], i['start'], i['end'], i['x'], i['y'], i['z'],
          i['magnitude'], i['id']] for i in events_list]
-    datatable_df = pd.DataFrame(events_list_graphs[:8]).sort_values(0)
+    datatable_df = pd.DataFrame(events_list_graphs).sort_values(0)
     return dash_table.DataTable(
         id='datatable-interactivity',
         columns=table_columns,
@@ -381,6 +385,9 @@ def analyze(n, token):
     for i in events:
         traces = i['traces']
         hypo_data = []
+        traces_raw = np.ndarray(shape=(len(traces), 3, 1500))
+        station_coords = []
+        trace_number = 0
         for j in traces:
             trace = rq.get(DATABASE_API + f"traces/{j}", headers=token).json()
             station = rq.get(DATABASE_API + f"stations/{trace['station']}", headers=token).json()
@@ -388,14 +395,29 @@ def analyze(n, token):
             hypo_data.append(
                     (station['x'], station['y'], station['z']) + (peaks[0] * trace['timedelta'] / 1000, )
             )
-            print(hypo_data)
+            st_c = convert_to_xy(station['x'], station['y'])
+
+            station_coords.append([st_c[0], st_c[1], station['z']])
+            for q in range(3):
+                traces_raw[trace_number][q] = np.load(trace['path'] + trace['channels'][q])
+
             print(peaks, int(peaks[0]), int(peaks[1]))
             rq.patch(DATABASE_API + f"traces/{j}/", json={"p_peak": int(peaks[0]), "s_peak": int(peaks[1])}, headers=token)
-        try:
-            res = hypocentre_search(hypo_data)
-        except TypeError:
-            return "Проверьте правильность координат станций"
-        rq.patch(DATABASE_API + f"events/{i['id']}/", json={"x": res[0], "y": res[1], "z": res[2]}, headers=token)
+
+            trace_number += 1
+        # try:
+        res = hypocentre_search(hypo_data)
+        # except TypeError:
+        #     return "Проверьте правильность координат станций"
+
+        magnitude_obj = Magnitude(np.array(station_coords), [res[0], res[1], res[2]], traces_raw, 0.1)
+
+        magnitude = magnitude_obj.magnitude_calc()
+        print(magnitude)
+
+        x, y = convert_to_lonlat(res[0], res[1])
+        rq.patch(DATABASE_API + f"events/{i['id']}/", json={"x": round(x, 4), "y": round(y, 4), "z": round(res[2], 4), "magnitude": round(magnitude, 4)}, headers=token)
+
     if len(events) == 0:
         return "Нет событий для обработки."
     return "Успешно обработано"
