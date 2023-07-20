@@ -244,8 +244,8 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
         map_df.columns = ['№', 'Локация', 'Начало', 'Конец', 'X', 'Y', 'Z', 'Магнитуда', 'id']
 
         map_figure.add_traces(list(px.scatter_mapbox(map_df,
-                                                     lat='Y',
-                                                     lon='X',
+                                                     lat='X',
+                                                     lon='Y',
                                                      size=markers_size_list,
                                                      hover_data="id",
                                                      color='Магнитуда',
