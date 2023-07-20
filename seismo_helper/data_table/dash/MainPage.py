@@ -407,7 +407,7 @@ def analyze(n, token):
         # except TypeError:
         #     return "Проверьте правильность координат станций"
 
-        magnitude_obj = Magnitude(np.array(station_coords), [res[0], res[1], res[2]], traces_raw)
+        magnitude_obj = Magnitude(np.array(station_coords), [res[0], res[1], res[2]], traces_raw, 0.1)
 
         magnitude = magnitude_obj.magnitude_calc()
         print(magnitude)
