@@ -252,7 +252,7 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
                                                      hover_data="id",
                                                      color='Z',
                                                      color_continuous_scale=px.colors.diverging.Portland).select_traces()))
-        map_figure.update_layout(coloraxis = {'colorscale':'rainbow_r'})
+        map_figure.update_layout(coloraxis={'colorscale': 'rainbow_r'})
     print(site_coords)
     map_figure.add_traces((go.Scattermapbox(
         lat=[i[0] for i in site_coords],
