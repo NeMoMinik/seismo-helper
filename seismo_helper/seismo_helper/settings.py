@@ -24,7 +24,9 @@ SECRET_KEY = os.environ.get("SECRET_KEY", default='django-insecure-o&89@7yf372_e
 
 DEBUG = int(os.environ.get("DEBUG", default=0))
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", default='127.0.0.1').split(" ")
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS",
+                               default='127.0.0.1 localhost web'
+                               ).split(" ")
 # Url for api
 DATABASE_API = f'http://{ALLOWED_HOSTS[0]}:8000/api/'
 
