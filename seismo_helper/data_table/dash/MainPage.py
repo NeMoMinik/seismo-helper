@@ -45,17 +45,17 @@ table_columns = [  # Формат колонок для таблицы
     },
     {
         'id': '4',
-        'name': 'X',
+        'name': 'X, долгота, °',
         'sortable': False,
     },
     {
         'id': '5',
-        'name': 'Y',
+        'name': 'Y, широта, °',
         'sortable': False,
     },
     {
         'id': '6',
-        'name': 'Z',
+        'name': 'Z, глубина, км',
         'sortable': False,
     },
     {
@@ -413,7 +413,7 @@ def analyze(n, token):
         print(magnitude)
 
         x, y = convert_to_lonlat(res[0], res[1])
-        rq.patch(DATABASE_API + f"events/{i['id']}/", json={"x": x, "y": y, "z": res[2], "magnitude": magnitude}, headers=token)
+        rq.patch(DATABASE_API + f"events/{i['id']}/", json={"x": round(x, 4), "y": round(y, 4), "z": round(res[2], 4), "magnitude": round(magnitude, 4)}, headers=token)
 
     if len(events) == 0:
         return "Нет событий для обработки."
