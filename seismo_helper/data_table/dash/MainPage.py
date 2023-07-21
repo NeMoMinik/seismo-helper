@@ -45,12 +45,12 @@ table_columns = [  # Формат колонок для таблицы
     },
     {
         'id': '4',
-        'name': 'X, долгота, °',
+        'name': 'X, широта, °',
         'sortable': False,
     },
     {
         'id': '5',
-        'name': 'Y, широта, °',
+        'name': 'Y, долгота, °',
         'sortable': False,
     },
     {
@@ -312,7 +312,7 @@ def create_datatable(events_list):
     events_list_graphs = [
         [f"[{i['id']}]({BASE_LINK + 'Events/'}{i['id']})", i['location'], i['start'], i['end'], i['x'], i['y'], i['z'],
          i['magnitude'], i['id']] for i in events_list]
-    datatable_df = pd.DataFrame(events_list_graphs[:8]).sort_values(0)
+    datatable_df = pd.DataFrame(events_list_graphs).sort_values(0)
     return dash_table.DataTable(
         id='datatable-interactivity',
         columns=table_columns,
