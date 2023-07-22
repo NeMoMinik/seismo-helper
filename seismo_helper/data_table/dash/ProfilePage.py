@@ -27,7 +27,7 @@ app.layout = html.Div([
 def load_profile(aboba):
     style = {'margin-top': '1%', 'color': '#000000'}
     if aboba is not None:
-        data = rq.get(f'http://{ALLOWED_HOSTS[0]}:8000/auth/users/me',
+        data = rq.get(f'{BASE_LINK}auth/users/me',
                       headers=aboba).json()
         global profile_data
         profile_data = data

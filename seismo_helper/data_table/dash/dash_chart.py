@@ -7,7 +7,7 @@ import requests as rq
 from data_table.dash.Pageblank import navbar, footer, stylesheets
 from seismo_helper.settings import DATABASE_API, BASE_LINK
 
-app = DjangoDash('Chart', external_stylesheets=stylesheets, url_base_pathname=BASE_LINK)
+app = DjangoDash('Chart', external_stylesheets=stylesheets)
 
 app.layout = html.Div([
     navbar,

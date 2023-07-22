@@ -58,10 +58,16 @@ def signupredir(n):
 def register(clicks, username, email, password, data):
     stuff = {"email": "Адрес электронной почты",
              "Enter a valid email address.": "Введите корректный адрес",
+             "username": "Имя",
              "password": "Пароль",
-             "This password is too short. It must contain at least 8 characters.": "Минимальная длина пароля -- 8 симаолов",
-             "This password is entirely numeric.": "В пароле должны быть не только цифры!",
-             'user with this email address already exists.': "Почта занята!"}
+             "A user with that username already exists.": "Пользователь с таким именем уже существует.",
+             "This password is too short. It must contain at least 8 characters.": "Минимальная длина пароля -- 8 символов",
+             "This password is entirely numeric.": "В пароле должны быть не только цифры.",
+             'user with this email address already exists.': "Пользователь с такой почтой уже существует.",
+             'Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.': "Имя может содержать только буквы и символы @/./+/-/_",
+             'This password is too common.': 'Пароль слишком простой.',
+             'The password is too similar to the username.': "Пароль слишком похож на имя пользователя."
+             }
     print(data)
     r = rq.post(f"{AUTH}auth/users/", data={
         "username": username,
@@ -74,9 +80,9 @@ def register(clicks, username, email, password, data):
         text = ''
         for i in r.json():
             try:
-                text += f"{stuff[i]}: {stuff[r.json()[i][0]]}\n"
-            except:
-                text += i + "; "
+                text += f"{stuff[i]}: {' '.join([stuff[r.json()[i][j]] for j in range(len(r.json()[i]))])}\n"
+            except KeyError:
+                text += i + str(r.json()[i]) + "; "
         return text
     r = rq.post(f"{AUTH}auth/token/login/", data={"username": username, "password": password}).json()
     if "auth_token" in r:
