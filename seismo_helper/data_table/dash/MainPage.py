@@ -238,7 +238,7 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
                                           event['z'],
                                           event['magnitude'],
                                           event['id']])
-    print(events_list_table)
+    
     if len(events_list_table) != 0:
         map_df = pd.DataFrame(events_list_table)  # .sort_values(0)
 
@@ -251,8 +251,8 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
                                                      size=markers_size_list,
                                                      hover_data="id",
                                                      color='Z',
-                                                     color_continuous_scale=px.colors.diverging.Portland).select_traces()))
-        map_figure.update_layout(coloraxis = {'colorscale':'rainbow_r'})
+                                                     color_continuous_scale=px.colors.diverging.Portland).select_traces())) #  https://plotly.com/python/builtin-colorscales/
+        map_figure.update_layout(coloraxis={'colorscale': 'rainbow_r'})
     print(site_coords)
     map_figure.add_traces((go.Scattermapbox(
         lat=[i[0] for i in site_coords],
@@ -261,7 +261,7 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
         mode='markers',
         marker=go.scattermapbox.Marker(
             size=15,
-            color='rgb(0, 255, 0)',
+            color='rgb(0, 0, 0)',
             opacity=1
         ),
         hoverinfo='none'
@@ -278,18 +278,18 @@ def create_magnitude_graphs(events_list):
         [f"[{i['id']}]({BASE_LINK + 'Events/'}{i['id']})", i['location'], i['start'], i['end'], i['x'], i['y'], i['z'],
          i['magnitude'], i['id']] for i in events_list]
     magnitude_time_graph.update_traces(mode="markers", hovertemplate=None)
-    magnitude_count_list = [0 for _ in range(100)]
+    magnitude_count_list = [0 for _ in range(1000)]
     magnitude_count_df = [{"Magnitude": None, "Count": None}]
     for event in events_list_graphs:
         if event[7]:
-            magnitude_count_list[int(event[7] * 100 // 10)] += 1
+            magnitude_count_list[int(event[7] * 1000 // 10)] += 1
 
     magnitudes_list = []
     magnitudes_count_list = []
-    for i in range(100):
+    for i in range(1000):
         if magnitude_count_list[i] != 0:
-            magnitude_count_df.append({'Magnitude': i / 10, 'Count': magnitude_count_list[i]})
-            magnitudes_list.append(i / 10)
+            magnitude_count_df.append({'Magnitude': i / 100, 'Count': magnitude_count_list[i]})
+            magnitudes_list.append(i / 100)
             magnitudes_count_list.append(magnitude_count_list[i])
     magn_count_graph = px.scatter(magnitude_count_df, x="Magnitude", y="Count", title="Количество от магнитуды",
                                   log_y=True)
@@ -298,7 +298,7 @@ def create_magnitude_graphs(events_list):
     if len(magnitudes_list) != 0:
         magn_count_trend = LinearRegression()
         magn_count_trend.fit(magnitudes_list, magnitudes_count_list)
-        x_range = np.linspace(magnitudes_list.min(), magnitudes_list.max(), 100)
+        x_range = np.linspace(magnitudes_list.min(), magnitudes_list.max(), 1000)
         y_range = magn_count_trend.predict(x_range.reshape(-1, 1))
         magn_count_graph.add_traces(go.Scatter(x=x_range, y=y_range, name='Тренд'))
 
@@ -349,10 +349,9 @@ def update_output(value, token):  # Функция для обновления �
     # Запросы в базу данных:
     events_list = rq.get(DATABASE_API + 'events/', headers=token).json()['results']
     stations_list = rq.get(DATABASE_API + 'stations/', headers=token).json()['results']
-    user = rq.get(f'http://{ALLOWED_HOSTS[0]}:8000/auth/users/me', headers=token).json()
+    user = rq.get(f'{BASE_LINK}auth/users/me', headers=token).json()
     locations_requested = rq.get(DATABASE_API + f'locations/?corporation={user["corporation"]}', headers=token).json()[
         'results']
-    print(events_list)
     if len(events_list) == 0 or len(stations_list) == 0:
         divs_children = [create_dropdown(locations_requested, value),
                          html.Div(dcc.Graph(figure=update_map(events_list, stations_list, value), id='mapD')),
@@ -378,7 +377,6 @@ def update_output(value, token):  # Функция для обновления �
     prevent_initial_call=True
 )
 def analyze(n, token):
-    print('dlrkgaelkrgrli b nr j qpeorjqerjqe po')
     events = rq.get(DATABASE_API + "events/", headers=token).json()['results']
     events = [i for i in events if len(i['traces']) > 2 and i['x'] is None]
     nn = NeuralNetworkUse(MODEL_DIR)

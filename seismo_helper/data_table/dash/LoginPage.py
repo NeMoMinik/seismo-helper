@@ -46,9 +46,9 @@ def signupredir(n):
     prevent_initial_call=True,
 )
 def log_in(n_clicks, username, password):
-    r = rq.post("http://127.0.0.1:8000/auth/token/login/", data={"username": username, "password": password}).json()
+    r = rq.post(f"{BASE_LINK}auth/token/login/", data={"username": username, "password": password}).json()
     if "auth_token" in r:
-        r = rq.get("http://127.0.0.1:8000/auth/users/me/", headers={"Authorization": f"Token {r['auth_token']}"}).json()
+        r = rq.get(f"{BASE_LINK}auth/users/me/", headers={"Authorization": f"Token {r['auth_token']}"}).json()
         return dcc.Location(pathname=f"Logging/{r['id']}", id="someid_doesnt_matter")
     else:
         return no_update

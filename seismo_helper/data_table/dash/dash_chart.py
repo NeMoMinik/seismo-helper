@@ -12,7 +12,7 @@ app = DjangoDash('Chart', external_stylesheets=stylesheets)
 app.layout = html.Div([
     navbar,
     html.H1('Сейсмотрасса'),
-    html.Div(dcc.Graph(id="graph"),style={'margin-bottom':'10%'}),
+    html.Div(dcc.Graph(id="graph"), style={'margin-bottom':'10%'}),
     dcc.Input(id='id_event', type='hidden', value=''),
     dcc.Store(id='session', data=''),
     footer
@@ -34,7 +34,7 @@ def update_line_chart(value, token):
     traces_requested = rq.get(f'{DATABASE_API}traces/?event={value}', headers=token).json()['results']
     fig = make_subplots(rows=len(traces_requested), cols=1, shared_xaxes=True, shared_yaxes=True)
     for n, i in enumerate(traces_requested):
-        st = rq.get(f"http://{ALLOWED_HOSTS[0]}:8000/api/stations/{i['station']}/", headers=token).json()['name']
+        st = rq.get(f"{DATABASE_API}stations/{i['station']}/", headers=token).json()['name']
         for color, j in enumerate(i['channels']):
             d = np.load(i['path'] + j)
             fig.add_trace(go.Scatter(x=[i for i in range(0, len(d) * i["timedelta"], i["timedelta"])],
@@ -51,7 +51,10 @@ def update_line_chart(value, token):
             fig.add_trace(go.Scatter(x=[i["p_peak"] * i["timedelta"]],
                                      y=[0],
                                      mode='markers',
-                                     line=dict(color="#000000", width=20),
+                                     marker_symbol='cross-dot',  #  https://plotly.com/python/marker-style/
+                                        marker_line_color="black", marker_color="orange",
+                                        marker_line_width=2, marker_size=15,
+                                        hovertemplate="name: %{y}%{x}<br>number: %{marker.symbol}<extra></extra>",
                                      name="P PEAK"
                                      ),
                           col=1,
@@ -61,7 +64,10 @@ def update_line_chart(value, token):
             fig.add_trace(go.Scatter(x=[i["s_peak"] * i["timedelta"]],
                                      y=[0],
                                      mode='markers',
-                                     line=dict(color="#000000", width=20),
+                                     marker_symbol='x-dot',
+                                        marker_line_color="black", marker_color="orange",
+                                        marker_line_width=2, marker_size=15,
+                                        hovertemplate="name: %{y}%{x}<br>number: %{marker.symbol}<extra></extra>",
                                      name="S PEAK"
                                      ),
                           col=1,

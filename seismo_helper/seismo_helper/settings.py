@@ -20,21 +20,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-print(os.environ)
-SECRET_KEY = 'django-insecure-o&89@7yf372_ezexb6v@h*wb(ro&o^wr_8t!196t(=3tu!qepu'
+SECRET_KEY = os.environ.get("SECRET_KEY", default='django-insecure-o&89@7yf372_ezexb6v@h*wb(ro&o^wr_8t!196t(=3tu!qepu')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = int(os.environ.get("DEBUG", default=1))
 
-ALLOWED_HOSTS = ['127.0.0.1']
-# Url for api
-DATABASE_API = f'http://{ALLOWED_HOSTS[0]}:8000/api/'
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS",
+                               default='127.0.0.1 localhost web'
+                               ).split(" ")
+# Url for api'
+port = os.environ.get("PORT", "8000")
+print(port)
+BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:{port}/'
+DATABASE_API = f'{BASE_LINK}api/'
 
-BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/'
+UPLOAD_DIRECTORY = str(BASE_DIR) + "/media/MiniSeed/"
 
-UPLOAD_DIRECTORY = str(BASE_DIR) + "\\media\\MiniSeed\\"
-
-MODEL_DIR = str(BASE_DIR) + '\\data_table\\modelnew.mdl'
+MODEL_DIR = str(BASE_DIR) + '/data_table/modelnew.mdl'
 
 # Application definition
 
@@ -137,6 +138,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = "/var/html/static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
