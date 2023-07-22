@@ -48,16 +48,28 @@ def signupredir(n):
     prevent_initial_call=True,
 )
 def register(clicks, username, email, password, data):
+    stuff = {"email": "Адрес электронной почты",
+             "Enter a valid email address.": "Введите корректный адрес",
+             "password":"Пароль",
+             "This password is too short. It must contain at least 8 characters.":"Минимальная длина пароля -- 8 симаолов",
+             "This password is entirely numeric.":"В пароле должны быть не только цифры!",
+             'user with this email address already exists.':"Почта занята!"}
     print(data)
     r = rq.post(f"{BASE_LINK}auth/users/", data={
         "username": username,
         "email": email,
         "password": password
     }
-                )
+    )
     print(r.content)
     if r.status_code == 400:
-        return no_update
+        text = ''
+        for i in r.json():
+            try:
+                text += f"{stuff[i]}: {stuff[r.json()[i][0]]}\n"
+            except:
+                text += i + "; "
+        return text
     r = rq.post(f"{BASE_LINK}auth/token/login/", data={"username": username, "password": password}).json()
     if "auth_token" in r:
         r = rq.get(f"{BASE_LINK}auth/users/me/", headers={"Authorization": f"Token {r['auth_token']}"}).json()

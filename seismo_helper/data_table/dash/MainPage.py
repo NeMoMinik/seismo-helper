@@ -278,18 +278,18 @@ def create_magnitude_graphs(events_list):
         [f"[{i['id']}]({BASE_LINK + 'Events/'}{i['id']})", i['location'], i['start'], i['end'], i['x'], i['y'], i['z'],
          i['magnitude'], i['id']] for i in events_list]
     magnitude_time_graph.update_traces(mode="markers", hovertemplate=None)
-    magnitude_count_list = [0 for _ in range(100)]
+    magnitude_count_list = [0 for _ in range(1000)]
     magnitude_count_df = [{"Magnitude": None, "Count": None}]
     for event in events_list_graphs:
         if event[7]:
-            magnitude_count_list[int(event[7] * 100 // 10)] += 1
+            magnitude_count_list[int(event[7] * 1000 // 10)] += 1
 
     magnitudes_list = []
     magnitudes_count_list = []
-    for i in range(100):
+    for i in range(1000):
         if magnitude_count_list[i] != 0:
-            magnitude_count_df.append({'Magnitude': i / 10, 'Count': magnitude_count_list[i]})
-            magnitudes_list.append(i / 10)
+            magnitude_count_df.append({'Magnitude': i / 100, 'Count': magnitude_count_list[i]})
+            magnitudes_list.append(i / 100)
             magnitudes_count_list.append(magnitude_count_list[i])
     magn_count_graph = px.scatter(magnitude_count_df, x="Magnitude", y="Count", title="Количество от магнитуды",
                                   log_y=True)
@@ -298,7 +298,7 @@ def create_magnitude_graphs(events_list):
     if len(magnitudes_list) != 0:
         magn_count_trend = LinearRegression()
         magn_count_trend.fit(magnitudes_list, magnitudes_count_list)
-        x_range = np.linspace(magnitudes_list.min(), magnitudes_list.max(), 100)
+        x_range = np.linspace(magnitudes_list.min(), magnitudes_list.max(), 1000)
         y_range = magn_count_trend.predict(x_range.reshape(-1, 1))
         magn_count_graph.add_traces(go.Scatter(x=x_range, y=y_range, name='Тренд'))
 
