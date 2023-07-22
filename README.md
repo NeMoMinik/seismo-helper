@@ -24,5 +24,5 @@
 ![M1](seismo_helper/media/Photos_for_Front/M1.jpg)
 
 <h2>Сборка docker-контейнера</h2>
-В директории проекта прописать `docker-compose -f docker-compose.prod up -d --build`
-Для просмотра логов `docker-compose -f docker-compose.prod logs`
+В директории проекта прописать <code>docker-compose -f docker-compose.prod up -d --build</code><br>
+Для просмотра логов <code>docker-compose -f docker-compose.prod logs</code>
