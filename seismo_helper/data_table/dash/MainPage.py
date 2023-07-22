@@ -238,7 +238,7 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
                                           event['z'],
                                           event['magnitude'],
                                           event['id']])
-    print(events_list_table)
+    
     if len(events_list_table) != 0:
         map_df = pd.DataFrame(events_list_table)  # .sort_values(0)
 
@@ -251,7 +251,7 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
                                                      size=markers_size_list,
                                                      hover_data="id",
                                                      color='Z',
-                                                     color_continuous_scale=px.colors.diverging.Portland).select_traces()))
+                                                     color_continuous_scale=px.colors.diverging.Portland).select_traces())) #  https://plotly.com/python/builtin-colorscales/
         map_figure.update_layout(coloraxis={'colorscale': 'rainbow_r'})
     print(site_coords)
     map_figure.add_traces((go.Scattermapbox(
@@ -261,7 +261,7 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
         mode='markers',
         marker=go.scattermapbox.Marker(
             size=15,
-            color='rgb(0, 255, 0)',
+            color='rgb(0, 0, 0)',
             opacity=1
         ),
         hoverinfo='none'
