@@ -6,6 +6,7 @@ from dash.dependencies import Output, Input, State
 import requests as rq
 from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK, BASE_DIR
 
+AUTH = "http://127.0.0.1:8000/"
 app = DjangoDash("SignUpPage", external_stylesheets=stylesheets)
 
 app.layout = html.Div([
@@ -55,7 +56,7 @@ def register(clicks, username, email, password, data):
              "This password is entirely numeric.":"В пароле должны быть не только цифры!",
              'user with this email address already exists.':"Почта занята!"}
     print(data)
-    r = rq.post(f"{BASE_LINK}auth/users/", data={
+    r = rq.post(f"{AUTH}auth/users/", data={
         "username": username,
         "email": email,
         "password": password
@@ -70,9 +71,9 @@ def register(clicks, username, email, password, data):
             except:
                 text += i + "; "
         return text
-    r = rq.post(f"{BASE_LINK}auth/token/login/", data={"username": username, "password": password}).json()
+    r = rq.post(f"{AUTH}auth/token/login/", data={"username": username, "password": password}).json()
     if "auth_token" in r:
-        r = rq.get(f"{BASE_LINK}auth/users/me/", headers={"Authorization": f"Token {r['auth_token']}"}).json()
+        r = rq.get(f"{AUTH}auth/users/me/", headers={"Authorization": f"Token {r['auth_token']}"}).json()
         return dcc.Location(pathname=f"Logging/{r['id']}", id="someid_doesnt_matter")
     else:
         return no_update

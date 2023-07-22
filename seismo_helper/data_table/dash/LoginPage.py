@@ -8,7 +8,7 @@ import requests as rq
 from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK
 
 app = DjangoDash('LoginPage', external_stylesheets=stylesheets)
-
+AUTH = "http://127.0.0.1:8000/"
 app.layout = html.Div([
     navbar,
     html.H1('Войдите или зарегистрируйтесь', style={'margin-top': '10%', 'text-align': 'center', 'font-size': '25px'}),
@@ -46,9 +46,10 @@ def signupredir(n):
     prevent_initial_call=True,
 )
 def log_in(n_clicks, username, password):
-    r = rq.post(f"{BASE_LINK}auth/token/login/", data={"username": username, "password": password}).json()
+    r = rq.post(f"{AUTH}auth/token/login/", data={"username": username, "password": password}).json()
+    print(r)
     if "auth_token" in r:
-        r = rq.get(f"{BASE_LINK}auth/users/me/", headers={"Authorization": f"Token {r['auth_token']}"}).json()
+        r = rq.get(f"{AUTH}auth/users/me/", headers={"Authorization": f"Token {r['auth_token']}"}).json()
         return dcc.Location(pathname=f"Logging/{r['id']}", id="someid_doesnt_matter")
     else:
         return no_update

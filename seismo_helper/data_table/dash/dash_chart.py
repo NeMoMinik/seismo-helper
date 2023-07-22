@@ -1,18 +1,18 @@
-from dash import dcc, html, Input, Output, State
+from dash import dcc, html, Input, Output, State, Dash
 from django_plotly_dash import DjangoDash
 import plotly.graph_objects as go
 import numpy as np
 from plotly.subplots import make_subplots
 import requests as rq
 from data_table.dash.Pageblank import navbar, footer, stylesheets
-from seismo_helper.settings import ALLOWED_HOSTS, DATABASE_API
+from seismo_helper.settings import ALLOWED_HOSTS, DATABASE_API, BASE_LINK
 
-app = DjangoDash('Chart', external_stylesheets=stylesheets)
+app = DjangoDash('Chart', external_stylesheets=stylesheets, url_base_pathname=BASE_LINK)
 
 app.layout = html.Div([
     navbar,
     html.H1('Сейсмотрасса'),
-    html.Div(dcc.Graph(id="graph"), style={'margin-bottom':'10%'}),
+    html.Div(dcc.Graph(id="graph"), style={'margin-bottom': '10%'}),
     dcc.Input(id='id_event', type='hidden', value=''),
     dcc.Store(id='session', data=''),
     footer
