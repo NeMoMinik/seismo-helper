@@ -1,6 +1,6 @@
 # seismo-helper
 <p><a href="https://konkurs.sochisirius.ru" target="_blank">
-  <img src="project_data/ЛОГО (ЗЕЛЕНЫЙ).png" alt="Большие вызовы", style="width: 30%; height: 30%;">
+  <img src="seismo_helper/media/Photos_for_Front/ЛОГО (ЗЕЛЕНЫЙ).png" alt="Большие вызовы", style="width: 30%; height: 30%;">
 </a></p>
 
 ## Автоматический анализ сейсмической активности геологических сред
