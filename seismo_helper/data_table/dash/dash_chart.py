@@ -51,7 +51,7 @@ def update_line_chart(value, token):
             fig.add_trace(go.Scatter(x=[i["p_peak"] * i["timedelta"]],
                                      y=[0],
                                      mode='markers',
-                                     marker_symbol='cross-dot',  #  https://plotly.com/python/marker-style/
+                                     marker_symbol='cross-dot',  # https://plotly.com/python/marker-style/
                                         marker_line_color="black", marker_color="orange",
                                         marker_line_width=2, marker_size=15,
                                         hovertemplate="name: %{y}%{x}<br>number: %{marker.symbol}<extra></extra>",
