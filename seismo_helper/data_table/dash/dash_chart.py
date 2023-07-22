@@ -1,11 +1,11 @@
-from dash import dcc, html, Input, Output, State, Dash
+from dash import dcc, html, Input, Output, State
 from django_plotly_dash import DjangoDash
 import plotly.graph_objects as go
 import numpy as np
 from plotly.subplots import make_subplots
 import requests as rq
 from data_table.dash.Pageblank import navbar, footer, stylesheets
-from seismo_helper.settings import ALLOWED_HOSTS, DATABASE_API, BASE_LINK
+from seismo_helper.settings import DATABASE_API, BASE_LINK
 
 app = DjangoDash('Chart', external_stylesheets=stylesheets)
 

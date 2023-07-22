@@ -1,7 +1,7 @@
 import dash_mantine_components as dmc
 import dash_bootstrap_components as dbc
 from dash import html
-from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK, BASE_DIR
+from seismo_helper.settings import BASE_LINK, BASE_DIR
 import base64
 import os
 

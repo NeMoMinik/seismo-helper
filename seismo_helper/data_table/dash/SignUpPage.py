@@ -4,7 +4,6 @@ import dash_bootstrap_components as dbc
 from data_table.dash.Pageblank import footer, navbar, stylesheets
 from dash.dependencies import Output, Input, State
 import requests as rq
-from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK, BASE_DIR
 
 AUTH = "http://127.0.0.1:8000/"
 app = DjangoDash("SignUpPage", external_stylesheets=stylesheets)

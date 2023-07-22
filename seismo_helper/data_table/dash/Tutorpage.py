@@ -3,7 +3,7 @@ from django_plotly_dash import DjangoDash
 from data_table.dash.Pageblank import footer, navbar, stylesheets
 import os
 import base64
-from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK, BASE_DIR
+from seismo_helper.settings import BASE_DIR
 
 app = DjangoDash('TutorPage', external_stylesheets=stylesheets)
 
