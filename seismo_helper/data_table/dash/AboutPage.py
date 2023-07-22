@@ -35,7 +35,7 @@ app.layout = html.Div([
                 style={'text-align': 'center'}),
         dbc.Col([html.Div(images[2]), html.H3("Ольга Демидович"), html.P("DS Engineer, UX Designer")],
                 style={'text-align': 'center'}),
-        dbc.Col([html.Div(images[3]), html.H3("Борисенко Владислав"), html.P("Frontend Developer + UI & UX Designer")],
+        dbc.Col([html.Div(images[3]), html.H3("Борисенко Владислав"), html.P("Project manager, Frontend Developer + UI & UX Designer")],
                 style={'text-align': 'center'}),
         dbc.Col([html.Div(images[4]), html.H3("Шинелёв Маким"), html.P("ML Engineer")], style={'text-align': 'center'}),
     ]),

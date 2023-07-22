@@ -238,7 +238,7 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
                                           event['z'],
                                           event['magnitude'],
                                           event['id']])
-    print(events_list_table)
+    
     if len(events_list_table) != 0:
         map_df = pd.DataFrame(events_list_table)  # .sort_values(0)
 
