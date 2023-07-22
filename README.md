@@ -25,4 +25,7 @@
 
 <h2>Сборка docker-контейнера</h2>
 В директории проекта прописать <code>docker-compose -f docker-compose.prod up -d --build</code><br>
-Для просмотра логов <code>docker-compose -f docker-compose.prod logs</code>
+Для просмотра логов <code>docker-compose -f docker-compose.prod logs</code><br>
+При первом запуске вам потребуется выполнить следующие команды<br>
+<code>docker-compose -f docker-compose.prod exec web python manage.py makemigrations</code><br>
+<code>docker-compose -f docker-compose.prod exec web python manage.py migrate</code>
