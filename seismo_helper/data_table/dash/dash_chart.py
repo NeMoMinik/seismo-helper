@@ -49,7 +49,7 @@ def update_line_chart(value, token):
             fig.update_yaxes(title_text=st, col=1, row=n + 1)
         if i["p_peak"] is not None:
             fig.add_trace(go.Scatter(x=[i["p_peak"] * i["timedelta"]],
-                                     y=[0],
+                                     y=[d[i["p_peak"]]],
                                      mode='markers',
                                      marker_symbol='cross-dot',  # https://plotly.com/python/marker-style/
                                         marker_line_color="black", marker_color="orange",
@@ -62,7 +62,7 @@ def update_line_chart(value, token):
                           )
         if i["s_peak"] is not None:
             fig.add_trace(go.Scatter(x=[i["s_peak"] * i["timedelta"]],
-                                     y=[0],
+                                     y=[d[i["s_peak"]]],
                                      mode='markers',
                                      marker_symbol='x-dot',
                                         marker_line_color="black", marker_color="orange",
