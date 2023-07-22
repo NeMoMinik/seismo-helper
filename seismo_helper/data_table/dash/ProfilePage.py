@@ -29,7 +29,7 @@ def load_profile(aboba):
     style = {'margin-top': '1%', 'color': '#000000'}
     if aboba is not None:
         data = rq.get(f'http://{ALLOWED_HOSTS[0]}:8000/auth/users/me',
-                      headers={'Authorization': 'Token ' + aboba}).json()
+                      headers=aboba).json()
         global profile_data
         profile_data = data
         print(data)
@@ -41,7 +41,6 @@ def load_profile(aboba):
             dbc.Row(html.P(data['third_name']), id="third_name", style=style),
             dbc.Row(html.P(data['bio']), id="bio", style=style),
             dbc.Row(html.P(data['corporation']), id='corp', style=style),
-            dbc.Row(html.Button("Редактировать", id="edit"), style={'margin-top': '1%'}),
             dcc.Store('id', data=data['id'])]
         )
     else:
