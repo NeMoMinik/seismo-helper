@@ -1,4 +1,4 @@
-from dash import html, dcc, dash_table, no_update
+from dash import html, dcc, dash_table
 from django_plotly_dash import DjangoDash
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
