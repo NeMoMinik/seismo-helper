@@ -5,6 +5,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model
 import requests as rq
 from django.contrib.auth import login, logout
+from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK, BASE_DIR
 
 
 def get_token(request):
@@ -20,7 +21,7 @@ def get_table(request):
         update_output('Все локации', token["dash_context"]["session"]["data"])
         template = 'datatable/Datatable.html'
         return render(request, template, context=token)
-    return redirect('http://127.0.0.1:8000/Login/')
+    return redirect(f'{BASE_LINK}Login/')
 
 
 def get_chart(request, id_event):
@@ -72,14 +73,14 @@ def get_auth(request):
 def logging(request, user_id):
     u = get_user_model().objects.get(id=user_id)
     login(request, u)
-    return redirect("http://127.0.0.1:8000/About/")
+    return redirect(f"{BASE_LINK}About/")
 
 
 def get_logout(request):
-    r = rq.post("http://127.0.0.1:8000/auth/token/logout/").json()
+    r = rq.post(f"{BASE_LINK}auth/token/logout/").json()
     print(r)
     logout(request)
-    return redirect("http://127.0.0.1:8000/About/")
+    return redirect(f"{BASE_LINK}About/")
 
 
 def get_locations(request):
