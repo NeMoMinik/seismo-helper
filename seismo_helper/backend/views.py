@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 import requests as rq
 from django.contrib.auth import login, logout
 from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK, BASE_DIR
+AUTH = "http://127.0.0.1:8000/"
 
 
 def get_token(request):
@@ -77,7 +78,7 @@ def logging(request, user_id):
 
 
 def get_logout(request):
-    r = rq.post(f"{BASE_LINK}auth/token/logout/").json()
+    r = rq.post(f"{AUTH}auth/token/logout/").json()
     print(r)
     logout(request)
     return redirect(f"{BASE_LINK}About/")
