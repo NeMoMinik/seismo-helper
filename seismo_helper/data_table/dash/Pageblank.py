@@ -24,12 +24,12 @@ bvlogo = openImg('media/Photos_for_Front/BV_logo.png')
 
 navbar = dbc.NavbarSimple(
     children=[
-        dbc.NavItem(dbc.NavLink("Main Page", href=BASE_LINK + 'Events/')),
-        dbc.NavItem(dbc.NavLink("Tutorial", href=BASE_LINK + 'Tutorial')),
-        dbc.NavItem(dbc.NavLink("About", href=BASE_LINK + 'About/')),
-        dbc.NavItem(dbc.NavLink("Profile", href=BASE_LINK + 'Profile/')),
-        dbc.NavItem(dbc.NavLink("Log In", href=BASE_LINK + 'Login/')),
-        dbc.NavItem(dbc.NavLink("Log Out", href=BASE_LINK + 'Logout/'))
+        dbc.NavItem(dbc.NavLink("Main Page", href=BASE_LINK + 'Events/', target='_blank')),
+        dbc.NavItem(dbc.NavLink("Tutorial", href=BASE_LINK + 'Tutorial', target='_blank')),
+        dbc.NavItem(dbc.NavLink("About", href=BASE_LINK + 'About/', target='_blank')),
+        dbc.NavItem(dbc.NavLink("Profile", href=BASE_LINK + 'Profile/', target='_blank')),
+        dbc.NavItem(dbc.NavLink("Log In", href=BASE_LINK + 'Login/', target='_blank')),
+        dbc.NavItem(dbc.NavLink("Log Out", href=BASE_LINK + 'Logout/', target='_blank'))
     ],
     brand="Seismo-helper",
     brand_href=BASE_LINK,

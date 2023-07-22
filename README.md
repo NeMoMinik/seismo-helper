@@ -1,12 +1,12 @@
 # seismo-helper
 <p><a href="https://konkurs.sochisirius.ru" target="_blank">
-  <img src="project_data/ЛОГО (ЗЕЛЕНЫЙ).png" alt="Большие вызовы", style="width: 30%; height: 30%;">
+  <img src="seismo_helper/media/Photos_for_Front/ЛОГО (ЗЕЛЕНЫЙ).png" alt="Большие вызовы", style="width: 30%; height: 30%;">
 </a></p>
 
 ## Автоматический анализ сейсмической активности геологических сред
 Наш партнёр: [Газпромнефть](https://www.gazprom-neft.ru/)
 
-![ГРП](project_data/ГРП.gif)
+![ГРП](seismo_helper/media/Photos_for_Front/ГРП.gif)
 
 Наша цель:
 Создание сервиса для автоматического мониторинга сейсмической активности
@@ -21,4 +21,4 @@
 * 4 Web-сервис
   + Написали backend и frontend с RestAPI, создали дизайн
 
-![M1](project_data/M1.jpg)
+![M1](seismo_helper/media/Photos_for_Front/M1.jpg)

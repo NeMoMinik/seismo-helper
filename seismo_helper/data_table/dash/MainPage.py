@@ -349,10 +349,9 @@ def update_output(value, token):  # Функция для обновления �
     # Запросы в базу данных:
     events_list = rq.get(DATABASE_API + 'events/', headers=token).json()['results']
     stations_list = rq.get(DATABASE_API + 'stations/', headers=token).json()['results']
-    user = rq.get(f'http://{ALLOWED_HOSTS[0]}:8000/auth/users/me', headers=token).json()
+    user = rq.get(f'{BASE_LINK}auth/users/me', headers=token).json()
     locations_requested = rq.get(DATABASE_API + f'locations/?corporation={user["corporation"]}', headers=token).json()[
         'results']
-    print(events_list)
     if len(events_list) == 0 or len(stations_list) == 0:
         divs_children = [create_dropdown(locations_requested, value),
                          html.Div(dcc.Graph(figure=update_map(events_list, stations_list, value), id='mapD')),
@@ -378,7 +377,6 @@ def update_output(value, token):  # Функция для обновления �
     prevent_initial_call=True
 )
 def analyze(n, token):
-    print('dlrkgaelkrgrli b nr j qpeorjqerjqe po')
     events = rq.get(DATABASE_API + "events/", headers=token).json()['results']
     events = [i for i in events if len(i['traces']) > 2 and i['x'] is None]
     nn = NeuralNetworkUse(MODEL_DIR)

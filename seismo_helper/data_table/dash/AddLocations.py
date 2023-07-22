@@ -6,6 +6,7 @@ from data_table.dash.Pageblank import footer, navbar, stylesheets
 from dash.dependencies import Output, Input, State
 import requests as rq
 import pandas as pd
+from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK, BASE_DIR
 
 app = DjangoDash('AddLocations', external_stylesheets=stylesheets)
 
@@ -72,7 +73,7 @@ def update_output(n_clicks, name, token):
              "name": "Название",
              "This field may not be blank.": "Поле не может быть пустым.",
              "This field is required.": "Это поле обязательно"}
-    user = rq.get(f'http://{ALLOWED_HOSTS[0]}:8000/auth/users/me', headers=token).json()
+    user = rq.get(f'{BASE_LINK}auth/users/me', headers=token).json()
     data = {
         "name": name,
         "corporation": user["corporation"]

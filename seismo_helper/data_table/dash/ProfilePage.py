@@ -5,7 +5,7 @@ import dash_bootstrap_components as dbc
 from data_table.dash.Pageblank import footer, navbar, stylesheets
 from dash.dependencies import Output, Input, State
 import requests as rq
-from seismo_helper.settings import ALLOWED_HOSTS
+from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK
 
 app = DjangoDash('ProfilePage', external_stylesheets=stylesheets)
 global profile_data
@@ -87,6 +87,6 @@ def update_profile(n, user_id, token, *dat):
         else:
             d.pop(i)
     if len(d):
-        r = rq.patch(f'http://{ALLOWED_HOSTS[0]}:8000/auth/users/{user_id}/', headers=token, data=d)
+        r = rq.patch(f'{BASE_LINK}auth/users/{user_id}/', headers=token, data=d)
         print(r.content)
         return no_update

@@ -12,7 +12,7 @@ app = DjangoDash('Chart', external_stylesheets=stylesheets)
 app.layout = html.Div([
     navbar,
     html.H1('Сейсмотрасса'),
-    html.Div(dcc.Graph(id="graph"),style={'margin-bottom':'10%'}),
+    html.Div(dcc.Graph(id="graph"), style={'margin-bottom':'10%'}),
     dcc.Input(id='id_event', type='hidden', value=''),
     dcc.Store(id='session', data=''),
     footer
@@ -34,7 +34,7 @@ def update_line_chart(value, token):
     traces_requested = rq.get(f'{DATABASE_API}traces/?event={value}', headers=token).json()['results']
     fig = make_subplots(rows=len(traces_requested), cols=1, shared_xaxes=True, shared_yaxes=True)
     for n, i in enumerate(traces_requested):
-        st = rq.get(f"http://{ALLOWED_HOSTS[0]}:8000/api/stations/{i['station']}/", headers=token).json()['name']
+        st = rq.get(f"{DATABASE_API}stations/{i['station']}/", headers=token).json()['name']
         for color, j in enumerate(i['channels']):
             d = np.load(i['path'] + j)
             fig.add_trace(go.Scatter(x=[i for i in range(0, len(d) * i["timedelta"], i["timedelta"])],

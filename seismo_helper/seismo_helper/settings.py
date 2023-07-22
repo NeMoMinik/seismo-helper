@@ -27,10 +27,11 @@ DEBUG = int(os.environ.get("DEBUG", default=0))
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS",
                                default='127.0.0.1 localhost web'
                                ).split(" ")
-# Url for api
-DATABASE_API = f'http://{ALLOWED_HOSTS[0]}:8000/api/'
-
-BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:8000/'
+# Url for api'
+port = os.environ.get("PORT", "8000")
+print(port)
+BASE_LINK = f'http://{ALLOWED_HOSTS[0]}:{port}/'
+DATABASE_API = f'{BASE_LINK}api/'
 
 UPLOAD_DIRECTORY = str(BASE_DIR) + "/media/MiniSeed/"
 

@@ -4,6 +4,7 @@ import dash_bootstrap_components as dbc
 from data_table.dash.Pageblank import footer, navbar, stylesheets
 from dash.dependencies import Output, Input, State
 import requests as rq
+from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK, BASE_DIR
 
 app = DjangoDash("SignUpPage", external_stylesheets=stylesheets)
 
@@ -48,7 +49,7 @@ def signupredir(n):
 )
 def register(clicks, username, email, password, data):
     print(data)
-    r = rq.post("http://127.0.0.1:8000/auth/users/", data={
+    r = rq.post(f"{BASE_LINK}auth/users/", data={
         "username": username,
         "email": email,
         "password": password
@@ -57,9 +58,9 @@ def register(clicks, username, email, password, data):
     print(r.content)
     if r.status_code == 400:
         return no_update
-    r = rq.post("http://127.0.0.1:8000/auth/token/login/", data={"username": username, "password": password}).json()
+    r = rq.post(f"{BASE_LINK}auth/token/login/", data={"username": username, "password": password}).json()
     if "auth_token" in r:
-        r = rq.get("http://127.0.0.1:8000/auth/users/me/", headers={"Authorization": f"Token {r['auth_token']}"}).json()
+        r = rq.get(f"{BASE_LINK}auth/users/me/", headers={"Authorization": f"Token {r['auth_token']}"}).json()
         return dcc.Location(pathname=f"Logging/{r['id']}", id="someid_doesnt_matter")
     else:
         return no_update
