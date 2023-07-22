@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   web:
-    build: ./seismo_helper
+    image: nemominik/seismo-helper-web:v1.0
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - static_value:/seismo_helper/static/
