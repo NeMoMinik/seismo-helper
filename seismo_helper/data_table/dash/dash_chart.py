@@ -7,7 +7,7 @@ import requests as rq
 from data_table.dash.Pageblank import navbar, footer, stylesheets
 from seismo_helper.settings import ALLOWED_HOSTS, DATABASE_API, BASE_LINK
 
-app = DjangoDash('Chart', external_stylesheets=stylesheets, url_base_pathname=BASE_LINK)
+app = DjangoDash('Chart', external_stylesheets=stylesheets)
 
 app.layout = html.Div([
     navbar,
@@ -52,9 +52,9 @@ def update_line_chart(value, token):
                                      y=[d[i["p_peak"]]],
                                      mode='markers',
                                      marker_symbol='cross-dot',  # https://plotly.com/python/marker-style/
-                                        marker_line_color="black", marker_color="orange",
-                                        marker_line_width=2, marker_size=15,
-                                        hovertemplate="name: %{y}%{x}<br>number: %{marker.symbol}<extra></extra>",
+                                     marker_line_color="black", marker_color="orange",
+                                     marker_line_width=2, marker_size=15,
+                                     hovertemplate="name: %{y}%{x}<br>number: %{marker.symbol}<extra></extra>",
                                      name="P PEAK"
                                      ),
                           col=1,
@@ -65,9 +65,9 @@ def update_line_chart(value, token):
                                      y=[d[i["s_peak"]]],
                                      mode='markers',
                                      marker_symbol='x-dot',
-                                        marker_line_color="black", marker_color="orange",
-                                        marker_line_width=2, marker_size=15,
-                                        hovertemplate="name: %{y}%{x}<br>number: %{marker.symbol}<extra></extra>",
+                                     marker_line_color="black", marker_color="orange",
+                                     marker_line_width=2, marker_size=15,
+                                     hovertemplate="name: %{y}%{x}<br>number: %{marker.symbol}<extra></extra>",
                                      name="S PEAK"
                                      ),
                           col=1,
