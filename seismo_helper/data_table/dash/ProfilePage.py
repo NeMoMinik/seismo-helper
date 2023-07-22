@@ -41,7 +41,6 @@ def load_profile(aboba):
             dbc.Row(html.P(data['third_name']), id="third_name", style=style),
             dbc.Row(html.P(data['bio']), id="bio", style=style),
             dbc.Row(html.P(data['corporation']), id='corp', style=style),
-            dbc.Row(html.Button("Редактировать", id="edit"), style={'margin-top': '1%'}),
             dcc.Store('id', data=data['id'])]
         )
     else:
