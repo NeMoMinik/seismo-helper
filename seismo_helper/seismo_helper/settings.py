@@ -163,6 +163,7 @@ REST_FRAMEWORK = {
 
 DJOSER = {
     'CREATE_SESSION_ON_LOGIN': True,
-    'SERIALIZERS': dict(current_user='users.serializers.CustomUserSerializer', user='users.serializers.CustomUserSerializer',)
+    'SERIALIZERS': dict(current_user='users.serializers.CustomUserSerializer',
+        user='users.serializers.CustomUserSerializer',)
 }
 AUTH_USER_MODEL = "users.CustomUser"

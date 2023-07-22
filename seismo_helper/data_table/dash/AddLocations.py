@@ -5,7 +5,7 @@ from data_table.dash.Pageblank import footer, navbar, stylesheets
 from dash.dependencies import Output, Input, State
 import requests as rq
 import pandas as pd
-from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK, BASE_DIR
+from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK
 
 app = DjangoDash('AddLocations', external_stylesheets=stylesheets)
 

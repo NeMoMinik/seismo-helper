@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
-
 import numpy as np
+
 
 class NeuralNetwork(nn.Module):
     def __init__(self):
@@ -26,20 +26,20 @@ class NeuralNetwork(nn.Module):
         self.activation_3 = nn.Sigmoid()
 
     def forward(self, x):
-      x = self.conv_1(x)
-      x = self.batchnorm_1(x)
-      x = self.activation_1(x)
-      x = self.dropout_1(x)
+        x = self.conv_1(x)
+        x = self.batchnorm_1(x)
+        x = self.activation_1(x)
+        x = self.dropout_1(x)
 
-      x = self.conv_2(x)
-      x = self.batchnorm_2(x)
-      x = self.activation_2(x)
-      x = self.dropout_2(x)
+        x = self.conv_2(x)
+        x = self.batchnorm_2(x)
+        x = self.activation_2(x)
+        x = self.dropout_2(x)
 
-      x = self.conv_3(x)
-      x = self.activation_3(x)
+        x = self.conv_3(x)
+        x = self.activation_3(x)
 
-      return x
+        return x
 
 
 class NeuralNetworkUse:

@@ -4,6 +4,7 @@ from scipy.optimize import Bounds
 from scipy.optimize import fsolve
 from pyproj import Transformer
 
+
 def hypocentre_search(stations: list[list]) -> tuple:
     velocity = 6
     stations = np.array(stations)

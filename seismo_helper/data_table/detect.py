@@ -228,6 +228,6 @@ traces : dict
                 names.append(f'{name}_{channel[0]}.npy')
             paths.append(names)
             stations.append(name)
-        with open(path + f'/info.json', 'w') as outfile:
+        with open(path + '/info.json', 'w') as outfile:
             json.dump(js, outfile)
         return path, paths, stations

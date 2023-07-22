@@ -49,27 +49,31 @@ def update_line_chart(value, token):
             fig.update_yaxes(title_text=st, col=1, row=n + 1)
         if i["p_peak"] is not None:
             fig.add_trace(go.Scatter(x=[i["p_peak"] * i["timedelta"]],
-                                     y=[d[i["p_peak"]]],
-                                     mode='markers',
-                                     marker_symbol='cross-dot',  # https://plotly.com/python/marker-style/
-                                        marker_line_color="black", marker_color="orange",
-                                        marker_line_width=2, marker_size=15,
-                                        hovertemplate="name: %{y}%{x}<br>number: %{marker.symbol}<extra></extra>",
-                                     name="P PEAK"
-                                     ),
+                                    y=[d[i["p_peak"]]],
+                                    mode='markers',
+                                    marker_symbol='cross-dot',  # https://plotly.com/python/marker-style/
+                                    marker_line_color="black",
+                                    marker_color="orange",
+                                    marker_line_width=2,
+                                    marker_size=15,
+                                    hovertemplate="name: %{y}%{x}<br>number: %{marker.symbol}<extra></extra>",
+                                    name="P PEAK"
+                                    ),
                           col=1,
                           row=n + 1
                           )
         if i["s_peak"] is not None:
             fig.add_trace(go.Scatter(x=[i["s_peak"] * i["timedelta"]],
-                                     y=[d[i["s_peak"]]],
-                                     mode='markers',
-                                     marker_symbol='x-dot',
-                                        marker_line_color="black", marker_color="orange",
-                                        marker_line_width=2, marker_size=15,
-                                        hovertemplate="name: %{y}%{x}<br>number: %{marker.symbol}<extra></extra>",
-                                     name="S PEAK"
-                                     ),
+                                    y=[d[i["s_peak"]]],
+                                    mode='markers',
+                                    marker_symbol='x-dot',
+                                    marker_line_color="black",
+                                    marker_color="orange",
+                                    marker_line_width=2,
+                                    marker_size=15,
+                                    hovertemplate="name: %{y}%{x}<br>number: %{marker.symbol}<extra></extra>",
+                                    name="S PEAK"
+                                    ),
                           col=1,
                           row=n + 1
                           )

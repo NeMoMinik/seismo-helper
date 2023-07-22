@@ -1,9 +1,8 @@
 import obspy
-import numpy as np
 from datetime import datetime
 from data_table.detect import Detect
 import requests as rq
-from seismo_helper.settings import ALLOWED_HOSTS, DATABASE_API
+from seismo_helper.settings import DATABASE_API
 
 #  Функция, обрабатывающая загруженные miniseed-файлы и вызывающая детектор
 
@@ -27,8 +26,7 @@ def upload_miniseed(paths, location, token):
                 "z": None,
                 "location": location,
             }
-            r = rq.post(DATABASE_API + 'stations/', data=data, headers=token)
-        
+            r = rq.post(DATABASE_API + 'stations/', data=data, headers=token)        
         date = datetime.strptime(tarce[tarce.find('| ')+2:tarce.find(' - ')-8], '%Y-%m-%dT%H:%M:%S')
         Files.append([date, i])
         Times.append(date)
@@ -42,7 +40,7 @@ def upload_miniseed(paths, location, token):
             if j[0] == i:
                 A.append(j[1])
         sorted_files.append(A)
-    
+
     for list_names in sorted_files:
         detect_obj = Detect(list_names, str(location))
         events_list = detect_obj.detection()

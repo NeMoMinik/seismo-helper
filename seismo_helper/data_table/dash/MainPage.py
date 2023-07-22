@@ -100,27 +100,31 @@ app.layout = html.Div(
                     },
                     multiple=True
                 )),
-                html.Div(html.Button('Рассчитать', id='submit-val', n_clicks=0, style={
-                        'color': 'Black', 'width': '100%',
-                        'height': '40px',
-                        'lineHeight': '40px',
-                        'borderWidth': '1px',
-                        'borderStyle': 'dashed',
-                        'borderRadius': '5px',
-                        'textAlign': 'center',
-                        'vertical-align': 'middle',
-                        'margin-left': '10px',
-                        'margin-right': '10px',
-                        'background-color': 'white'
-                                           }))
-                
+                html.Div(html.Button('Рассчитать',
+                                     id='submit-val',
+                                     n_clicks=0,
+                                     style={'color': 'Black',
+                                        'width': '100%',
+                                        'height': '40px',
+                                        'lineHeight': '40px',
+                                        'borderWidth': '1px',
+                                        'borderStyle': 'dashed',
+                                        'borderRadius': '5px',
+                                        'textAlign': 'center',
+                                        'vertical-align': 'middle',
+                                        'margin-left': '10px',
+                                        'margin-right': '10px',
+                                        'background-color': 'white'
+                                        }))
+
                 ]),
                 dbc.Col(html.Div(
                     [dbc.NavItem(
                         dbc.NavLink("Добавить станции",
                                     href=f'http://{ALLOWED_HOSTS[0]}:8000/Stations/',
                                     target='_blank',
-                                    style={'color': 'Black', 'width': '95%',
+                                    style={'color': 'Black',
+                                           'width': '95%',
                                            'height': '40px',
                                            'lineHeight': '40px',
                                            'borderWidth': '1px',
@@ -135,7 +139,8 @@ app.layout = html.Div(
                             dbc.NavLink("Добавить локации",
                                         href=f'http://{ALLOWED_HOSTS[0]}:8000/Locations/',
                                         target='_blank',
-                                        style={'color': 'Black', 'width': '95%',
+                                        style={'color': 'Black',
+                                               'width': '95%',
                                                'height': '40px',
                                                'lineHeight': '40px',
                                                'borderWidth': '1px',
@@ -238,11 +243,11 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
                                           event['z'],
                                           event['magnitude'],
                                           event['id']])
-    
+
     if len(events_list_table) != 0:
         map_df = pd.DataFrame(events_list_table)  # .sort_values(0)
 
-        markers_size_list = [round(event[7],2) for event in events_list_table if event[7] is not None]
+        markers_size_list = [round(event[7], 2) for event in events_list_table if event[7] is not None]
         map_df.columns = ['№', 'Локация', 'Начало', 'Конец', 'X', 'Y', 'Z', 'Магнитуда', 'id']
 
         map_figure.add_traces(list(px.scatter_mapbox(map_df,
@@ -251,7 +256,7 @@ def update_map(requested_events=None, requested_stations=None, location=None):  
                                                      size=markers_size_list,
                                                      hover_data="id",
                                                      color='Z',
-                                                     color_continuous_scale=px.colors.diverging.Portland).select_traces())) #  https://plotly.com/python/builtin-colorscales/
+                                                     color_continuous_scale=px.colors.diverging.Portland).select_traces()))  # https://plotly.com/python/builtin-colorscales/
         map_figure.update_layout(coloraxis={'colorscale': 'rainbow_r'})
     print(site_coords)
     map_figure.add_traces((go.Scattermapbox(

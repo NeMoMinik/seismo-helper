@@ -19,7 +19,8 @@ class LocationSerializer(serializers.ModelSerializer):
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        fields = ('name', 'x', 'y', 'z', 'start', 'end', 'magnitude', 'location', 'id', 'traces')
+        fields = ('name', 'x', 'y', 'z', 'start', 'end',
+                  'magnitude', 'location', 'id', 'traces')
 
 
 class ChannelSerializer(serializers.ModelSerializer):
@@ -34,7 +35,8 @@ class TraceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Trace
-        fields = ('path', 'station', 'channels', 'event', 'timedelta', 'p_peak', 's_peak', 'id')
+        fields = ('path', 'station', 'channels', 'event',
+                  'timedelta', 'p_peak', 's_peak', 'id')
 
 
 class PostTraceSerializer(serializers.ModelSerializer):
@@ -42,7 +44,8 @@ class PostTraceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Trace
-        fields = ('path', 'station', 'channels', 'event', 'id', 'timedelta', 'p_peak', 's_peak')
+        fields = ('path', 'station', 'channels', 'event',
+                  'id', 'timedelta', 'p_peak', 's_peak')
 
     def create(self, validated_data):
         # print(validated_data)

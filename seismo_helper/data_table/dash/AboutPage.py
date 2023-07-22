@@ -24,7 +24,7 @@ app.layout = html.Div([
     navbar,
     html.H1('Сервис Seismo-helper', style={'text-align': 'center'}),
     html.P(
-        f"Seismo-helper - сервис для автоматизированного мониторинга сейсмической активности, инструкция по использованию находится в туториале."),
+        "Seismo-helper - сервис для автоматизированного мониторинга сейсмической активности, инструкция по использованию находится в туториале."),
     html.H2('Разработчики', style={'text-align': 'center'}),
     dbc.Row([
         dbc.Col([html.Div(images[0]), html.H3("Мастов Арсений"), html.P("Fullstack Developer")],

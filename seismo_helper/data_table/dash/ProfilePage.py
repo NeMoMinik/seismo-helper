@@ -13,7 +13,7 @@ app.layout = html.Div([
     html.H2('Ваш профиль', style={'margin-right': 'auto', 'margin-left': 'auto'}),
     html.Div(id='usrn', style={'margin-right': 'auto', 'margin-left': 'auto', 'width': '20%'}, children=[]),
     dcc.Store(id="session", data=None),
-    dbc.Row(html.Button("Редактировать", id="edit"), style={'margin-top':'1%', 'margin-right': 'auto', 'margin-left': 'auto', 'width': '20%'},),
+    dbc.Row(html.Button("Редактировать", id="edit"), style={'margin-top': '1%', 'margin-right': 'auto', 'margin-left': 'auto', 'width': '20%'},),
     html.Div(id="q", style={'margin-right': 'auto', 'margin-left': 'auto', 'width': '20%'}, children=[html.Div(id="q2")]),
     html.Div(id="hidden_div_for_callback"),
     footer
@@ -43,7 +43,7 @@ def load_profile(aboba):
             dcc.Store('id', data=data['id'])]
         )
     else:
-        return dcc.Location(pathname=f"Login/", id="someid_doesnt_matter")
+        return dcc.Location(pathname="Login/", id="someid_doesnt_matter")
 
 
 @app.callback(

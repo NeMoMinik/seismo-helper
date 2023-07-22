@@ -10,7 +10,10 @@ app = DjangoDash("SignUpPage", external_stylesheets=stylesheets)
 
 app.layout = html.Div([
     navbar,
-    html.H1('Регистрация', style={'margin-top': '10%', 'text-align': 'center', 'font-size': '25px'}),
+    html.H1('Регистрация',
+            style={'margin-top': '10%',
+                'text-align': 'center',
+                'font-size': '25px'}),
     html.Div([
         dbc.Col([
             dbc.Row(dcc.Input(id='username', placeholder='Имя пользователя', type='text'), style={'margin-top': '1%'}),
@@ -19,9 +22,14 @@ app.layout = html.Div([
             dbc.Row(html.Button('Регистрация', id='submit_val', n_clicks=0),
                     style={'margin-top': '1%'}),
             dbc.Row(html.Button('Войти', id='signinbutton', n_clicks=0),
-                    style={'margin-right': 'auto', 'text-align': 'center', 'margin-left': 'auto', 'margin-top': '5%',
+                    style={'margin-right': 'auto',
+                           'text-align': 'center',
+                           'margin-left': 'auto',
+                           'margin-top': '5%',
                            'width': '60%'}),
-        ])], style={'margin-right': 'auto', 'margin-left': 'auto', 'width': '20%'}),
+        ])], style={'margin-right': 'auto',
+                    'margin-left': 'auto',
+                    'width': '20%'}),
     dcc.Store(id="session", data=''),
     html.Div(id="hidden_div_for_callback"),
     html.Div(id="redirdiv"),
@@ -50,10 +58,10 @@ def signupredir(n):
 def register(clicks, username, email, password, data):
     stuff = {"email": "Адрес электронной почты",
              "Enter a valid email address.": "Введите корректный адрес",
-             "password":"Пароль",
-             "This password is too short. It must contain at least 8 characters.":"Минимальная длина пароля -- 8 симаолов",
-             "This password is entirely numeric.":"В пароле должны быть не только цифры!",
-             'user with this email address already exists.':"Почта занята!"}
+             "password": "Пароль",
+             "This password is too short. It must contain at least 8 characters.": "Минимальная длина пароля -- 8 симаолов",
+             "This password is entirely numeric.": "В пароле должны быть не только цифры!",
+             'user with this email address already exists.': "Почта занята!"}
     print(data)
     r = rq.post(f"{AUTH}auth/users/", data={
         "username": username,

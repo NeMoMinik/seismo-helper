@@ -21,7 +21,7 @@ class Magnitude:
         distances = []
         for i in range(station_coords.shape[0]):
             distances.append(sqrt((station_coords[i][0]-event_coord[0])**2+(station_coords[i][1]-event_coord[1])**2+(station_coords[i][2]-event_coord[2])**2))
-        return distances #список расстояний от станций до события
+        return distances  # список расстояний от станций до события
 
     def amplitude_calc(self) -> float:
         traces = self.traces
@@ -31,7 +31,7 @@ class Magnitude:
             amplitude = traces[i].max()
             amplitudes.append(amplitude*distances[i])
         original_amplitude = sum(amplitudes) / len(amplitudes)
-        return original_amplitude #амплитуда события
+        return original_amplitude  # амплитуда события
 
     def magnitude_calc(self) -> float:
         self.magnitude = log10(self.amplitude_calc()) * self.coefficient
@@ -39,4 +39,3 @@ class Magnitude:
 
     def __str__(self) -> str:
         return f"Magnitude object with coords: {self.event_coord} and magnitude: {self.magnitude}"
-    

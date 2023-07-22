@@ -1,5 +1,5 @@
 from dash import html, dcc, no_update, dash_table
-from seismo_helper.settings import ALLOWED_HOSTS, DATABASE_API
+from seismo_helper.settings import DATABASE_API
 from django_plotly_dash import DjangoDash
 from data_table.dash.Pageblank import footer, navbar, stylesheets
 from dash.dependencies import Output, Input, State
@@ -112,7 +112,6 @@ def update_output(n_clicks, x, y, z, name, loc_id, token):
         }
         r = rq.post(DATABASE_API + 'stations/', headers=token, data=data)
         text = "Успешно"
-        txtstyle = {'color': 'Green'}
         if r.status_code == 400:
             text = ''
             for i in r.json():

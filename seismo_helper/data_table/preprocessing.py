@@ -1,8 +1,4 @@
-import obspy
 from scipy import signal
-import scipy.io as sio
-import matplotlib.pyplot as plt
-import numpy as np
 
 
 class Preprocessing:

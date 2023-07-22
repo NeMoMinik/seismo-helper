@@ -5,7 +5,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model
 import requests as rq
 from django.contrib.auth import login, logout
-from seismo_helper.settings import ALLOWED_HOSTS, BASE_LINK, BASE_DIR
+from seismo_helper.settings import BASE_LINK
 AUTH = "http://127.0.0.1:8000/"
 
 
@@ -28,7 +28,8 @@ def get_table(request):
 def get_chart(request, id_event):
     template = 'datatable/Chart.html'
     token = get_token(request)
-    context = {'dash_context': {'id_event': {'value': id_event}, 'session': {"data": token['dash_context']['session']['data']}}}
+    context = {'dash_context': {'id_event': {'value': id_event},
+                                'session': {"data": token['dash_context']['session']['data']}}}
     response = render(request, template, context=context)
     return response
 
