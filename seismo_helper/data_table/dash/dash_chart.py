@@ -51,7 +51,10 @@ def update_line_chart(value, token):
             fig.add_trace(go.Scatter(x=[i["p_peak"] * i["timedelta"]],
                                      y=[0],
                                      mode='markers',
-                                     line=dict(color="#000000", width=20),
+                                     marker_symbol='cross-dot',  #  https://plotly.com/python/marker-style/
+                                        marker_line_color="black", marker_color="orange",
+                                        marker_line_width=2, marker_size=15,
+                                        hovertemplate="name: %{y}%{x}<br>number: %{marker.symbol}<extra></extra>",
                                      name="P PEAK"
                                      ),
                           col=1,
@@ -61,7 +64,10 @@ def update_line_chart(value, token):
             fig.add_trace(go.Scatter(x=[i["s_peak"] * i["timedelta"]],
                                      y=[0],
                                      mode='markers',
-                                     line=dict(color="#000000", width=20),
+                                     marker_symbol='x-dot',
+                                        marker_line_color="black", marker_color="orange",
+                                        marker_line_width=2, marker_size=15,
+                                        hovertemplate="name: %{y}%{x}<br>number: %{marker.symbol}<extra></extra>",
                                      name="S PEAK"
                                      ),
                           col=1,
